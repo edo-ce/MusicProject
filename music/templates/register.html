@@ -3,5 +3,56 @@
     Register Page
 {% endblock %}
 {% block content %}
-    
+    <form>
+      Email<br>
+      <input type="text" name="name"><br>
+      Username<br>
+      <input type="text" name="username"><br>
+      Password<br>
+      <input type="text" name="password"><br>
+        Gender<br>
+      <input type="text" name="gender"><br>
+        Nationality<br>
+      <input type="text" name="nationality"><br>
+        Birth date<br>
+      <input type="text" name="gender"><br><br>
+
+      <input type="checkbox" id="is_artist">
+      <label for="is_artist"> I'm an Artist</label><br>
+
+        <script>
+            //TODO
+            //initial condition
+            block = document.createElement('text');
+            block.id='not_artist';
+            block.innerText="NON sono un artista, aggiungo roba"
+            document.body.appendChild(block);
+
+            //checkbox
+            document.getElementById('is_artist').onclick = function() {
+                if(document.getElementById('is_artist').checked) {
+                    document.getElementById('is_artist').checked = true;
+                    //remove
+                    document.getElementById('not_artist').remove();
+                    //append
+                    block = document.createElement('text');
+                    block.id='yes_artist';
+                    block.innerText="sono un artista, aggiungo roba"
+                    document.body.appendChild(block);
+                }else{
+                    //remove
+                    document.getElementById('yes_artist').remove();
+                    //append
+                    block = document.createElement('text');
+                    block.id='not_artist';
+                    block.innerText="NON sono un artista, aggiungo roba"
+                    document.body.appendChild(block);
+                }
+                console.log(document.getElementById('is_artist').checked)
+            }
+
+
+        </script>
+    </form>
+
 {% endblock %}
