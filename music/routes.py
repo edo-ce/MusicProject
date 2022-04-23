@@ -1,6 +1,6 @@
 from music import app
 from flask import render_template, redirect, url_for
-from music.forms import RegisterForm, LoginForm
+from music.forms import SignUpForm, LoginForm
 
 
 @app.route('/')
@@ -9,13 +9,15 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    return render_template('register.html')
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignUpForm()
+    return render_template('signup.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     return render_template('login.html')
 
 

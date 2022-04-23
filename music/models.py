@@ -19,7 +19,6 @@ class Artist(User):
 
 class Listener(User):
     entry_date = db.Column(db.Date)
-    is_premium = db.Column(db.Boolean)
 
 # ------------------------------------------------------
 class Elements(db.Model):
@@ -59,7 +58,7 @@ class PaymentCard(db.Model):
     type = db.Column(db.String)
 
 #----------------------------------------------------
-class Premium(db.Model):
+class Premium(Listener):
     id = db.Column(db.Integer, primary_key=True)
     registration_date = db.Column(db.Date)
 
