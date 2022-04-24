@@ -1,18 +1,19 @@
 from flask_wtf import FlaskForm
 from music.models import User, Artist, Listener
-from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField
 from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError
+from wtforms.widgets import TextArea
 
 
 class SignUpForm(FlaskForm):
-    username = StringField(label='Username:', validators=[Length(min=3, max = 30), DataRequired()])
+    username = StringField(label='Username:', validators=[Length(min=2, max=30), DataRequired()])
     email = StringField(label='Email:', validators=[Email(), DataRequired()])
     name = StringField(label='Name:', validators=[Length(min=2, max=30), DataRequired()])
     surname = StringField(label='Surname:', validators=[Length(min=2, max=30), DataRequired()])
     password = PasswordField(label='Password:', validators=[Length(min=8), DataRequired()])
     password_check = PasswordField(label='Confirm Password:', validators=[EqualTo('password'), DataRequired()])
     nation = StringField(label='Nation:', validators=[Length(min=2, max=30), DataRequired()])
-    birthdate = DateField(label='Username:', validators=[DataRequired()]) # vedi DateField
+    birthdate = DateField(label='Username:', format='%d/%m/%Y', validators=[DataRequired()])
     gender = SelectField(label='Gender', choices=['M', 'F'])
     submit = SubmitField(label='Create Account')
 
@@ -26,7 +27,16 @@ class SignUpForm(FlaskForm):
         if email_res:
             raise ValidationError('Email already exists!')
 
+
 class LoginForm(FlaskForm):
     username = StringField(label='Username:', validators=[DataRequired()])
     password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Login')
+
+
+class PaymentForm(FlaskForm):
+    type = StringField(label='Card Type:', validators=[DataRequired()])
+    number = StringField(label='Card Number:', validators=[Length(min=13, max=19), DataRequired()])
+    holder = StringField(label='Holder:', validators=[Length(min=2, max=60), DataRequired()])
+    expiration_date = DateField(label='Expiration Date:', format='%d/%m/%Y', validators=[DataRequired()])
+    pin = StringField(label='Pin:', validators=[Length(min=3, max=4), DataRequired()])

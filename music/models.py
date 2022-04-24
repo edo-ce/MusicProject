@@ -1,5 +1,10 @@
-from music import db
+from music import db, login_manager
 from flask_login import UserMixin
+
+
+@login_manager.user_loader
+def load_user(username):
+    return User.query.get(username)
 
 # ------------------------------------------------------
 class User(db.Model):
@@ -11,6 +16,7 @@ class User(db.Model):
     gender = db.Column(db.String)
     country = db.Column(db.String)
     birth_date = db.Column(db.Date)
+
 
 class Artist(User):
     stage_name = db.Column(db.String)
@@ -58,7 +64,7 @@ class PaymentCard(db.Model):
     type = db.Column(db.String)
 
 #----------------------------------------------------
-class Premium(Listener):
+class Premium(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     registration_date = db.Column(db.Date)
 
