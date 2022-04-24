@@ -19,7 +19,7 @@ class SignUpForm(FlaskForm):
     def username_check(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
-            raise ValidationError('Username alrready exists!')
+            raise ValidationError('Username already exists!')
 
     def email_check(self, email):
         email_res = User.query.filter_by(email=email.data).first()
