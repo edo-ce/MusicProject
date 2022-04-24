@@ -3,56 +3,80 @@
     Sign-Up Page
 {% endblock %}
 {% block content %}
-    <form>
-      Email<br>
-      <input type="text" name="name"><br>
-      Username<br>
-      <input type="text" name="username"><br>
-      Password<br>
-      <input type="text" name="password"><br>
-        Gender<br>
-      <input type="text" name="gender"><br>
-        Nationality<br>
-      <input type="text" name="nationality"><br>
-        Birth date<br>
-      <input type="text" name="gender"><br><br>
 
-      <input type="checkbox" id="is_artist">
-      <label for="is_artist"> I'm an Artist</label><br>
+    <section class="container">
+        <form>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" class="form-control">
+                    <option selected>Choose...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="nazionality">Nazionality</label>
+                <input type="text" class="form-control" id="nazionality" name="nazionality" placeholder="Nazionality">
+            </div>
+            <div class="form-group">
+                <label for="birthdate">Birthdate</label>
+                <input type="date" class="form-control" id="birthdate" name="birthdate">
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="is_artist">
+                <label for="is_artist"> I'm an Artist</label>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </section>
 
-        <script>
-            //TODO
-            //initial condition
-            block = document.createElement('text');
-            block.id='not_artist';
-            block.innerText="NON sono un artista, aggiungo roba"
-            document.body.appendChild(block);
+    <script>
+        //TODO
+        //initial condition
+        block = document.createElement('text');
+        block.id='not_artist';
+        block.innerText="NON sono un artista, aggiungo roba"
+        document.body.appendChild(block);
 
-            //checkbox
-            document.getElementById('is_artist').onclick = function() {
-                if(document.getElementById('is_artist').checked) {
-                    document.getElementById('is_artist').checked = true;
-                    //remove
-                    document.getElementById('not_artist').remove();
-                    //append
-                    block = document.createElement('text');
-                    block.id='yes_artist';
-                    block.innerText="sono un artista, aggiungo roba"
-                    document.body.appendChild(block);
-                }else{
-                    //remove
-                    document.getElementById('yes_artist').remove();
-                    //append
-                    block = document.createElement('text');
-                    block.id='not_artist';
-                    block.innerText="NON sono un artista, aggiungo roba"
-                    document.body.appendChild(block);
-                }
-                console.log(document.getElementById('is_artist').checked)
+        //checkbox
+        document.getElementById('is_artist').onclick = function() {
+            if(document.getElementById('is_artist').checked) {
+                document.getElementById('is_artist').checked = true;
+                //remove
+                document.getElementById('not_artist').remove();
+                //append
+                block = document.createElement('text');
+                block.id='yes_artist';
+                block.innerText="sono un artista, aggiungo roba"
+                document.body.appendChild(block);
+            }else{
+                //remove
+                document.getElementById('yes_artist').remove();
+                //append
+                block = document.createElement('text');
+                block.id='not_artist';
+                block.innerText="NON sono un artista, aggiungo roba"
+                document.body.appendChild(block);
             }
+            console.log(document.getElementById('is_artist').checked)
+        }
 
 
-        </script>
-    </form>
+    </script>
 
 {% endblock %}
