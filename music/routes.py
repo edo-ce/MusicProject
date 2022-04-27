@@ -1,6 +1,6 @@
-from music import app, db, bcrypt
+from music import app, bcrypt, session
 from flask import render_template, redirect, url_for, flash
-from music.models import User, PaymentCard
+from music.models import User, Artist, Listener, Premium, PaymentCard
 from music.forms import SignUpForm, LoginForm, PaymentForm
 from flask_login import login_user, logout_user, login_required
 
@@ -21,10 +21,13 @@ def signup():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = session.query(User).filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             flash(f'Hi {user.username}! You are logged in', category='success')
+            artist = session.query(Artist).filter_by(username=user.username).first()
+            if artist:
+                return render_template('private_artist.html')
             return render_template('private_listener.html')
         else:
             flash('Username and password are not correct!', category='danger')
@@ -47,8 +50,8 @@ def premium():
         card = PaymentCard(number=form.number.data, security_code=form.pin.data,
                            expiration_date=form.expiration_date.data,
                            owner=form.holder.data, type=form.type.data)
-        db.session().add(card)
-        db.session.commit()
+        session.add(card)
+        session.commit()
         flash('Account Premium create successfully', category='success')
         return redirect(url_for('private'))
     return render_template('premium.html', form=form)

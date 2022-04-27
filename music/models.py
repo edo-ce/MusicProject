@@ -1,76 +1,136 @@
-from music import db, login_manager
+from music import login_manager, Base
 from flask_login import UserMixin
+from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 
 
 @login_manager.user_loader
 def load_user(username):
     return User.query.get(username)
 
-# ------------------------------------------------------
-class User(db.Model):
-    email = db.Column(db.String, primary_key=True)
-    password = db.Column(db.String(8))
-    username = db.Column(db.String)
-    name = db.Column(db.String)
-    surname = db.Column(db.String)
-    gender = db.Column(db.String)
-    country = db.Column(db.String)
-    birth_date = db.Column(db.Date)
+
+class User(Base, UserMixin):
+    __tablename__ = 'users'
+
+    username = Column(String, primary_key=True)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String(8), nullable=False)
+    name = Column(String, nullable=False)
+    lastname = Column(String, nullable=False)
+    gender = Column(String, nullable=False)
+    country = Column(String, nullable=False)
+    birth_date = Column(Date, nullable=False)
+
+    artists = relationship('Artist', back_populates='user')
+    listeners = relationship('Listener', back_populates='user')
 
 
 class Artist(User):
-    stage_name = db.Column(db.String)
-    is_solo = db.Column(db.Boolean)
-    bio = db.Column(db.String)
+    __tablename__ = 'artists'
+
+    id = Column(ForeignKey(User.username, ondelete='CASCADE'), primary_key=True)
+    stage_name = Column(String, nullable=False)
+    is_solo = Column(Boolean, nullable=False)
+    bio = Column(String, nullable=False)
+
+    user = relationship('User', back_populates='artists')
+
 
 class Listener(User):
-    entry_date = db.Column(db.Date)
+    __tablename__ = 'listeners'
 
-# ------------------------------------------------------
-class Elements(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
+    id = Column(ForeignKey(User.username, ondelete='CASCADE'), primary_key=True)
+    registration_date = Column(Date, nullable=False)
 
-class Album(Elements):
-    release_date = db.Column(db.Date)
-
-class Track(Elements):
-    duration = db.Column(db.String)
-    genre = db.Column(db.String)
-
-class Playlists(Elements):
-    is_private = db.Column(db.Boolean)
-    maker = db.Column(db.String)
-
-#-----------------------------------------------------
-class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.Date)
-    start_time = db.Column(db.Date)
-    end_time = db.Column(db.Date)
-    location = db.Column(db.String)
-    link = db.Column(db.String)
-
-class Genre(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-
-class PaymentCard(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    number = db.Column(db.String)
-    security_code = db.Column(db.String)
-    expiration_date = db.Column(db.Date)
-    owner = db.Column(db.String)
-    type = db.Column(db.String)
-
-#----------------------------------------------------
-class Premium(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    registration_date = db.Column(db.Date)
-
-class Follower(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    following_data = db.Column(db.Date)
+    user = relationship('User', back_populates='listeners')
+    premiums = relationship('Premium', back_populates='listener')
 
 
+class Element(Base):
+    __tablename__ = 'elements'
 
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+
+    albums = relationship('Album', back_populates='element')
+    tracks = relationship('Track', back_populates='element')
+    playlists = relationship('Playlist', back_populates='element')
+
+
+class Album(Element):
+    __tablename__ = 'albums'
+
+    id = Column(ForeignKey(Element.id), primary_key=True)
+    release_date = Column(Date, nullable=False)
+
+    element = relationship('Element', back_populates='albums')
+
+
+class Track(Element):
+    __tablename__ = 'tracks'
+
+    id = Column(ForeignKey(Element.id), primary_key=True)
+    duration = Column(String, nullable=False)
+    genre = Column(String, nullable=False)
+
+    element = relationship('Element', back_populates='tracks')
+
+
+class Playlists(Element):
+    __tablename__ = 'playlists'
+
+    id = Column(ForeignKey(Element.id), primary_key=True)
+    is_private = Column(Boolean, nullable=False)
+    maker = Column(String, nullable=False)
+
+    element = relationship('Element', back_populates='playlists')
+
+
+class Event(Base):
+    __tablename__ = 'events'
+
+    id = Column(Integer, primary_key=True)
+    date = Column(Date, nullable=False)
+    start_time = Column(String, nullable=False)
+    end_time = Column(String, nullable=False)
+    location = Column(String, nullable=False)
+    link = Column(String, nullable=False)
+
+
+class Genre(Base):
+    __tablename__ = 'genres'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+class PaymentCard(Base):
+    __tablename__ = 'payment_cards'
+
+    id = Column(Integer, primary_key=True)
+    number = Column(String, nullable=False)
+    security_code = Column(String, nullable=False)
+    expiration_date = Column(Date, nullable=False)
+    owner = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+
+    premiums = relationship('Premium', back_populates='card')
+
+
+class Premium(Listener):
+    __tablename__ = 'premiums'
+
+    id = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
+    registration_date = Column(Date, nullable=False)
+    # basta eliminare la carta per eliminare l'account premium
+    payment_card = Column(ForeignKey(PaymentCard.id, ondelete='CASCADE'), nullable=False)
+
+    listener = relationship('Listener', back_populates='premiums')
+    card = relationship('PaymentCard', back_populates='premiums')
+
+
+class Follower(Base):
+    __tablename__ = 'followers'
+
+    id = Column(Integer, primary_key=True)
+    following_date = Column(Date, nullable=False)
