@@ -1,8 +1,9 @@
 from music import app, bcrypt, session
 from flask import render_template, redirect, url_for, flash
 from music.models import User, Artist, Listener, Premium, PaymentCard
-from music.forms import SignUpForm, LoginForm, PaymentForm
+from music.forms import SignUpForm, LoginForm, PaymentForm, SearchForm
 from flask_login import login_user, logout_user, login_required
+from music.algorithms import search_func
 
 
 @app.route('/')
@@ -66,5 +67,7 @@ def private():
 @app.route('/search')
 @login_required
 def search():
-    return render_template('search.html')
+    form = SearchForm()
+    res = search_func(form.text.data)
+    return render_template('search.html', res=res)
 

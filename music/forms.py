@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from music.models import User, Artist, Listener
-from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
+    IntegerField, FieldList
 from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError
 from wtforms.widgets import TextArea
 
@@ -40,3 +41,29 @@ class PaymentForm(FlaskForm):
     holder = StringField(label='Holder:', validators=[Length(min=2, max=60), DataRequired()])
     expiration_date = DateField(label='Expiration Date:', format='%d/%m/%Y', validators=[DataRequired()])
     pin = StringField(label='Pin:', validators=[Length(min=3, max=4), DataRequired()])
+    submit = SubmitField(label='Login')
+
+
+class SearchForm(FlaskForm):
+    text = StringField(label='Search:', validators=[DataRequired()])
+    submit = SubmitField(label='Search')
+
+
+class TrackForm(FlaskForm):
+    title = StringField(label='Track Title:', validators=[DataRequired()])
+    copyright = StringField(label='Copyright:', validators=[DataRequired()])
+    genre = StringField(label='Copyright:', validators=[DataRequired()])
+    featuring = FieldList(StringField(label='Feat:', validators=[DataRequired()]))
+    submit = SubmitField(label='Upload')
+
+
+class AlbumForm(FlaskForm):
+    title = StringField(label='Album Title:', validators=[DataRequired()])
+    num_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired()])
+    submit = SubmitField(label='Upload')
+
+
+class PlaylistForm(FlaskForm):
+    title = StringField(label='Album Title:', validators=[DataRequired()])
+    private = BooleanField(label='Is Private:', validators=[DataRequired()])
+    submit = SubmitField(label='Upload')
