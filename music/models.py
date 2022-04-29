@@ -1,4 +1,4 @@
-from music import login_manager, Base
+from music import login_manager, Base, bcrypt
 from flask_login import UserMixin
 from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table
 from sqlalchemy.orm import relationship
@@ -19,11 +19,22 @@ class User(Base, UserMixin):
     lastname = Column(String, nullable=False)
     gender = Column(String, nullable=False)
     country = Column(String, nullable=False)
-    birth_date = Column(Date, nullable=False)
+    birthdate = Column(Date, nullable=False)
 
     artists = relationship('Artist', back_populates='user')
     listeners = relationship('Listener', back_populates='user')
     playlists = relationship('Playlist', back_populates='user')
+
+    @property
+    def mypassword(self):
+        return self.password
+
+    @mypassword.setter
+    def mypassword(self, psw):
+        self.password = bcrypt.generate_password_hash(psw).decode('utf-8')
+
+    def password_check(self, psw):
+        return bcrypt.check_password_hash(self.password, psw)
 
 
 class Artist(User):
