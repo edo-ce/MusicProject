@@ -1,0 +1,22 @@
+[data-theme="dark"] {
+  background-color: #111 !important;
+  color: #eee;
+}
+
+[data-theme="dark"] .bg-light .navbar-light .navbar-expand-lg {
+  background-color: #333 !important;
+  color: #eeeeee;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: #000 !important;
+  color: #eeeeee;
+}
+
+[data-theme="dark"] .bg-black {
+  background-color: #eee !important;
+}
+
+[data-theme="dark"] .custom-control-label {
+  color: #111111;
+}
