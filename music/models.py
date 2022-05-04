@@ -1,12 +1,12 @@
-from music import login_manager, Base, bcrypt
+from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
-from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table
+from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
 
 
 @login_manager.user_loader
-def load_user(username):
-    return User.query.get(username)
+def load_user(code):
+    return session.query(User).filter_by(username=code).first()
 
 
 class User(Base, UserMixin):
@@ -19,11 +19,11 @@ class User(Base, UserMixin):
     lastname = Column(String, nullable=False)
     gender = Column(String, nullable=False)
     country = Column(String, nullable=False)
-    birthdate = Column(Date, nullable=False)
+    birth_date = Column(Date, nullable=False)
 
-    artists = relationship('Artist', back_populates='user')
-    listeners = relationship('Listener', back_populates='user')
-    playlists = relationship('Playlist', back_populates='user')
+    artists = relationship('Artist', backref='user')
+    listeners = relationship('Listener', backref='user')
+    playlists = relationship('Playlist', backref='user')
 
     @property
     def mypassword(self):
@@ -37,7 +37,7 @@ class User(Base, UserMixin):
         return bcrypt.check_password_hash(self.password, psw)
 
 
-class Artist(User):
+class Artist(Base):
     __tablename__ = 'artists'
 
     id = Column(ForeignKey(User.username, ondelete='CASCADE'), primary_key=True)
@@ -45,19 +45,17 @@ class Artist(User):
     is_solo = Column(Boolean, nullable=False)
     bio = Column(String, nullable=False)
 
-    user = relationship('User', back_populates='artists')
-    followers = relationship('Follower', back_populates='artists')
+    followers = relationship('Follower', backref='artists')
 
 
-class Listener(User):
+class Listener(Base):
     __tablename__ = 'listeners'
 
     id = Column(ForeignKey(User.username, ondelete='CASCADE'), primary_key=True)
     registration_date = Column(Date, nullable=False)
 
-    user = relationship('User', back_populates='listeners')
-    premiums = relationship('Premium', back_populates='listener')
-    followers = relationship('Follower', back_populates='listeners')
+    followers = relationship('Follower', backref='listeners')
+    premiums_id = relationship('Premium', backref='listener_id')
 
 
 saved_elements = Table('saved_elements', Base.metadata,
@@ -71,9 +69,9 @@ class Element(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
 
-    albums = relationship('Album', back_populates='element')
-    tracks = relationship('Track', back_populates='element')
-    playlists = relationship('Playlist', back_populates='element')
+    albums = relationship('Album', backref='element')
+    tracks = relationship('Track', backref='element')
+    playlists = relationship('Playlist', backref='element')
 
     listeners = relationship("Listener", secondary=saved_elements, backref="elements")
 
@@ -84,7 +82,7 @@ class Genre(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
-    tracks = relationship('Track', back_populates='genre_id')
+    tracks = relationship('Track', backref='genre_id')
 
 
 featuring = Table('featuring', Base.metadata,
@@ -97,42 +95,34 @@ playlist_tracks = Table('playlist_tracks', Base.metadata,
                         Column('id_playlist', ForeignKey('playlists.id'), primary_key=True),)
 
 
-class Album(Element):
+class Album(Base):
     __tablename__ = 'albums'
 
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     release_date = Column(Date, nullable=False)
 
-    element = relationship('Element', back_populates='albums')
-    tracks = relationship('Track', back_populates='album_id')
+    tracks_in = relationship('Track', backref='album_in')
 
 
-class Track(Element):
+class Track(Base):
     __tablename__ = 'tracks'
 
     id = Column(ForeignKey(Element.id), primary_key=True)
     duration = Column(String, nullable=False)
     copyright = Column(String, nullable=False)
     genre = Column(ForeignKey(Genre.id, ondelete='CASCADE'), nullable=False)
-    album = Column(ForeignKey(Album.id, ondelete='CASCADE'), nullable=False)
+    album_id = Column(ForeignKey(Album.id, ondelete='CASCADE'), nullable=False)
 
-    element = relationship('Element', back_populates='tracks')
-    genre_id = relationship('Genre', back_populates='tracks')
-    album_id = relationship('Album', back_populates='tracks')
-
-    artists = relationship("Artist", secondary=featuring, backref="tracks")
-    playlists = relationship("Playlist", secondary=playlist_tracks, backref="tracks")
+    artists_feat = relationship("Artist", secondary=featuring, backref="tracks_feat")
+    playlists_id = relationship("Playlist", secondary=playlist_tracks, backref="tracks_id")
 
 
-class Playlists(Element):
+class Playlist(Base):
     __tablename__ = 'playlists'
 
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     is_private = Column(Boolean, nullable=False)
     creator = Column(ForeignKey(User.username, ondelete='CASCADE'), nullable=False)
-
-    element = relationship('Element', back_populates='playlists')
-    user = relationship('User', back_populates='playlists')
 
 
 event_participation = Table('event_participation', Base.metadata,
@@ -152,6 +142,10 @@ class Event(Base):
 
     artists = relationship("Artist", secondary=event_participation, backref="events")
 
+    __table_args__ = (
+        CheckConstraint('end_time > start_time'),
+    )
+
 
 class PaymentCard(Base):
     __tablename__ = 'payment_cards'
@@ -163,18 +157,15 @@ class PaymentCard(Base):
     owner = Column(String, nullable=False)
     type = Column(String, nullable=False)
 
-    premiums = relationship('Premium', back_populates='card')
+    premiums = relationship('Premium', backref='card')
 
 
-class Premium(Listener):
+class Premium(Base):
     __tablename__ = 'premiums'
 
-    id = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
-    registration_date = Column(Date, nullable=False)
+    premium_id = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
+    registration_date_p = Column(Date, nullable=False)
     payment_card = Column(ForeignKey(PaymentCard.id, ondelete='CASCADE'), nullable=False)
-
-    listener = relationship('Listener', back_populates='premiums')
-    card = relationship('PaymentCard', back_populates='premiums')
 
 
 class Follower(Base):
@@ -183,6 +174,3 @@ class Follower(Base):
     id_artist = Column(ForeignKey(Artist.id, ondelete='CASCADE'), primary_key=True)
     id_listener = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
     following_date = Column(Date, nullable=False)
-
-    artists = relationship('Artist', back_populates='followers')
-    listeners = relationship('Listener', back_populates='followers')

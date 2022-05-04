@@ -19,7 +19,7 @@ def signup():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data, password=form.password.data,
                     name=form.name.data, lastname=form.lastname, country=form.country, gender=form.gender.data,
-                    birthdate=form.birthdate.data)
+                    birth_date=form.birth_date.data)
         session.add(user)
         if form.is_artist.data:
             artist = Artist(id=form.username.data, stage_name=form.stage_name.data, is_solo=form.is_solo.data,
@@ -27,7 +27,7 @@ def signup():
             session.add(artist)
             session.commit()
             return render_template('private_artist.html')
-        listener = Listener(id=form.username.data, registration_date=date.today().strftime("%d/%m/%Y"))
+        listener = Listener(id=form.username.data, registration_date=date.today())
         session.add(listener)
         session.commit()
         return render_template('private_listener.html')
@@ -42,7 +42,7 @@ def login():
         if user and user.check_password(psw=form.password.data):
             login_user(user)
             flash(f'Hi {user.username}! You are logged in', category='success')
-            artist = session.query(Artist).filter_by(username=user.username).first()
+            artist = session.query(Artist).filter_by(id=user.username).first()
             if artist:
                 return render_template('private_artist.html')
             return render_template('private_listener.html')
@@ -67,8 +67,7 @@ def premium():
         card = PaymentCard(number=form.number.data, security_code=form.pin.data,
                            expiration_date=form.expiration_date.data,
                            owner=form.holder.data, type=form.type.data)
-        premium_listener = Premium(id=current_user.username, registration_date=date.today().strftime("%d/%m/%Y"),
-                                   payment_card=card.id)
+        premium_listener = Premium(id=current_user.username, registration_date=date.today(), payment_card=card.id)
         session.add(card)
         session.add(premium_listener)
         session.commit()
@@ -87,6 +86,6 @@ def private():
 @login_required
 def search():
     form = SearchForm()
-    res = search_func(form.text.data)
+    res = search_func(form.search.data, form.select.data)
     return render_template('search.html', res=res)
 

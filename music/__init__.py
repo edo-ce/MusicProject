@@ -7,7 +7,12 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-url = f"postgresql://postgres:{sys.argv[1]}@localhost/{sys.argv[2]}"
+# first = sys.argv[1]
+# second = sys.argv[2]
+first = 'postgres'
+second = 'musicsql'
+
+url = f"postgresql://postgres:{first}@localhost/{second}"
 if not database_exists(url):
     create_database(url)
 engine = create_engine(url, echo=False)
@@ -28,6 +33,6 @@ login_manager.login_message_category = "info"
 
 from music import models
 
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
 
 from music import routes

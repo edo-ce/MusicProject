@@ -14,7 +14,7 @@ class SignUpForm(FlaskForm):
     password = PasswordField(label='Password:', validators=[Length(min=8), DataRequired()])
     password_check = PasswordField(label='Confirm Password:', validators=[EqualTo('password'), DataRequired()])
     country = StringField(label='Country:', validators=[Length(min=2, max=30), DataRequired()])
-    birthdate = DateField(label='Username:', format='%d/%m/%Y', validators=[DataRequired()])
+    birth_date = DateField(label='Username:', format='%d/%m/%Y', validators=[DataRequired()])
     gender = SelectField(label='Gender', choices=['M', 'F'], validators=[DataRequired()])
     is_artist = BooleanField(label='Is Artist:', validators=[DataRequired()])
     stage_name = None

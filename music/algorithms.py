@@ -1,7 +1,7 @@
 from music import Base, engine, session
 
 
-def search_func(text):
+def search_func(text, select):
     pass
 
 
