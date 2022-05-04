@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}
+    Sign-Up Artist Page
+{% endblock %}
+{% block content %}
+<body class="text-center">
+    <section class="container">
+        <form method="POST", class="form-signup">
+            {{ form.hidden_tag() }}
+            <h1>Sign-Up Artist</h1>
+            <br>
+            {{ form.stage_name.label() }}
+            {{ form.stage_name(class="form-control", placeholder="Stage Name") }}
+            {{ form.solo_group.label() }}
+            {{ form.solo_group(class="form-control") }}
+            {{ form.bio.label() }}
+            {{ form.bio(class="form-control", value="Solo") }}
+            {%  endif %}
+            <br>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </section>
+</body>
+{% endblock %}

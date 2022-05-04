@@ -7,10 +7,8 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-# first = sys.argv[1]
-# second = sys.argv[2]
-first = 'postgres'
-second = 'musicsql'
+first = sys.argv[1]
+second = sys.argv[2]
 
 url = f"postgresql://postgres:{first}@localhost/{second}"
 if not database_exists(url):

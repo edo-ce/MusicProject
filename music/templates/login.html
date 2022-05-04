@@ -7,7 +7,7 @@
     <section class="container">
     <form method="POST" class="form-signin">
       {{ form.hidden_tag() }}
-      <h1>Login</h1>
+      <h1>Sign-In</h1>
       <br>
       {{ form.username.label() }}
       {{ form.username(class="form-control", placeholder="Username")}}
@@ -16,7 +16,7 @@
       <br>
       <small id="notSignedSpan" class="form-text text-muted">If you aren't registered yet <a href="{{ url_for('signup') }}"> Sign up</a></small>
       <div class="form-group">
-        {{ form.submit(class="btn btn-primary") }}
+          {{ form.submit(class="btn btn-primary") }}
       </div>
     </form>
     </section>

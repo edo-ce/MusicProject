@@ -1,7 +1,9 @@
+import flask
+
 from music import app, bcrypt, session
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from music.models import User, Artist, Listener, Premium, PaymentCard
-from music.forms import SignUpForm, LoginForm, PaymentForm, SearchForm
+from music.forms import SignUpForm, LoginForm, PaymentForm, SearchForm, SignUpFormArtist
 from flask_login import login_user, logout_user, login_required, current_user
 from music.algorithms import search_func
 from datetime import date
@@ -13,6 +15,21 @@ def home():
     return render_template('home.html')
 
 
+@app.route('/signup-artist', methods=['GET', 'POST'])
+def signup_artist():
+    form = SignUpFormArtist()
+    username = request.args['username']
+    if form.validate_on_submit():
+        artist = Artist(id=username, stage_name=form.stage_name.data, is_solo=(form.solo_group.data == 'Solo'),
+                        bio=form.bio.data)
+        session.add(artist)
+        session.commit()
+        login(session.query(User).filter_by(username=username).first())
+        flash(f"Artist account created successfully! You are logged in {artist.id}", category="success")
+        return render_template('private_artist.html')
+    return render_template('signup_artist.html', form=form)
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
@@ -21,16 +38,17 @@ def signup():
                     name=form.name.data, lastname=form.lastname, country=form.country, gender=form.gender.data,
                     birth_date=form.birth_date.data)
         session.add(user)
-        if form.is_artist.data:
-            artist = Artist(id=form.username.data, stage_name=form.stage_name.data, is_solo=form.is_solo.data,
-                            bio=form.bio.data)
-            session.add(artist)
-            session.commit()
-            return render_template('private_artist.html')
+        if form.user_type.data == 'Artist':
+            return redirect(url_for('signup_artist', username=user.username))
         listener = Listener(id=form.username.data, registration_date=date.today())
         session.add(listener)
         session.commit()
+        login(user)
+        flash(f"Listener account created successfully! You are logged in {user.username}", category="success")
         return render_template('private_listener.html')
+    if form.errors != {}:
+        for message in form.errors.values():
+            flash(f"Error: {message}", category="danger")
     return render_template('signup.html', form=form)
 
 

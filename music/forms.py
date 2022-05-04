@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from music.models import User, Artist, Listener
+from music.models import session, User, Artist, Listener
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
     IntegerField, FieldList, SearchField
 from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError
@@ -16,26 +16,25 @@ class SignUpForm(FlaskForm):
     country = StringField(label='Country:', validators=[Length(min=2, max=30), DataRequired()])
     birth_date = DateField(label='Username:', format='%d/%m/%Y', validators=[DataRequired()])
     gender = SelectField(label='Gender', choices=['M', 'F'], validators=[DataRequired()])
-    is_artist = BooleanField(label='Is Artist:', validators=[DataRequired()])
-    stage_name = None
-    is_solo = None
-    bio = None
+    user_type = SelectField(label='User Type:', choices=['Listener', 'Artist'], validators=[DataRequired()])
     submit = SubmitField(label='Create Account')
 
-    def add_artist(self):
-        self.stage_name = StringField(label='Stage Name:', validators=[Length(min=2, max=30), DataRequired()])
-        self.is_solo = BooleanField(label='Is Solo:', validators=[DataRequired()])
-        self.bio = TextAreaField(label='Bio:', validators=[DataRequired()])
-
     def username_check(self, username):
-        user = User.query.filter_by(username=username.data).first()
+        user = session.query(User).filter_by(username=username.data).first()
         if user:
             raise ValidationError('Username already exists!')
 
     def email_check(self, email):
-        email_res = User.query.filter_by(email=email.data).first()
+        email_res = session.query(User).filter_by(email=email.data).first()
         if email_res:
             raise ValidationError('Email already exists!')
+
+
+class SignUpFormArtist(FlaskForm):
+    stage_name = StringField(label='Stage Name:', validators=[Length(min=2, max=30), DataRequired()])
+    solo_group = SelectField(label='Solo/Group:', choices=['Solo', 'Group'], validators=[DataRequired()])
+    bio = TextAreaField(label='Bio:', validators=[DataRequired()])
+    submit = SubmitField(label='Create Account')
 
 
 class LoginForm(FlaskForm):
