@@ -53,7 +53,7 @@ class PaymentForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    choices = [('artist', 'artist'), ('track', 'track'), ('album', 'album'), ('playlist', 'playlist')]
+    choices = ['artists', 'tracks', 'albums', 'playlists']
     select = SelectField('Search Type:', choices=choices, validators=[DataRequired()])
     search = StringField('Search:', validators=[DataRequired()])
     submit = SubmitField(label='Search')

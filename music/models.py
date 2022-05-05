@@ -48,6 +48,7 @@ class Artist(Base):
     is_solo = Column(Boolean, nullable=False)
     bio = Column(String, nullable=False)
 
+    albums = relationship('Album', backref='artist')
     followers = relationship('Follower', backref='artists')
 
 
@@ -103,6 +104,7 @@ class Album(Base):
 
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     release_date = Column(Date, nullable=False)
+    artist_id = Column(ForeignKey(Artist.id, ondelete='CASCADE'), primary_key=True)
 
     tracks_in = relationship('Track', backref='album_in')
 

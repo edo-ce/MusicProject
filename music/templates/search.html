@@ -3,5 +3,19 @@
     Search Page
 {% endblock %}
 {% block content %}
-    
+<body class="text-center">
+    <section class="container">
+        <tbody>
+            {% if elem %}
+                {% for elem in res %}
+                    <tr>
+
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <h2>No result found!</h2>
+            {% endif %}
+        </tbody>
+    </section>
+</body>
 {% endblock %}

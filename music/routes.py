@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, flash, request
 from music.models import User, Artist, Listener, Premium, PaymentCard
 from music.forms import SignUpForm, LoginForm, PaymentForm, SearchForm, SignUpFormArtist
 from flask_login import login_user, logout_user, login_required, current_user
-from music.algorithms import search_func
+from music.algorithms import search_func, find_creator_artist
 from datetime import date
 
 
@@ -92,10 +92,15 @@ def premium():
     return render_template('premium.html', form=form)
 
 
-@app.route('/private-listener')
+@app.route('/private-listener', methods=['GET', 'POST'])
 @login_required
 def private_listener():
-    return render_template('private_listener.html')
+    form = SearchForm()
+    if form.validate_on_submit():
+        res = search_func(form.select.data, form.search.data)
+        # TODO trova i creator
+        return redirect(url_for('search', res=res))
+    return render_template('private_listener.html', form=form, music_type=form.select.data)
 
 
 @app.route('/private-artist')
@@ -107,7 +112,6 @@ def private_artist():
 @app.route('/search')
 @login_required
 def search():
-    form = SearchForm()
-    res = search_func(form.search.data, form.select.data)
+    res = request.args.get('res')
     return render_template('search.html', res=res)
 

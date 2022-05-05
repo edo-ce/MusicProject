@@ -3,5 +3,21 @@
     Listener Page
 {% endblock %}
 {% block content %}
-    
+<body class="text-center">
+    <section class="container">
+        <form method="POST", class="form-search">
+            {{ form.hidden_tag() }}
+            <h1>Sign-Up Premium</h1>
+            <br>
+            {{ form.select.label() }}
+            {{ form.select(class="form-control", value="tracks") }}
+            {{ form.search.label() }}
+            {{ form.search(class="form-control", placeholder="Search") }}
+            <br>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </section>
+</body>
 {% endblock %}
