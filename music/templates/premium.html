@@ -1,7 +1,29 @@
 {% extends 'base.html' %}
 {% block title %}
-    Premium Page
+    Sign-Up Premium
 {% endblock %}
 {% block content %}
-
+<body class="text-center">
+    <section class="container">
+        <form method="POST", class="form-signup-premium">
+            {{ form.hidden_tag() }}
+            <h1>Sign-Up Premium</h1>
+            <br>
+            {{ form.type.label() }}
+            {{ form.type(class="form-control", placeholder="Card Type") }}
+            {{ form.number.label() }}
+            {{ form.number(class="form-control", placeholder="Number") }}
+            {{ form.holder.label() }}
+            {{ form.holder(class="form-control", placeholder="Holder")}}
+            {{ form.expiration_date.label() }}
+            {{ form.expiration_date(class="form-control", placeholder="Expiration Date")}}
+            {{ form.pin.label() }}
+            {{ form.pin(class="form-control", placeholder="Pin") }}
+            <br>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </section>
+</body>
 {% endblock %}

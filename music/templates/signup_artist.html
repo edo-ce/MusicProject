@@ -5,7 +5,7 @@
 {% block content %}
 <body class="text-center">
     <section class="container">
-        <form method="POST", class="form-signup">
+        <form method="POST", class="form-signup-artist">
             {{ form.hidden_tag() }}
             <h1>Sign-Up Artist</h1>
             <br>
@@ -15,7 +15,6 @@
             {{ form.solo_group(class="form-control") }}
             {{ form.bio.label() }}
             {{ form.bio(class="form-control", value="Solo") }}
-            {%  endif %}
             <br>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}

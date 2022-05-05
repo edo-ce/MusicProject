@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from music.models import session, User, Artist, Listener
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
     IntegerField, FieldList, SearchField
-from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError
+from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired
 from wtforms.widgets import TextArea
 
 
@@ -14,7 +14,7 @@ class SignUpForm(FlaskForm):
     password = PasswordField(label='Password:', validators=[Length(min=8), DataRequired()])
     password_check = PasswordField(label='Confirm Password:', validators=[EqualTo('password'), DataRequired()])
     country = StringField(label='Country:', validators=[Length(min=2, max=30), DataRequired()])
-    birth_date = DateField(label='Username:', format='%d/%m/%Y', validators=[DataRequired()])
+    birth_date = DateField(label='Birth Date:', validators=[InputRequired()])
     gender = SelectField(label='Gender', choices=['M', 'F'], validators=[DataRequired()])
     user_type = SelectField(label='User Type:', choices=['Listener', 'Artist'], validators=[DataRequired()])
     submit = SubmitField(label='Create Account')
@@ -34,7 +34,7 @@ class SignUpFormArtist(FlaskForm):
     stage_name = StringField(label='Stage Name:', validators=[Length(min=2, max=30), DataRequired()])
     solo_group = SelectField(label='Solo/Group:', choices=['Solo', 'Group'], validators=[DataRequired()])
     bio = TextAreaField(label='Bio:', validators=[DataRequired()])
-    submit = SubmitField(label='Create Account')
+    submit = SubmitField(label='Create Artist Account')
 
 
 class LoginForm(FlaskForm):
@@ -47,9 +47,9 @@ class PaymentForm(FlaskForm):
     type = StringField(label='Card Type:', validators=[DataRequired()])
     number = StringField(label='Card Number:', validators=[Length(min=13, max=19), DataRequired()])
     holder = StringField(label='Holder:', validators=[Length(min=2, max=60), DataRequired()])
-    expiration_date = DateField(label='Expiration Date:', format='%d/%m/%Y', validators=[DataRequired()])
+    expiration_date = DateField(label='Expiration Date:', validators=[DataRequired()])
     pin = StringField(label='Pin:', validators=[Length(min=3, max=4), DataRequired()])
-    submit = SubmitField(label='Login')
+    submit = SubmitField(label='Upgrade to Premium')
 
 
 class SearchForm(FlaskForm):

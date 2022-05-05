@@ -25,6 +25,9 @@ class User(Base, UserMixin):
     listeners = relationship('Listener', backref='user')
     playlists = relationship('Playlist', backref='user')
 
+    def get_id(self):
+        return self.username
+
     @property
     def mypassword(self):
         return self.password
@@ -152,7 +155,7 @@ class PaymentCard(Base):
 
     id = Column(Integer, primary_key=True)
     number = Column(String, nullable=False)
-    security_code = Column(String, nullable=False)
+    pin = Column(String, nullable=False)
     expiration_date = Column(Date, nullable=False)
     owner = Column(String, nullable=False)
     type = Column(String, nullable=False)
@@ -163,8 +166,8 @@ class PaymentCard(Base):
 class Premium(Base):
     __tablename__ = 'premiums'
 
-    premium_id = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
-    registration_date_p = Column(Date, nullable=False)
+    id = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
+    registration_date = Column(Date, nullable=False)
     payment_card = Column(ForeignKey(PaymentCard.id, ondelete='CASCADE'), nullable=False)
 
 
