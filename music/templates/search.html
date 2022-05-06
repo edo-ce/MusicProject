@@ -5,17 +5,19 @@
 {% block content %}
 <body class="text-center">
     <section class="container">
-        <tbody>
-            {% if elem %}
-                {% for elem in res %}
-                    <tr>
-
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <h2>No result found!</h2>
-            {% endif %}
-        </tbody>
+        <form method="POST", class="form-search">
+            {{ form.hidden_tag() }}
+            <h1>Search Music</h1>
+            <br>
+            {{ form.select.label() }}
+            {{ form.select(class="form-control", value="tracks") }}
+            {{ form.search.label() }}
+            {{ form.search(class="form-control", placeholder="Search") }}
+            <br>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
     </section>
 </body>
 {% endblock %}

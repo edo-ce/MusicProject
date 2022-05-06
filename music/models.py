@@ -2,6 +2,7 @@ from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
 from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
+from music.algorithms import get_title, is_artist
 
 
 @login_manager.user_loader
@@ -39,6 +40,9 @@ class User(Base, UserMixin):
     def password_check(self, psw):
         return bcrypt.check_password_hash(self.password, psw)
 
+    def __repr__(self):
+        return f"<User(username={self.username}, password={self.password}, email={self.email})>"
+
 
 class Artist(Base):
     __tablename__ = 'artists'
@@ -50,6 +54,9 @@ class Artist(Base):
 
     albums = relationship('Album', backref='artist')
     followers = relationship('Follower', backref='artists')
+
+    def __repr__(self):
+        return f"Stage Name: {self.stage_name}"
 
 
 class Listener(Base):
@@ -108,6 +115,9 @@ class Album(Base):
 
     tracks_in = relationship('Track', backref='album_in')
 
+    def number_of_tracks(self):
+        return session.query(Album).join(Track).filter_by(id=self.id).count()
+
 
 class Track(Base):
     __tablename__ = 'tracks'
@@ -121,6 +131,16 @@ class Track(Base):
     artists_feat = relationship("Artist", secondary=featuring, backref="tracks_feat")
     playlists_id = relationship("Playlist", secondary=playlist_tracks, backref="tracks_id")
 
+    def get_album(self):
+        return session.query(Album).filter_by(id=self.album_id).first()
+
+    # TODO vedere aggiungere genere
+    def __repr__(self):
+        album_name = 'Album: single'
+        if self.get_album().number_of_tracks() > 1:
+            album_name = f'Album: {get_title(self.get_album())}'
+        return f"Title: {get_title(self.id)}, {album_name}, Duration: {self.duration}"
+
 
 class Playlist(Base):
     __tablename__ = 'playlists'
@@ -128,6 +148,15 @@ class Playlist(Base):
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     is_private = Column(Boolean, nullable=False)
     creator = Column(ForeignKey(User.username, ondelete='CASCADE'), nullable=False)
+
+    def __repr__(self):
+        private = 'Public'
+        if self.is_private:
+            private = 'Private'
+        creator_name = self.creator
+        if is_artist(self.creator):
+            creator_name = is_artist(self.creator).stage_name
+        return f"Title: {get_title(self.id)}, State: {private}, Creator: {creator_name}"
 
 
 event_participation = Table('event_participation', Base.metadata,
