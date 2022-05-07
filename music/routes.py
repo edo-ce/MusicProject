@@ -55,7 +55,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = session.query(User).filter_by(username=form.username.data).first()
-        if user and user.check_password(psw=form.password.data):
+        if user and user.password_check(psw=form.password.data):
             login_user(user)
             flash(f'Hi {user.username}! You are logged in', category='success')
             return redirect(url_for('private'))

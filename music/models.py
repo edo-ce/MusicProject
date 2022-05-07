@@ -2,8 +2,7 @@ from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
 from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
-from music.algorithms import get_title, is_artist
-
+# from music.algorithms import is_artist, get_title
 
 @login_manager.user_loader
 def load_user(code):
@@ -135,11 +134,13 @@ class Track(Base):
         return session.query(Album).filter_by(id=self.album_id).first()
 
     # TODO vedere aggiungere genere
+    '''
     def __repr__(self):
         album_name = 'Album: single'
         if self.get_album().number_of_tracks() > 1:
             album_name = f'Album: {get_title(self.get_album())}'
         return f"Title: {get_title(self.id)}, {album_name}, Duration: {self.duration}"
+    '''
 
 
 class Playlist(Base):
@@ -149,6 +150,7 @@ class Playlist(Base):
     is_private = Column(Boolean, nullable=False)
     creator = Column(ForeignKey(User.username, ondelete='CASCADE'), nullable=False)
 
+    '''
     def __repr__(self):
         private = 'Public'
         if self.is_private:
@@ -157,6 +159,7 @@ class Playlist(Base):
         if is_artist(self.creator):
             creator_name = is_artist(self.creator).stage_name
         return f"Title: {get_title(self.id)}, State: {private}, Creator: {creator_name}"
+    '''
 
 
 event_participation = Table('event_participation', Base.metadata,
