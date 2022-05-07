@@ -4,32 +4,32 @@
 {% endblock %}
 {% block content %}
 <body class="text-center">
-    <section class="container">
-        <form method="POST", class="form-signup">
+    <section class="container justify-content-center">
+        <form method="POST", class="form-signup w-50" style="margin-left: auto; margin-right: auto;">
             {{ form.hidden_tag() }}
             <h1>Sign-Up</h1>
             <br>
-            {{ form.username.label() }}
-            {{ form.username(class="form-control", placeholder="Username") }}
-            {{ form.email.label() }}
-            {{ form.email(class="form-control", placeholder="Email") }}
-            {{ form.password.label() }}
-            {{ form.password(class="form-control", placeholder="Password")}}
-            {{ form.password_check.label() }}
-            {{ form.password_check(class="form-control", placeholder="Confirm Password")}}
-            {{ form.name.label() }}
-            {{ form.name(class="form-control", placeholder="Name") }}
-            {{ form.lastname.label() }}
-            {{ form.lastname(class="form-control", placeholder="Lastname") }}
-            {{ form.country.label() }}
-            {{ form.country(class="form-control", placeholder="Country") }}
-            {{ form.birth_date.label() }}
-            {{ form.birth_date(class="form-control", placeholder="Birth Date") }}
-            {{ form.gender.label() }}
-            {{ form.gender(class="form-control", value="M") }}
-            {{ form.user_type.label() }}
-            {{ form.user_type(class="form-control", value="Listener") }}
             <br>
+            {% with my_array='username email password password_check name lastname country birth_date gender user_type', cl='form-control' %}
+                {% for x in my_array.split() %}
+                <div>
+                    {{ form[x].label() }}
+                    {% if form[x].type != "SelectField" %}
+                        {% if x != "password_check" %}
+                            {{ form[x](class=cl, placeholder=x.capitalize()) }}
+                        {% else %}
+                            {{ form[x](class=cl, placeholder="Confirm Password") }}
+                        {% endif %}
+                    {% else %}
+                        {% if x == "gender" %}
+                            {{ form[x](class=cl, value="M") }}
+                        {% elif x == "user_type" %}
+                            {{ form[x](class=cl, value="Listener") }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endwith %}
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
             </div>
