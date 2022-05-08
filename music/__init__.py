@@ -1,4 +1,4 @@
-import sys
+from music.config.config import config_diz as cf
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -7,10 +7,8 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-first = sys.argv[1]
-second = sys.argv[2]
 
-url = f"postgresql://postgres:{first}@localhost/{second}"
+url = f"postgresql://{cf['username']}:{cf['password']}@{cf['address']}/{cf['database']}"
 if not database_exists(url):
     create_database(url)
 engine = create_engine(url, echo=False)
