@@ -171,6 +171,7 @@ class Event(Base):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
+    name = Column(Integer, nullable=False)
     date = Column(Date, nullable=False)
     start_time = Column(String, nullable=False)
     end_time = Column(String, nullable=False)

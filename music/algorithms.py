@@ -1,8 +1,16 @@
 from music import session
-from music.models import Element, Track, Album, Playlist, Artist, Listener, User, saved_elements, Follower
+from music.models import Element, Track, Album, Playlist, Artist, Listener, saved_elements, Follower, Event, \
+    event_participation
 from sqlalchemy import func
 
 # TODO controllare tutto il testo con lowercase
+
+def commit():
+    session.commit()
+
+
+def rollback():
+    session.rollback()
 
 
 def search_func(select, text):
@@ -17,6 +25,7 @@ def search_func(select, text):
 
 def find_saved_elements(listener):
     elems = {'albums': [], 'tracks': [], 'artists': [], 'playlists': []}
+
     for elem in elems.keys():
         if elem != 'artists':
             res = session.query(Element.title).join(elem).join(saved_elements).join(Listener)\
@@ -25,6 +34,24 @@ def find_saved_elements(listener):
             res = session.query(Artist.stage_name).join(Follower).join(Listener).where(Listener.id == listener).all()
         for i in res:
             elems[elem].append(i)
+
+    return elems
+
+
+def display_artist_contents(artist):
+    elems = {'albums': [], 'playlists': [], 'events': []}
+
+    res = session.query(Element.title).join(Album).where(Album.artist_id == artist).all()
+    for i in res:
+        elems['albums'].append(i)
+    res = session.query(Element.title).join(Playlist).where(Playlist.creator == artist).all()
+    for i in res:
+        elems['playlists'].append(i)
+    res = session.query(Event.name, Event.date).join(event_participation).join(Artist).where(Artist.id == artist)\
+        .order_by(Event.date).all()
+    for i in res:
+        elems['events'].append(i[0] + ' ' + i[1])
+
     return elems
 
 
@@ -50,6 +77,45 @@ def find_album(code):
 
 def find_track(code):
     return session.query(Element).join(Track).where(Track.id == code).first()
+
+
+def update_user_info():
+    pass
+
+
+def update_artist_info():
+    pass
+
+
+def delete_premium_account():
+    pass
+
+
+def get_table(table):
+    return session.query(table).all()
+
+
+def add_and_commit(table, **kwargs):
+    try:
+        session.add(table(**kwargs))
+        commit()
+    except Exception as e:
+        rollback()
+        raise e
+
+
+def add_no_commit(table, **kwargs):
+    session.add(table(**kwargs))
+
+
+def delete_tuple(table, id):
+    try:
+        # vedere con user
+        session.query(table).filter_by(id=id).delete()
+        commit()
+    except Exception as e:
+        rollback()
+        raise e
 
 
 def advice_func():

@@ -2,6 +2,7 @@
 """A simple script that searches for a release in the MusicBrainz.
  $ ./populate.py Gemitaiz Kepler
 """
+"""
 import musicbrainzngs
 import sys
 import json
@@ -70,4 +71,4 @@ if __name__ == '__main__':
         print ("rollback")
 
     session.commit()
-
+"""

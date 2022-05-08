@@ -101,13 +101,15 @@ def private():
 @login_required
 def private_listener():
     saved_elements = find_saved_elements(current_user.username)
+
     return render_template('private_listener.html', elems=saved_elements)
 
 
 @app.route('/private-artist')
 @login_required
 def private_artist():
-    return render_template('private_artist.html')
+    form = SearchForm()
+    return render_template('private_artist.html', form=form)
 
 
 @app.route('/search', methods=['GET', 'POST'])
