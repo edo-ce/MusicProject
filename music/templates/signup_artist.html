@@ -9,12 +9,21 @@
             {{ form.hidden_tag() }}
             <h1>Sign-Up Artist</h1>
             <br>
-            {{ form.stage_name.label() }}
-            {{ form.stage_name(class="form-control", placeholder="Stage Name") }}
+            {% with array='stage_name solo_group bio' %}
+                {% for x in array.split() %}
+                    {{ form[x].label() }}
+                    {{ form[x](class="form-control", placeholder=x.capitalize().replace('_', ' ')) }}
+                {% endfor %}
+            {% endwith %}
+
+
+            <!--
             {{ form.solo_group.label() }}
             {{ form.solo_group(class="form-control") }}
             {{ form.bio.label() }}
             {{ form.bio(class="form-control", value="Solo") }}
+            -->
+
             <br>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}

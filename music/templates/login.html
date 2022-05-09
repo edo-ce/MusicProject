@@ -9,10 +9,12 @@
       {{ form.hidden_tag() }}
       <h1>Sign-In</h1>
       <br>
-      {{ form.username.label() }}
-      {{ form.username(class="form-control", placeholder="Username")}}
-      {{ form.password.label() }}
-      {{ form.password(class="form-control", placeholder="Password")}}
+        {% with array='username password' %}
+            {% for x in array.split() %}
+                {{ form[x].label() }}
+                {{ form[x](class="form-control", placeholder=x.capitalize())}}
+            {% endfor %}
+        {% endwith %}
       <br>
       <small id="notSignedSpan" class="form-text text-muted">If you aren't registered yet <a href="{{ url_for('signup') }}"> Sign up</a></small>
       <div class="form-group">
