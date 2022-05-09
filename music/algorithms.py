@@ -53,8 +53,15 @@ def display_artist_contents(artist):
     return elems
 
 
+# GET
+
+
 def get_user(code):
-    return session.query(User).filter_by(User.username == code).first()
+    return session.query(User).filter(User.username == code).first()
+
+
+def get_artists_events(code):
+    return session.query(Event).join(event_participation).join(Artist).where(Artist.id == code).all()
 
 
 def get_artist_albums(code):
@@ -117,15 +124,19 @@ def get_table(table):
 
 def add_and_commit(table, **kwargs):
     try:
-        session.add(table(**kwargs))
+        elem = table(**kwargs)
+        session.add(elem)
         commit()
+        return elem
     except Exception as e:
         rollback()
         raise e
 
 
 def add_no_commit(table, **kwargs):
-    session.add(table(**kwargs))
+    elem = table(**kwargs)
+    session.add(elem)
+    return elem
 
 
 def delete_tuple(table, id):

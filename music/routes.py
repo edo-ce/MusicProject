@@ -17,12 +17,10 @@ def signup_artist():
     form = SignUpFormArtist()
     username = request.args['username']
     if form.validate_on_submit():
-        artist = Artist(id=username, stage_name=form.stage_name.data, is_solo=(form.solo_group.data == 'Solo'),
+        add_and_commit(Artist, id=username, stage_name=form.stage_name.data, is_solo=(form.solo_group.data == 'Solo'),
                         bio=form.bio.data)
-        session.add(artist)
-        session.commit()
-        login_user(session.query(User).filter_by(username=username).first())
-        flash(f"Artist account created successfully! You are logged in {artist.id}", category="success")
+        login_user(get_user(username))
+        flash(f"Artist account created successfully! You are logged in {username}", category="success")
         return redirect(url_for('private_artist'))
     return render_template('signup_artist.html', form=form)
 
@@ -31,17 +29,14 @@ def signup_artist():
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data,
+        add_no_commit(User, username=form.username.data, email=form.email.data, password=form.password.data,
                     name=form.name.data, lastname=form.lastname.data, country=form.country.data,
                     gender=form.gender.data, birth_date=form.birth_date.data)
-        session.add(user)
         if form.user_type.data == 'Artist':
-            return redirect(url_for('signup_artist', username=user.username))
-        listener = Listener(id=form.username.data, registration_date=date.today())
-        session.add(listener)
-        session.commit()
-        login_user(user)
-        flash(f"Listener account created successfully! You are logged in {user.username}", category="success")
+            return redirect(url_for('signup_artist', username=form.username.data))
+        add_and_commit(Listener, id=form.username.data, registration_date=date.today())
+        login_user(get_user(form.username.data))
+        flash(f"Listener account created successfully! You are logged in {form.username.data}", category="success")
         return redirect(url_for('private_listener'))
     if form.errors != {}:
         for field, message in form.errors.items():
@@ -53,7 +48,7 @@ def signup():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = session.query(User).filter_by(username=form.username.data).first()
+        user = get_user(form.username.data)
         if user and user.password_check(psw=form.password.data):
             login_user(user)
             flash(f'Hi {user.username}! You are logged in', category='success')
@@ -75,13 +70,10 @@ def logout():
 def premium():
     form = PaymentForm()
     if form.validate_on_submit():
-        card = PaymentCard(number=form.number.data, pin=form.pin.data,
+        card = add_no_commit(PaymentCard, number=form.number.data, pin=form.pin.data,
                            expiration_date=form.expiration_date.data,
                            owner=form.holder.data, type=form.type.data)
-        premium_listener = Premium(id=current_user.username, registration_date=date.today(), payment_card=card.id)
-        session.add(card)
-        session.add(premium_listener)
-        session.commit()
+        add_and_commit(Premium, id=current_user.username, registration_date=date.today(), payment_card=card.id)
         flash('Account Premium create successfully', category='success')
         return redirect(url_for('private_listener'))
     return render_template('premium.html', form=form)
