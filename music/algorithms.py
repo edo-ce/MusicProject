@@ -1,6 +1,4 @@
-from music import session
-from music.models import Element, Track, Album, Playlist, Artist, Listener, saved_elements, Follower, Event, \
-    event_participation
+from music.models import *
 from sqlalchemy import func
 
 # TODO controllare tutto il testo con lowercase
@@ -55,12 +53,31 @@ def display_artist_contents(artist):
     return elems
 
 
+def get_user(code):
+    return session.query(User).filter_by(User.username == code).first()
+
+
+def get_artist_albums(code):
+    return session.query(Album).filter(Album.artist_id == code).all()
+
+
+def get_playlists_by_creator(code):
+    return session.query(Playlist).filter(Playlist.creator == code).all()
+
+
+def get_album_tracks(code):
+    return session.query(Track).join(Album).where(Album.id == code).all()
+
+
 def is_artist(username):
     return session.query(Artist).filter_by(id=username).first()
 
 
 def get_title(code):
     return session.query(Element.title).filter_by(id=code).first()
+
+
+# FIND
 
 
 def find_creator_artist(code):
@@ -77,6 +94,9 @@ def find_album(code):
 
 def find_track(code):
     return session.query(Element).join(Track).where(Track.id == code).first()
+
+
+# OPERATIONS
 
 
 def update_user_info():

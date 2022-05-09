@@ -1,9 +1,8 @@
-from music import app, session
+from music import app
 from flask import render_template, redirect, url_for, flash, request
-from music.models import User, Artist, Listener, Premium, PaymentCard
-from music.forms import SignUpForm, LoginForm, PaymentForm, SearchForm, SignUpFormArtist
+from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm
 from flask_login import login_user, logout_user, login_required, current_user
-from music.algorithms import search_func, find_creator_artist, find_saved_elements, is_artist
+from music.algorithms import *
 from datetime import date
 
 

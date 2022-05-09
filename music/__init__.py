@@ -27,8 +27,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
 
-from music import models
+from music import routes
 
 Base.metadata.create_all(engine)
-
-from music import routes

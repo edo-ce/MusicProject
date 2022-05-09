@@ -1,6 +1,6 @@
 config_diz = {
   "username": "postgres",
-  "password": "ferrari98",
-  "database": "music_db",
+  "password": "postgres",
+  "database": "musicsql",
   "address" : "localhost"
 }

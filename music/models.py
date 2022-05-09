@@ -12,9 +12,9 @@ def load_user(code):
 class User(Base, UserMixin):
     __tablename__ = 'users'
 
-    username = Column(String, primary_key=True)
-    email = Column(String, nullable=False, unique=True)
-    password = Column(String(8), nullable=False)
+    username = Column(String(length=30), primary_key=True)
+    email = Column(String(length=30), nullable=False, unique=True)
+    hashed_password = Column(String, nullable=False)
     name = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
     gender = Column(String, nullable=False)
@@ -29,18 +29,18 @@ class User(Base, UserMixin):
         return self.username
 
     @property
-    def mypassword(self):
+    def password(self):
         return self.password
 
-    @mypassword.setter
-    def mypassword(self, psw):
-        self.password = bcrypt.generate_password_hash(psw).decode('utf-8')
+    @password.setter
+    def password(self, psw):
+        self.hashed_password = bcrypt.generate_password_hash(psw).decode('utf-8')
 
     def password_check(self, psw):
-        return bcrypt.check_password_hash(self.password, psw)
+        return bcrypt.check_password_hash(self.hashed_password, psw)
 
     def __repr__(self):
-        return f"<User(username={self.username}, password={self.password}, email={self.email})>"
+        return f"<User(username={self.username}, password={self.hashed_password}, email={self.email})>"
 
 
 class Artist(Base):
@@ -110,7 +110,7 @@ class Album(Base):
 
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     release_date = Column(Date, nullable=False)
-    artist_id = Column(ForeignKey(Artist.id, ondelete='CASCADE'), primary_key=True)
+    artist_id = Column(ForeignKey(Artist.id, ondelete='CASCADE'), unique=True)
 
     tracks_in = relationship('Track', backref='album_in')
 
