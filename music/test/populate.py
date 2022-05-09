@@ -44,7 +44,7 @@ if __name__ == '__main__':
     delete_all_records()
 
     # Genere
-    genre = Genre(name="Rap")
+    genre = Genre(id=77, name="Rap")
     # Users
     user_obj = User(username="tt0", email="gemi@gemi.com", password="password",
                     name="Davide", lastname="De Luca", country="Italy",
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # Artist
     artist_obj = Artist(id=user_obj.username, stage_name="Gemitaiz", is_solo=True, bio="gemi Bio")
     # Album
-    album_element = Element(title=album)
+    album_element = Element(id=98, title=album)
     album_obj = Album(release_date=date.today(), artist_id=artist_obj.id, id=album_element.id )
 
     #containers
@@ -60,11 +60,14 @@ if __name__ == '__main__':
     track_vect = []
 
     #add tracks
+    i = 100
     for id, track in enumerate (tracks.get('recording-list')):
 
         #print(id, '{}'.format( track ) )
-        element_vect.append( Element( title= track['title'] ) )
-        track_vect.append( Track( id=element_vect[-1].id, duration= track['length'], copyright="example",genre=genre,album_id=album_obj.id))
+        i = i + 1
+        element_vect.append(Element(id=i, title= track['title']))
+        track_vect.append( Track(id=element_vect[-1].id, duration= track['length'], copyright="example",genre=genre.id,
+                                  album_id=album_obj.id))
 
 
 
