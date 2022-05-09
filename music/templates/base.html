@@ -61,10 +61,18 @@
                   {% endif %}
               </div>
           </div>
-          <div class="form-check form-switch">
+          <!--div class="form-check form-switch">
               <input type="checkbox" class="form-check-input" id="darkSwitch" />
               <label class="custom-control-label" for="darkSwitch">Dark Mode</label>
-          </div>
+          </div-->
+            <div class="content no-switch">
+                <i class="bi bi-sun"></i>
+                &nbsp;&nbsp;&nbsp;
+                <input type="checkbox" id="darkSwitch" class="cbx hidden"/>
+                <label for="darkSwitch" class="switch"></label>
+                &nbsp;&nbsp;&nbsp;
+                <i class="bi bi-moon"></i>
+            </div>
           <script src="static/js/dark-mode-switch.min.js"></script>
       </nav>
 
