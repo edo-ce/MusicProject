@@ -38,8 +38,13 @@
                                         <img src="" alt="{{ i }}" />
                                     </div>
                                     <div class="text-container">
-                                        <h6>{{ i }}</h6>
-                                        <p>Info</p>
+                                        <h6>
+                                            {% if elem != 'artists' %}
+                                                {{ get_title(i.id) }}
+                                            {% else %}
+                                                {{ i }}
+                                            {% endif %}
+                                        </h6>
                                     </div>
                                 </div>
                             </div>

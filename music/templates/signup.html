@@ -22,7 +22,7 @@
                         {% endif %}
                     {% else %}
                         {% if x == "gender" %}
-                            {{ form[x](class=cl, value="M") }}
+                            {{ form[x](class=cl) }}
                         {% elif x == "user_type" %}
                             {{ form[x](class=cl, value="Listener") }}
                         {% endif %}
@@ -30,6 +30,7 @@
                 </div>
                 {% endfor %}
             {% endwith %}
+            <br>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
             </div>

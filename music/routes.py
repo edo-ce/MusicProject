@@ -1,6 +1,6 @@
 from music import app
 from flask import render_template, redirect, url_for, flash, request
-from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm
+from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, PlaylistForm
 from flask_login import login_user, logout_user, login_required, current_user
 from music.algorithms import *
 from datetime import date
@@ -79,6 +79,37 @@ def premium():
     return render_template('premium.html', form=form)
 
 
+@app.route('/upload-track')
+@login_required
+def upload_track():
+    form = TrackForm()
+    if form.validate_on_submit():
+        code = add_no_commit(Element, title=form.title.data)
+        add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
+                      copywright=form.copyright.data)
+        # TODO featuring
+    return render_template('upload_track.html')
+
+
+@app.route('/upload-album')
+@login_required
+def upload_album():
+    form = AlbumForm()
+    if form.validate_on_submit():
+        code = add_no_commit(Element, title=form.title.data)
+        add_no_commit(Album, id=code, release_date=date.today(), artist_id=current_user.username)
+        for i in range(form.num_tracks.data):
+            upload_track()
+        commit()
+    return render_template('upload_album.html', form=form)
+
+
+@app.route('/create-playlist')
+@login_required
+def create_playlist():
+    form = PlaylistForm()
+    return render_template('create_playlist.html')
+
 @app.route('/private')
 @login_required
 def private():
@@ -91,9 +122,11 @@ def private():
 @app.route('/private-listener')
 @login_required
 def private_listener():
-    saved_elements = find_saved_elements(current_user.username)
+    elems = find_saved_elements(current_user.username)
 
-    return render_template('private_listener.html', elems=saved_elements)
+    def title(code):
+        return get_title(code)
+    return render_template('private_listener.html', elems=elems, get_title=title)
 
 
 @app.route('/private-artist')

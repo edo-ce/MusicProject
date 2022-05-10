@@ -1,7 +1,9 @@
 from music.models import *
 from sqlalchemy import func
+from sqlalchemy.sql import text
 
 # TODO controllare tutto il testo con lowercase
+
 
 def commit():
     session.commit()
@@ -26,12 +28,14 @@ def find_saved_elements(listener):
 
     for elem in elems.keys():
         if elem != 'artists':
-            res = session.query(Element.title).join(elem).join(saved_elements).join(Listener)\
-                .where(Listener.id == listener).all()
+            table_elems = get_element_table(elem)
+            listener_elems = get_listener(listener).elements
+            for e in listener_elems:
+                if session.query(table_elems).filter_by(id=e.id).first():
+                    elems[elem].append(session.query(table_elems).filter_by(id=e.id).first())
         else:
-            res = session.query(Artist.stage_name).join(Follower).join(Listener).where(Listener.id == listener).all()
-        for i in res:
-            elems[elem].append(i)
+            res = session.query(Artist).join(Follower).join(Listener).where(Listener.id == listener).all()
+            elems[elem] = res
 
     return elems
 
@@ -55,9 +59,21 @@ def display_artist_contents(artist):
 
 # GET
 
+def get_element_table(name):
+    if Album.__tablename__ == name:
+        return Album
+    elif Track.__tablename__ == name:
+        return Track
+    else:
+        return Playlist
+
 
 def get_user(code):
     return session.query(User).filter(User.username == code).first()
+
+
+def get_listener(code):
+    return session.query(Listener).filter_by(id=code).first()
 
 
 def get_artists_events(code):
@@ -78,10 +94,6 @@ def get_album_tracks(code):
 
 def is_artist(username):
     return session.query(Artist).filter_by(id=username).first()
-
-
-def get_title(code):
-    return session.query(Element.title).filter_by(id=code).first()
 
 
 # FIND
@@ -151,3 +163,9 @@ def delete_tuple(table, id):
 
 def advice_func():
     pass
+
+
+# TO CHANGE
+
+def get_genre_id(name):
+    return session.query(Genre.id).filter(Genre.name == name).first()

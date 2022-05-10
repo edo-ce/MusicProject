@@ -9,13 +9,13 @@ from wtforms.widgets import TextArea
 class SignUpForm(FlaskForm):
     username = StringField(label='Username:', validators=[Length(min=2, max=30), DataRequired()])
     email = StringField(label='Email:', validators=[Email(), DataRequired()])
-    name = StringField(label='Name:', validators=[Length(min=2, max=30), DataRequired()])
-    lastname = StringField(label='Lastname:', validators=[Length(min=2, max=30), DataRequired()])
+    name = StringField(label='Name:', validators=[Length(min=2, max=30)])
+    lastname = StringField(label='Lastname:', validators=[Length(min=2, max=30)])
     password = PasswordField(label='Password:', validators=[Length(min=6), DataRequired()])
     password_check = PasswordField(label='Confirm Password:', validators=[EqualTo('password'), DataRequired()])
     country = StringField(label='Country:', validators=[Length(min=2, max=30), DataRequired()])
-    birth_date = DateField(label='Birth Date:', validators=[InputRequired()])
-    gender = SelectField(label='Gender', choices=['M', 'F'], validators=[DataRequired()])
+    birth_date = DateField(label='Birth Date:')
+    gender = SelectField(label='Gender', choices=['M', 'F'])
     user_type = SelectField(label='User Type:', choices=['Listener', 'Artist'], validators=[DataRequired()])
     submit = SubmitField(label='Create Account')
 
@@ -62,7 +62,8 @@ class SearchForm(FlaskForm):
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
-    genre = StringField(label='Copyright:', validators=[DataRequired()])
+    duration = IntegerField(label='Duration:', validators=[DataRequired()])
+    genre = StringField(label='Genre:', validators=[DataRequired()])
     featuring = FieldList(StringField(label='Feat:', validators=[DataRequired()]))
     submit = SubmitField(label='Upload')
 

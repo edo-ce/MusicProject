@@ -2,11 +2,15 @@ from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
 from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
-# from music.algorithms import is_artist, get_title
+
 
 @login_manager.user_loader
 def load_user(code):
     return session.query(User).filter_by(username=code).first()
+
+
+def get_title(code):
+    return session.query(Element.title).filter_by(id=code).first()
 
 
 class User(Base, UserMixin):
@@ -15,11 +19,11 @@ class User(Base, UserMixin):
     username = Column(String(length=30), primary_key=True)
     email = Column(String(length=30), nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    lastname = Column(String, nullable=False)
-    gender = Column(String, nullable=False)
+    name = Column(String)
+    lastname = Column(String)
+    gender = Column(String)
     country = Column(String, nullable=False)
-    birth_date = Column(Date, nullable=False)
+    birth_date = Column(Date)
 
     artists = relationship('Artist', backref='user')
     listeners = relationship('Listener', backref='user')
@@ -58,6 +62,10 @@ class Artist(Base):
         return f"Stage Name: {self.stage_name}"
 
 
+saved_elements = Table('saved_elements', Base.metadata,
+                       Column('id_element', ForeignKey('elements.id'), primary_key=True),
+                       Column('id_listener', ForeignKey('listeners.id'), primary_key=True))
+
 class Listener(Base):
     __tablename__ = 'listeners'
 
@@ -67,10 +75,7 @@ class Listener(Base):
     followers = relationship('Follower', backref='listeners')
     premiums_id = relationship('Premium', backref='listener_id')
 
-
-saved_elements = Table('saved_elements', Base.metadata,
-                       Column('id_element', ForeignKey('elements.id'), primary_key=True),
-                       Column('id_listener', ForeignKey('listeners.id'), primary_key=True))
+    elements = relationship("Element", secondary=saved_elements, backref="listeners")
 
 
 class Element(Base):
@@ -82,8 +87,6 @@ class Element(Base):
     albums = relationship('Album', backref='element')
     tracks = relationship('Track', backref='element')
     playlists = relationship('Playlist', backref='element')
-
-    listeners = relationship("Listener", secondary=saved_elements, backref="elements")
 
 
 class Genre(Base):
@@ -122,7 +125,7 @@ class Track(Base):
     __tablename__ = 'tracks'
 
     id = Column(ForeignKey(Element.id), primary_key=True)
-    duration = Column(String, nullable=False)
+    duration = Column(Integer, nullable=False)
     copyright = Column(String, nullable=False)
     genre = Column(ForeignKey(Genre.id, ondelete='CASCADE'), nullable=False)
     album_id = Column(ForeignKey(Album.id, ondelete='CASCADE'), nullable=False)

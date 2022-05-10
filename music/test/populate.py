@@ -70,8 +70,6 @@ if __name__ == '__main__':
                                   album_id=album_obj.id))
 
 
-
-
     #upload elements
     try:
         session.add(user_obj)
@@ -86,4 +84,14 @@ if __name__ == '__main__':
         print(ex)
         session.rollback()
 
+    session.commit()
+
+    u = User(username='edo', email='idjdd@ddkod.com', password='password', country='Italy')
+    session.add(u)
+    l = Listener(id='edo', registration_date=date.today())
+    l.elements.append(session.query(Element).filter_by(id=98).first())
+    l.elements.append(session.query(Element).filter_by(id=102).first())
+
+
+    session.add(l)
     session.commit()
