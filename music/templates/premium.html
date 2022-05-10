@@ -5,20 +5,21 @@
 {% block content %}
 <body class="text-center">
     <section class="container">
-        <form method="POST", class="form-signup-premium">
+        <form method="POST", class="form-signup-premium w-50" style="margin-left: auto; margin-right: auto;">
             {{ form.hidden_tag() }}
             <h1>Sign-Up Premium</h1>
             <br>
-            {{ form.type.label() }}
-            {{ form.type(class="form-control", placeholder="Card Type") }}
-            {{ form.number.label() }}
-            {{ form.number(class="form-control", placeholder="Number") }}
-            {{ form.holder.label() }}
-            {{ form.holder(class="form-control", placeholder="Holder")}}
-            {{ form.expiration_date.label() }}
-            {{ form.expiration_date(class="form-control", placeholder="Expiration Date")}}
-            {{ form.pin.label() }}
-            {{ form.pin(class="form-control", placeholder="Pin") }}
+            {% with array='type number holder expiration_date pin' %}
+                {% for x in array.split() %}
+                    {% if x == 'type' %}
+                        {{ form[x].label() }}
+                        {{ form[x](class="form-control", placeholder="Card Type")}}
+                    {% else %}
+                        {{ form[x].label() }}
+                        {{ form[x](class="form-control", placeholder=x.replace('_', ' ').capitalize())}}
+                    {% endif  %}
+                {% endfor %}
+            {% endwith %}
             <br>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
