@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 <body class="text-center">
-    <section class="container">
+    <!--section class="container">
         <h1>My Library</h1>
         {% for elem, values in elems.items() %}
             <br>
@@ -18,6 +18,54 @@
                 {% endfor %}
             </table>
         {% endfor %}
+    </section-->
+
+    <section>
+        <h1>My Library</h1>
+        {% for elem, values in elems.items() %}
+        <div class="cards_landscape_wrap-2">
+            <div class="container">
+                <h1 class="fw-light">My {{ elem }}</h1>
+                <div class="row">
+                    {% for i in values %}
+                    <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 albums">
+                        <a style="cursor: pointer;">
+                            <div class="card-flyer">
+                                <div class="text-box">
+                                    <div class="image-box img-conver">
+                                        <!-- Image can be generated from the name
+                                                in img.alt must be the song/artist name -->
+                                        <img src="" alt="{{ i }}" />
+                                    </div>
+                                    <div class="text-container">
+                                        <h6>{{ i }}</h6>
+                                        <p>Info</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </section>
+
+
+
 </body>
+
+    <script>
+
+        window.onload = function () {
+            var divs = document.querySelectorAll(".img-conver");
+            for (const div of divs) {
+                var img = div.children[0];
+                var s = img.alt;
+                img.src = convertStringToImageUrl(s);
+            }
+        }
+
+    </script>
 {% endblock %}

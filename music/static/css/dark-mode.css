@@ -72,3 +72,8 @@
 [data-theme="dark"] .custom-control-label {
   color: #292C35;
 }
+
+[data-theme="dark"] .cards_landscape_wrap-2 {
+  background-color: #292C35 !important;
+  color: #eeeeee;
+}
