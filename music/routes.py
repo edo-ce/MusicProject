@@ -123,7 +123,8 @@ def private():
 @login_required
 def private_listener():
     elems = find_saved_elements(current_user.username)
-
+    '''element = {'title': "Leonardo Sartori Falling Snow", 'duration': 173, 'genre': 'classical',
+               'copyright': '© Leonardo Sartori'}'''
     def title(code):
         return get_title(code)
     return render_template('private_listener.html', elems=elems, get_title=title)

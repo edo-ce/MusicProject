@@ -21,6 +21,7 @@
     </section-->
 
     <section>
+        <!-- button onclick="showElementDetails(JSON.stringify({{ element }}))">Test!</button-->
         <h1>My Library</h1>
         {% for elem, values in elems.items() %}
         <div class="cards_landscape_wrap-2">
@@ -32,12 +33,12 @@
                         <!-- MUST PASS AN OBJECT WITH ['duration', 'copyright', 'genre', 'release_date', 'stage_name', 'bio', 'creator']
                          AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
                          TODO REVIEW JINJIA ARGUMENTS -->
-                        <a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ i }}))">
+                        <a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ get_title(i.id) }}))">
                             <div class="card-flyer">
                                 <div class="text-box">
                                     <div class="image-box img-conver">
                                         <!-- Image can be generated from the name
-                                                in img.alt must be the song/artist name -->
+                                                in img.alt must be the title song/artist name -->
                                         <img src="" alt="{{ i }}" />
                                     </div>
                                     <div class="text-container">
