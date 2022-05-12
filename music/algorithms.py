@@ -19,7 +19,7 @@ def search_func(text):
     for elem in elems:
         e = elem.find_type()
         res[e.__tablename__].append(e) if res.get(e.__tablename__) else res[e.__tablename__] = e
-    res['artists'] = session.query(Artist).filter_by(stage_name=text)
+    res['artists'] = session.query(Artist).filter_by(stage_name=text).all()
     return res
 
 

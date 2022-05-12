@@ -142,7 +142,7 @@ def private_artist():
 def search():
     form = SearchForm()
     if form.validate_on_submit():
-        res = search_func(form.search.data)
+        res = search_func(form.search.data.lower())
         return redirect(url_for('search_results', elems=res))
     return render_template('base.html', form=form)
 
