@@ -44,7 +44,7 @@ class User(Base, UserMixin):
         return bcrypt.check_password_hash(self.hashed_password, psw)
 
     def __repr__(self):
-        return f"<User(username={self.username}, password={self.hashed_password}, email={self.email})>"
+        return f'<User(username={self.username}, password={self.hashed_password}, email={self.email})>'
 
 
 class Artist(Base):
@@ -59,7 +59,9 @@ class Artist(Base):
     followers = relationship('Follower', backref='artists')
 
     def __repr__(self):
-        return f"Stage Name: {self.stage_name}"
+        solo = "Solo" if self.is_solo else "group"
+        b = self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
+        return f'Stage Name: {self.stage_name}\n{solo}\nBio: {b}'
 
 
 saved_elements = Table('saved_elements', Base.metadata,
@@ -120,6 +122,12 @@ class Album(Base):
     def number_of_tracks(self):
         return session.query(Album).join(Track).filter_by(id=self.id).count()
 
+    def get_artist(self):
+        return session.query(Artist).filter_by(id=self.artist_id).first()
+
+    def __repr__(self):
+        return f'Title: {get_title(self.id)}\nRelease Date: {self.release_date}\nArtist: {self.get_artist().stage_name}'
+
 
 class Track(Base):
     __tablename__ = 'tracks'
@@ -136,14 +144,16 @@ class Track(Base):
     def get_album(self):
         return session.query(Album).filter_by(id=self.album_id).first()
 
+    def get_genre(self):
+        return session.query(Genre).filter_by(id=self.genre).first()
+
     # TODO vedere aggiungere genere
-    '''
+
     def __repr__(self):
-        album_name = 'Album: single'
-        if self.get_album().number_of_tracks() > 1:
-            album_name = f'Album: {get_title(self.get_album())}'
-        return f"Title: {get_title(self.id)}, {album_name}, Duration: {self.duration}"
-    '''
+        album_name = 'Album: single' if self.get_album().number_of_tracks() > 1 else 'Single'
+        return f'Title: {get_title(self.id)}\n{album_name}\nArtist: {self.get_album().get_artist().stage_name}' \
+               f'\nFeaturing: {", ".join(f.stage_name for f in self.artists_feat)}' \
+               f'\nDuration: {self.duration}\nGenre: {self.get_genre().name}\nCopyright: {self.copyright}'
 
 
 class Playlist(Base):
@@ -153,16 +163,14 @@ class Playlist(Base):
     is_private = Column(Boolean, nullable=False)
     creator = Column(ForeignKey(User.username, ondelete='CASCADE'), nullable=False)
 
-    '''
+    def get_creator_name(self):
+        artist = session.query(Artist).filter_by(id=self.creator).first()
+        listener = session.query(Listener).filter_by(id=self.creator).first()
+        return artist.stage_name if artist else listener.id
+
     def __repr__(self):
-        private = 'Public'
-        if self.is_private:
-            private = 'Private'
-        creator_name = self.creator
-        if is_artist(self.creator):
-            creator_name = is_artist(self.creator).stage_name
-        return f"Title: {get_title(self.id)}, State: {private}, Creator: {creator_name}"
-    '''
+        playlist_type = 'Private' if self.is_private else 'Public'
+        return f'Title: {get_title(self.id)}\nPlaylist Type: {playlist_type}\nCreator: {self.get_creator_name()}'
 
 
 event_participation = Table('event_participation', Base.metadata,

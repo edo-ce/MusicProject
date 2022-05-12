@@ -33,13 +33,14 @@
                         <!-- MUST PASS AN OBJECT WITH ['duration', 'copyright', 'genre', 'release_date', 'stage_name', 'bio', 'creator']
                          AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
                          TODO REVIEW JINJIA ARGUMENTS -->
-                        <a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ get_title(i.id) }}))">
+                        <!--<a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ get_title(i.id) }}))">-->
+                            <a style="cursor: pointer;" onclick="showElementDetails( {{ i.__repr__ }} )">
                             <div class="card-flyer">
                                 <div class="text-box">
                                     <div class="image-box img-conver">
                                         <!-- Image can be generated from the name
                                                 in img.alt must be the title song/artist name -->
-                                        <img src="" alt="{{ i }}" />
+                                        <img src="" alt="{{ get_title(i.id) }}" />
                                     </div>
                                     <div class="text-container">
                                         <h6>
