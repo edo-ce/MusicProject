@@ -1,0 +1,9 @@
+// Vincoli
+// 1) la traccia deve essere compresa tra i 2 e 3 minuti
+// 2) album deve contenere almeno una traccia
+// 3) la data di nascità dell'artista/utente  deve essere comrpesa tra 16 - 100 anni
+// 4) Un artisti deve pubblicare almeno un album nella piattaforma per essere considerato tale (scadenza)
+// 5) un brano/ album preferito non piò essere inserito nei preferiti più volte
+
+// Privilegi
+// 1) privilegi di ascolto diversi per i minorenni???????
