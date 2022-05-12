@@ -142,9 +142,9 @@ def private_artist():
 def search():
     form = SearchForm()
     if form.validate_on_submit():
-        res = search_func(form.select.data, form.search.data)
-        return redirect(url_for('search_results', res=res))
-    return render_template('search.html', form=form)
+        res = search_func(form.search.data)
+        return redirect(url_for('search_results', elems=res))
+    return render_template('base.html', form=form)
 
 
 @app.route('/search-results')

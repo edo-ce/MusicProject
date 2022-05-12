@@ -90,6 +90,9 @@ class Element(Base):
     tracks = relationship('Track', backref='element')
     playlists = relationship('Playlist', backref='element')
 
+    def find_type(self):
+        return session.query(Track).filter_by(id=self.id).first() or session.query(Album).filter_by(id=self.id)\
+            .first() or session.query(Playlist).filter_by(id=self.id).first()
 
 class Genre(Base):
     __tablename__ = 'genres'

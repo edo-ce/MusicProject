@@ -13,13 +13,13 @@ def rollback():
     session.rollback()
 
 
-def search_func(select, text):
-    text = text.lower()
-    if select != 'artists':
-        res = session.query(Element).join(select).where(func.lower(Element.title) == text).all()
-    else:
-        res = session.query(Artist).filter(func.lower(Artist.stage_name) == text).all()
-    # TODO trovare titoli simili
+def search_func(text):
+    res = {}
+    elems = session.query(Element).filter_by(title=text).all()
+    for elem in elems:
+        e = elem.find_type()
+        res[e.__tablename__].append(e) if res.get(e.__tablename__) else res[e.__tablename__] = e
+    res['artists'] = session.query(Artist).filter_by(stage_name=text)
     return res
 
 

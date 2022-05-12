@@ -33,7 +33,7 @@ class SignUpForm(FlaskForm):
 class SignUpFormArtist(FlaskForm):
     stage_name = StringField(label='Stage Name:', validators=[Length(min=2, max=30), DataRequired()])
     solo_group = SelectField(label='Solo/Group:', choices=['Solo', 'Group'], validators=[DataRequired()])
-    bio = TextAreaField(label='Bio:', validators=[DataRequired()])
+    bio = TextAreaField(label='Bio:', validators=[InputRequired()])
     submit = SubmitField(label='Create Artist Account')
 
 
@@ -53,8 +53,6 @@ class PaymentForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    choices = ['artists', 'tracks', 'albums', 'playlists']
-    select = SelectField('Search Type:', choices=choices, validators=[DataRequired()])
     search = SearchField('Search:', validators=[DataRequired()])
     submit = SubmitField(label='Search')
 
