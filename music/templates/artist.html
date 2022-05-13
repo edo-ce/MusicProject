@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}
+    Artist Page
+{% endblock %}
+
+{% block content %}
+<style>
+    .masthead {
+        height: 100vh;
+        min-height: 500px;
+        background-image: url('{{ url_for('static', filename='images/background.jpg') }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: black;
+    }
+</style>
+<body class="text-center">
+    {% if bio %}
+        <header class="masthead" id="bio">
+          <div class="container h-100">
+            <div class="row h-100 align-items-center">
+              <div class="col-12 text-center">
+                <h1 class="fw-light">Bio</h1>
+                <p class="lead">{{ bio }}</p>
+              </div>
+            </div>
+          </div>
+        </header>
+    {% endif %}
+    <!--section>
+        <h1>My Library</h1>
+        {% for elem, values in elems.items() %}
+        <div class="cards_landscape_wrap-2">
+            <div class="container">
+                <h1 class="fw-light">My {{ elem }}</h1>
+                <div class="row">
+                    {% for i in values %}
+                    <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 albums"-->
+                        <!-- MUST PASS AN OBJECT WITH ['duration', 'copyright', 'genre', 'release_date', 'stage_name', 'bio', 'creator']
+                         AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
+                         TODO REVIEW JINJIA ARGUMENTS -->
+                        <!--a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ get_title(i.id) }}))">
+                            <div class="card-flyer">
+                                <div class="text-box">
+                                    <div class="image-box img-conver"-->
+                                        <!-- Image can be generated from the name
+                                                in img.alt must be the title song/artist name -->
+                                        <!--img src="" alt="{{ i }}" />
+                                    </div>
+                                    <div class="text-container">
+                                        <h6>
+                                            {% if elem != 'artists' %}
+                                                {{ get_title(i.id) }}
+                                            {% else %}
+                                                {{ i }}
+                                            {% endif %}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </section-->
+
+
+
+</body>
+
+    <script>
+
+        window.onload = function () {
+            var divs = document.querySelectorAll(".img-conver");
+            for (const div of divs) {
+                var img = div.children[0];
+                var s = img.alt;
+                img.src = convertStringToImageUrl(s);
+            }
+        }
+
+    </script>
+{% endblock %}
