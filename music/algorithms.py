@@ -13,16 +13,16 @@ def rollback():
     session.rollback()
 
 
-def search_func(text):
+def search_func(search_result):
     res = {}
-    elems = session.query(Element).filter_by(title=text).all()
+    elems = session.query(Element).filter_by(title=search_result).all()
     for elem in elems:
         e = elem.find_type()
         if res.get(e.__tablename__):
             res[e.__tablename__].append(e)
         else:
             res[e.__tablename__] = e
-    res['artists'] = session.query(Artist).filter_by(stage_name=text).all()
+    res['artists'] = session.query(Artist).filter_by(stage_name=search_result).all()
     return res
 
 
@@ -44,18 +44,16 @@ def find_saved_elements(listener):
 
 
 def display_artist_contents(artist):
-    elems = {'albums': [], 'playlists': [], 'events': []}
+    elems = {'albums': [], 'singles': [], 'playlists': [], 'events': []}
 
-    res = session.query(Element.title).join(Album).where(Album.artist_id == artist).all()
-    for i in res:
-        elems['albums'].append(i)
-    res = session.query(Element.title).join(Playlist).where(Playlist.creator == artist).all()
-    for i in res:
-        elems['playlists'].append(i)
-    res = session.query(Event.name, Event.date).join(event_participation).join(Artist).where(Artist.id == artist)\
-        .order_by(Event.date).all()
-    for i in res:
-        elems['events'].append(i[0] + ' ' + i[1])
+    albums = session.query(Album).filter_by(artist_id=artist).all()
+    for a in albums:
+        if a.number_of_tracks() > 1:
+            elems['albums'].append(a)
+        else:
+            elems['singles'].append(a)
+    elems['playlists'] = get_playlists_by_creator(artist)
+    elems['events'] = get_artists_events(artist)
 
     return elems
 
@@ -93,6 +91,10 @@ def get_playlists_by_creator(code):
 
 def get_album_tracks(code):
     return session.query(Track).join(Album).where(Album.id == code).all()
+
+
+def get_playlist_tracks(code):
+    return session.query(Track).join(Playlist).where(Playlist.id == code).all()
 
 
 def is_artist(username):

@@ -1,6 +1,7 @@
 from music import app
 from flask import render_template, redirect, url_for, flash, request
-from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, PlaylistForm
+from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, \
+    PlaylistForm
 from flask_login import login_user, logout_user, login_required, current_user
 from music.algorithms import *
 from datetime import date
@@ -21,7 +22,7 @@ def signup_artist():
                         bio=form.bio.data)
         login_user(get_user(username))
         flash(f"Artist account created successfully! You are logged in {username}", category="success")
-        return redirect(url_for('private_artist'))
+        return redirect(url_for('private'))
     return render_template('signup_artist.html', form=form)
 
 
@@ -37,7 +38,7 @@ def signup():
         add_and_commit(Listener, id=form.username.data, registration_date=date.today())
         login_user(get_user(form.username.data))
         flash(f"Listener account created successfully! You are logged in {form.username.data}", category="success")
-        return redirect(url_for('private_listener'))
+        return redirect(url_for('private'))
     if form.errors != {}:
         for field, message in form.errors.items():
             flash(f"Error: {field} {message}", category="danger")
@@ -75,11 +76,11 @@ def premium():
                            owner=form.holder.data, type=form.type.data)
         add_and_commit(Premium, id=current_user.username, registration_date=date.today(), payment_card=card.id)
         flash('Account Premium create successfully', category='success')
-        return redirect(url_for('private_listener'))
+        return redirect(url_for('private'))
     return render_template('premium.html', form=form)
 
 
-@app.route('/upload-track')
+@app.route('/upload-track', methods=['GET', 'POST'])
 @login_required
 def upload_track():
     form = TrackForm()
@@ -91,7 +92,7 @@ def upload_track():
     return render_template('upload_track.html')
 
 
-@app.route('/upload-album')
+@app.route('/upload-album', methods=['GET', 'POST'])
 @login_required
 def upload_album():
     form = AlbumForm()
@@ -104,37 +105,24 @@ def upload_album():
     return render_template('upload_album.html', form=form)
 
 
-@app.route('/create-playlist')
+@app.route('/create-playlist', methods=['GET', 'POST'])
 @login_required
 def create_playlist():
     form = PlaylistForm()
     return render_template('create_playlist.html')
 
+
 @app.route('/private')
 @login_required
 def private():
-    if is_artist(current_user.username):
-        return redirect(url_for('private_artist'))
-    else:
-        return redirect(url_for('private_listener'))
-
-
-@app.route('/private-listener')
-@login_required
-def private_listener():
-    elems = find_saved_elements(current_user.username)
-    '''element = {'title': "Leonardo Sartori Falling Snow", 'duration': 173, 'genre': 'classical',
-               'copyright': '© Leonardo Sartori'}'''
     def title(code):
         return get_title(code)
-    return render_template('private_listener.html', elems=elems, get_title=title)
-
-
-@app.route('/private-artist')
-@login_required
-def private_artist():
-    form = SearchForm()
-    return render_template('private_artist.html', form=form)
+    if is_artist(current_user.username):
+        elems = display_artist_contents(current_user.username)
+        return render_template('private_artist.html', elems=elems, get_title=title)
+    else:
+        elems = find_saved_elements(current_user.username)
+        return render_template('private_listener.html', elems=elems, get_title=title)
 
 
 @app.route('/search', methods=['GET', 'POST'])
