@@ -125,6 +125,19 @@ def private():
         return render_template('private_listener.html', elems=elems, get_title=title)
 
 
+@app.route('/view/<username>')
+@login_required
+def view(username):
+    if not username_exists(username):
+        return redirect(url_for('home'))
+    artist = is_artist(username) is not None
+    if artist:
+        elems = find_saved_elements(username)
+    else:
+        elems = get_playlists_by_creator(username)
+    return render_template('view.html', elems=elems, artist=artist)
+
+
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():

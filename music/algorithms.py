@@ -13,6 +13,10 @@ def rollback():
     session.rollback()
 
 
+def username_exists(code):
+    return session.query(User).filter_by(username=code).first()
+
+
 def search_func(search_result):
     res = {}
     elems = session.query(Element).filter_by(title=search_result).all()
