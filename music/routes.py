@@ -80,16 +80,25 @@ def premium():
     return render_template('premium.html', form=form)
 
 
-@app.route('/upload-track', methods=['GET', 'POST'])
+@app.route('/upload-track/<number>', methods=['GET', 'POST'])
 @login_required
-def upload_track():
+def upload_track(number):
+    number = int(number)
+    album = request.args.get('album')
     form = TrackForm()
     if form.validate_on_submit():
-        code = add_no_commit(Element, title=form.title.data)
-        add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
-                      copywright=form.copyright.data)
+        if number != 1:
+            code = add_no_commit(Element, title=form.title.data)
+            add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
+                          copywright=form.copyright.data, album_id=album)
+            return redirect(url_for(f'upload_track/{number-1}', album=album))
+        else:
+            code = add_no_commit(Element, title=form.title.data)
+            add_and_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
+                          copywright=form.copyright.data, album_id=album)
+            return redirect(url_for('private'))
         # TODO featuring
-    return render_template('upload_track.html')
+    return render_template('upload_track.html', form=form)
 
 
 @app.route('/upload-album', methods=['GET', 'POST'])
@@ -99,9 +108,7 @@ def upload_album():
     if form.validate_on_submit():
         code = add_no_commit(Element, title=form.title.data)
         add_no_commit(Album, id=code, release_date=date.today(), artist_id=current_user.username)
-        for i in range(form.num_tracks.data):
-            upload_track()
-        commit()
+        return redirect(url_for(f'upload_track/{str(form.num_tracks.data)}', album=code))
     return render_template('upload_album.html', form=form)
 
 
@@ -125,6 +132,8 @@ def private():
         return render_template('private_listener.html', elems=elems, get_title=title)
 
 
+# per visualizzare la pagina di un'artista (album, playlist, eventi)
+# per visualizzare la pagina di un utente (playlist)
 @app.route('/view/<username>')
 @login_required
 def view(username):
