@@ -2,7 +2,10 @@ from flask_wtf import FlaskForm
 from music.models import session, User, Artist, Listener
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
     IntegerField, FieldList, SearchField, TimeField, URLField
-from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired
+from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange
+
+
+# TODO add constraints
 
 
 class SignUpForm(FlaskForm):
@@ -59,7 +62,7 @@ class SearchForm(FlaskForm):
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
-    duration = IntegerField(label='Duration (seconds):', validators=[DataRequired()])
+    duration = IntegerField(label='Duration (seconds):', validators=[DataRequired(), NumberRange(min=0)])
     genre = StringField(label='Genre:', validators=[DataRequired()])
     featuring = FieldList(StringField(label='Feat:', validators=[DataRequired()]))
     submit = SubmitField(label='Upload Track')
@@ -67,7 +70,7 @@ class TrackForm(FlaskForm):
 
 class AlbumForm(FlaskForm):
     title = StringField(label='Album Title:', validators=[DataRequired()])
-    num_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired()])
+    num_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField(label='Upload Album')
 
 
@@ -81,8 +84,7 @@ class PlaylistTrackForm(FlaskForm):
 class PlaylistForm(FlaskForm):
     title = StringField(label='Playlist Title:', validators=[DataRequired()])
     private = BooleanField(label='Is Private:', validators=[DataRequired()])
-    # TODO add integer constraints
-    number_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired()])
+    number_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField(label='Upload Playlist')
 
 
