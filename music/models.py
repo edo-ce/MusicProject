@@ -58,6 +58,9 @@ class Artist(Base):
     albums = relationship('Album', backref='artist')
     followers = relationship('Follower', backref='artists')
 
+    def get_stage_name(self):
+        return self.stage_name
+
     def __repr__(self):
         solo = "Solo" if self.is_solo else "group"
         b = self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
@@ -123,7 +126,7 @@ class Album(Base):
     tracks_in = relationship('Track', backref='album_in')
 
     def number_of_tracks(self):
-        return session.query(Album).join(Track).filter_by(id=self.id).count()
+        return session.query(Album).join(Track).where(Track.album_id == self.id).count()
 
     def get_artist(self):
         return session.query(Artist).filter_by(id=self.artist_id).first()
@@ -176,9 +179,9 @@ class Playlist(Base):
         return f'Title: {get_title(self.id)}\nPlaylist Type: {playlist_type}\nCreator: {self.get_creator_name()}'
 
 
-event_participation = Table('event_participation', Base.metadata,
-                            Column('id_event', ForeignKey('events.id'), primary_key=True),
-                            Column('id_artist', ForeignKey('artists.id'), primary_key=True))
+guests = Table('guests', Base.metadata,
+                  Column('id_artist', ForeignKey('artists.id'), primary_key=True),
+                  Column('id_event', ForeignKey('events.id'), primary_key=True))
 
 
 class Event(Base):
@@ -191,8 +194,10 @@ class Event(Base):
     end_time = Column(String, nullable=False)
     location = Column(String, nullable=False)
     link = Column(String, nullable=False)
+    creator = Column(ForeignKey(Artist.id, ondelete='CASCADE'), nullable=False)
 
-    artists = relationship("Artist", secondary=event_participation, backref="events")
+    # TODO change schema
+    artists_guests = relationship("Artist", secondary=guests, backref="events_guests")
 
     __table_args__ = (
         CheckConstraint('end_time > start_time'),

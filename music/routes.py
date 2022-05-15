@@ -1,7 +1,7 @@
 from music import app
 from flask import render_template, redirect, url_for, flash, request
 from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, \
-    PlaylistForm
+    PlaylistForm, EventForm, PlaylistTrackForm
 from flask_login import login_user, logout_user, login_required, current_user
 from music.algorithms import *
 from datetime import date
@@ -96,6 +96,7 @@ def upload_track(number):
             code = add_no_commit(Element, title=form.title.data)
             add_and_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
                           copywright=form.copyright.data, album_id=album)
+            flash('Album uploaded successfully!', category='success')
             return redirect(url_for('private'))
         # TODO featuring
     return render_template('upload_track.html', form=form)
@@ -112,10 +113,57 @@ def upload_album():
     return render_template('upload_album.html', form=form)
 
 
+@app.route('/upload-event', methods=['GET', 'POST'])
+@login_required
+def upload_event():
+    form = EventForm()
+    if form.validate_on_submit():
+        event = add_no_commit(Event, name=form.name.data, date=form.date.data, start_time=form.start_time.data,
+                      end_time=form.end_time.data, location=form.location.data, link=form.link.data,
+                      creator=current_user.username)
+        for artist in form.guests.data.split():
+            if is_artist(artist) is None:
+                flash(f'Artist {artist} does not exist!', category='danger')
+                rollback()
+                return redirect(url_for('upload_event'))
+            else:
+                event.artists_guests.append(is_artist(artist))
+        commit()
+        flash('Event uploaded successfully!', category='success')
+        return redirect(url_for('private'))
+    return render_template('upload_event.html')
+
+
+@app.route('/add-playlist-track/<number>', methods=['GET', 'POST'])
+@login_required
+def add_playlist_track(number):
+    number = int(number)
+    playlist = request.args.get('playlist')
+    form = PlaylistTrackForm()
+    if form.validate_on_submit():
+        track = get_playlist_track(form.title.data, form.album.data, form.artist.data)
+        if track is None:
+            flash(f'Track {form.title.data} does not exist!', category='danger')
+            rollback()
+            return redirect(url_for('upload_event'))
+        get_playlist(playlist).tracks_id.append(track.id)
+        if number != 1:
+            return redirect(url_for(f'add-playlist-track/{str(number-1)}', playlist=playlist))
+        else:
+            commit()
+            flash('Playlist uploaded successfully!', category='success')
+            return redirect(url_for('private'))
+    return render_template('add_playlist_track.html')
+
+
 @app.route('/create-playlist', methods=['GET', 'POST'])
 @login_required
 def create_playlist():
     form = PlaylistForm()
+    if form.validate_on_submit():
+        code = add_no_commit(Element, title=form.title.data)
+        add_no_commit(Playlist, id=code, is_private=form.private.data, creator=current_user.username)
+        return redirect(url_for(f'add-playlist-track/{str(form.number_tracks.data)}', playlist=code))
     return render_template('create_playlist.html')
 
 
@@ -162,3 +210,9 @@ def search():
 def search_results():
     res = request.args.get('res')
     return render_template('search.html', res=res)
+
+
+@app.route('/settings')
+@login_required
+def settings():
+    pass

@@ -1,9 +1,8 @@
 from flask_wtf import FlaskForm
 from music.models import session, User, Artist, Listener
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
-    IntegerField, FieldList, SearchField
+    IntegerField, FieldList, SearchField, TimeField, URLField
 from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired
-from wtforms.widgets import TextArea
 
 
 class SignUpForm(FlaskForm):
@@ -60,19 +59,39 @@ class SearchForm(FlaskForm):
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
-    duration = IntegerField(label='Duration:', validators=[DataRequired()])
+    duration = IntegerField(label='Duration (seconds):', validators=[DataRequired()])
     genre = StringField(label='Genre:', validators=[DataRequired()])
     featuring = FieldList(StringField(label='Feat:', validators=[DataRequired()]))
-    submit = SubmitField(label='Upload')
+    submit = SubmitField(label='Upload Track')
 
 
 class AlbumForm(FlaskForm):
     title = StringField(label='Album Title:', validators=[DataRequired()])
     num_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired()])
-    submit = SubmitField(label='Upload')
+    submit = SubmitField(label='Upload Album')
+
+
+class PlaylistTrackForm(FlaskForm):
+    title = StringField(label='Track Title:', validators=[DataRequired()])
+    album = StringField(label='Album Title:', validators=[DataRequired()])
+    artist = StringField(label='Artist Title:', validators=[DataRequired()])
+    submit = SubmitField(label='Add Track')
 
 
 class PlaylistForm(FlaskForm):
-    title = StringField(label='Album Title:', validators=[DataRequired()])
+    title = StringField(label='Playlist Title:', validators=[DataRequired()])
     private = BooleanField(label='Is Private:', validators=[DataRequired()])
+    # TODO add integer constraints
+    number_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired()])
+    submit = SubmitField(label='Upload Playlist')
+
+
+class EventForm(FlaskForm):
+    name = StringField(label='Event Name:', validators=[DataRequired()])
+    date = DateField(label='Birth Date:', validators=[DataRequired()])
+    start_time = TimeField(label='Start Time:', validators=[DataRequired()])
+    end_time = TimeField(label='End Time:', validators=[DataRequired()])
+    location = StringField(label='Location:', validators=[DataRequired()])
+    link = URLField(label='Link:', validators=[DataRequired()])
+    guests = StringField(label='Guests')
     submit = SubmitField(label='Upload')

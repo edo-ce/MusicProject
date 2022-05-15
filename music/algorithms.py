@@ -81,8 +81,13 @@ def get_listener(code):
     return session.query(Listener).filter_by(id=code).first()
 
 
+def get_playlist(code):
+    return session.query(Playlist).filter_by(id=code).first()
+
+
 def get_artists_events(code):
-    return session.query(Event).join(event_participation).join(Artist).where(Artist.id == code).all()
+    # TODO
+    pass
 
 
 def get_artist_albums(code):
@@ -91,6 +96,16 @@ def get_artist_albums(code):
 
 def get_playlists_by_creator(code):
     return session.query(Playlist).filter(Playlist.creator == code).all()
+
+
+def get_playlist_track(title, album, artist):
+    # TODO gestire il caso in cui c'è un artista con il nome uguale e anche il nome di un album uguale
+    album_id = session.query(Album.id).join(Element).join(Artist).where(Element.id == Album.id and
+                                                                        Album.artist_id == Artist.id and
+                                                                        Artist.stage_name == artist and
+                                                                        Element.title == album).first()
+    return session.query(Track).join(Element).where(Element.id == Track.id and Element.title == title and
+                                                    Track.album_id == album_id).first()
 
 
 def get_album_tracks(code):

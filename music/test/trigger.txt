@@ -7,3 +7,6 @@
 
 // Privilegi
 // 1) privilegi di ascolto diversi per i minorenni???????
+
+// Trigger
+// 1) Un'artista non può avere più di un album (o traccia?) con lo stesso nome
