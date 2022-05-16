@@ -1,13 +1,9 @@
 #!/usr/bin/env python
-"""A simple script that searches for a release in the MusicBrainz.
- $ ./populate.py Gemitaiz Kepler
-"""
 
-import musicbrainzngs
 from music.models import *
 from datetime import date
 
-models_list = [ User, Artist, Listener, Element, Genre, Album, Track, Playlist, Event, PaymentCard, Premium, Follower]
+models_list = [ User, Artist, Listener, Element, Genre, Album, Track, Playlist, Event, PaymentCard, Premium, Follower, saved_elements, featuring, playlist_tracks, guests]
 
 
 def delete_all_records():
@@ -15,25 +11,39 @@ def delete_all_records():
         for it in models_list:
             session.query(it).delete()
     except Exception as ex:
-        print(ex)
         session.rollback()
+        raise ex
 
     session.commit()
 
+def upload_all_element():
+    try:
+        session.add(user_obj)
+        session.add(artist_obj)
+        session.add(album_element)
+        session.add(album_obj)
+        session.add(genre)
 
-# online db
-musicbrainzngs.set_useragent(
-    "python-musicbrainzngs-example",
-    "0.1",
-    "https://github.com/alastair/python-musicbrainzngs/",
-)
+        session.add_all(element_vect)
+        session.add_all(track_vect)
+    except Exception as ex:
+        session.rollback()
+        raise ex
+
+    session.commit()
+
+def upload_element(el):
+    try:
+        session.add(el)
+    except Exception as ex:
+        session.rollback()
+        raise ex
+    session.commit()
 
 if __name__ == '__main__':
 
     artist = "Gemitaiz"
     album = "Kepler"
-
-    #print(json.dumps(tracks.get('recording-list')[0].get('title'), indent=4, sort_keys=True))
 
     #delete all rows
     delete_all_records()
@@ -65,20 +75,7 @@ if __name__ == '__main__':
 
 
     #upload elements
-    try:
-        session.add(user_obj)
-        session.add(artist_obj)
-        session.add(album_element)
-        session.add(album_obj)
-        session.add(genre)
-
-        session.add_all(element_vect)
-        session.add_all(track_vect)
-    except Exception as ex:
-        session.rollback()
-        raise ex
-
-    session.commit()
+    upload_all_element()
 
     u = User(username='edo', email='idjdd@ddkod.com', password='password', country='Italy')
     session.add(u)
@@ -86,6 +83,5 @@ if __name__ == '__main__':
     l.elements.append(session.query(Element).filter_by(id=98).first())
     l.elements.append(session.query(Element).filter_by(id=102).first())
 
-
-    session.add(l)
-    session.commit()
+    # upload single element
+    upload_element(l)
