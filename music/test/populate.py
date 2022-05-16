@@ -33,11 +33,6 @@ if __name__ == '__main__':
     artist = "Gemitaiz"
     album = "Kepler"
 
-    #query result
-    tracks = musicbrainzngs.search_recordings(artist=artist, release=album, limit=10)
-    artist_searched = musicbrainzngs.search_artists(artist=artist)
-    print(artist_searched)
-
     #print(json.dumps(tracks.get('recording-list')[0].get('title'), indent=4, sort_keys=True))
 
     #delete all rows
@@ -53,7 +48,7 @@ if __name__ == '__main__':
     artist_obj = Artist(id=user_obj.username, stage_name="Gemitaiz", is_solo=True, bio="gemi Bio")
     # Album
     album_element = Element(id=98, title=album)
-    album_obj = Album(release_date=date.today(), artist_id=artist_obj.id, id=album_element.id )
+    album_obj = Album(release_date=date.today(), artist_id=artist_obj.id, id=album_element.id)
 
     #containers
     element_vect = []
@@ -61,12 +56,11 @@ if __name__ == '__main__':
 
     #add tracks
     i = 100
-    for id, track in enumerate (tracks.get('recording-list')):
-
+    for _ in range(10):
         #print(id, '{}'.format( track ) )
         i = i + 1
-        element_vect.append(Element(id=i, title= track['title']))
-        track_vect.append( Track(id=element_vect[-1].id, duration= track['length'], copyright="example",genre=genre.id,
+        element_vect.append(Element(id=i, title=str(i)))
+        track_vect.append(Track(id=element_vect[-1].id, duration=34, copyright="example",genre=genre.id,
                                   album_id=album_obj.id))
 
 
@@ -81,8 +75,8 @@ if __name__ == '__main__':
         session.add_all(element_vect)
         session.add_all(track_vect)
     except Exception as ex:
-        print(ex)
         session.rollback()
+        raise ex
 
     session.commit()
 
