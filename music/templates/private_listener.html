@@ -34,7 +34,7 @@
                          AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
                          TODO REVIEW JINJIA ARGUMENTS -->
                         <!--<a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ get_title(i.id) }}))">-->
-                            <a style="cursor: pointer;" onclick="showElementDetails( {{ i.__repr__ }} )">
+                            <a style="cursor: pointer;" onclick="showElementDetails( {{ i.__repr__() }} )">
                             <div class="card-flyer">
                                 <div class="text-box">
                                     <div class="image-box img-conver">

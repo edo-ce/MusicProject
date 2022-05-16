@@ -10,3 +10,4 @@
 
 // Trigger
 // 1) Un'artista non può avere più di un album (o traccia?) con lo stesso nome
+// 2) Un'utente non premium non può salvare più di 5 album...

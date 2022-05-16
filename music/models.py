@@ -10,7 +10,7 @@ def load_user(code):
 
 
 def get_title(code):
-    return session.query(Element.title).filter_by(id=code).first()
+    return session.query(Element.title).filter_by(id=code).first()[0]
 
 
 class User(Base, UserMixin):
