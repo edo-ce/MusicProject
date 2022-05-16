@@ -13,6 +13,10 @@ def rollback():
     session.rollback()
 
 
+def flush():
+    session.flush()
+
+
 def username_exists(code):
     return session.query(User).filter_by(username=code).first()
 
@@ -183,6 +187,13 @@ def delete_tuple(table, id):
     except Exception as e:
         rollback()
         raise e
+
+
+def update_tuple(table, code, **kwargs):
+    row = session.query(table).filter_by(id=code).first()
+    for attribute, value in kwargs.items():
+        setattr(row, attribute, value)
+    commit()
 
 
 def advice_func():
