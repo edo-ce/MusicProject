@@ -172,12 +172,15 @@ def create_playlist():
 def private():
     def title(code):
         return get_title(code)
+
+    def print_info(i):
+        return i.__repr__()
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('private_artist.html', elems=elems, get_title=title)
+        return render_template('private_artist.html', elems=elems, get_title=title, print_info=print_info)
     else:
         elems = find_saved_elements(current_user.username)
-        return render_template('private_listener.html', elems=elems, get_title=title)
+        return render_template('private_listener.html', elems=elems, get_title=title, print_info=print_info)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
@@ -209,7 +212,8 @@ def search():
 @login_required
 def search_results():
     res = request.args.get('res')
-    return render_template('search.html', res=res)
+    d = {'Track': ['prima', 'seconda'], 'Album': ['terzo', 'quarto']}
+    return render_template('search.html', dict=d)
 
 
 @app.route('/settings')

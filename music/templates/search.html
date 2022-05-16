@@ -5,6 +5,12 @@
 {% block content %}
 <body class="text-center">
     <section class="container">
+        {% for key, value in dict.items() %}
+            <h1>{{ key }}</h1>
+            {% for i in value %}
+                <p>{{ i }}</p>
+            {% endfor %}
+        {% endfor %}
     </section>
 </body>
 {% endblock %}

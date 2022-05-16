@@ -3,7 +3,8 @@
 from music.models import *
 from datetime import date
 
-models_list = [ User, Artist, Listener, Element, Genre, Album, Track, Playlist, Event, PaymentCard, Premium, Follower, saved_elements, featuring, playlist_tracks, guests]
+models_list = [User, Artist, Listener, Element, Genre, Album, Track, Playlist, Event, PaymentCard, Premium, Follower,
+                saved_elements, featuring, playlist_tracks, guests]
 
 
 def delete_all_records():
