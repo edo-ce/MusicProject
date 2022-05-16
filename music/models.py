@@ -2,7 +2,7 @@ from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
 from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
-
+import json
 
 @login_manager.user_loader
 def load_user(code):
@@ -44,7 +44,12 @@ class User(Base, UserMixin):
         return bcrypt.check_password_hash(self.hashed_password, psw)
 
     def __repr__(self):
-        return f'<User(username={self.username}, password={self.hashed_password}, email={self.email})>'
+        ret = {
+            'username' : self.username,
+            'password' : self.hashed_password,
+            'email' : self.email
+        }
+        return json.dumps(ret, indent=4)
 
 
 class Artist(Base):
@@ -62,9 +67,13 @@ class Artist(Base):
         return self.stage_name
 
     def __repr__(self):
-        solo = "Solo" if self.is_solo else "group"
-        b = self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
-        return f'Stage Name: {self.stage_name}\n{solo}\nBio: {b}'
+        ret = {
+           'Stage Name' : self.stage_name + ("Solo" if self.is_solo else "group"),
+            'Bio' : self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
+        }
+
+
+        return json.dumps(ret, indent=4)
 
 
 saved_elements = Table('saved_elements', Base.metadata,
@@ -132,7 +141,11 @@ class Album(Base):
         return session.query(Artist).filter_by(id=self.artist_id).first()
 
     def __repr__(self):
-        return f'Title: {get_title(self.id)}\nRelease Date: {self.release_date}\nArtist: {self.get_artist().stage_name}'
+        a = { 'Title' : get_title(self.id) ,
+              'Release Date' : str(self.release_date) ,
+              'Artist' : self.get_artist().stage_name
+              }
+        return json.dumps(a, indent = 4)
 
 
 class Track(Base):
@@ -156,10 +169,18 @@ class Track(Base):
     # TODO vedere aggiungere genere
 
     def __repr__(self):
-        album_name = 'Album: single' if self.get_album().number_of_tracks() > 1 else 'Single'
-        return f'Title: {get_title(self.id)}\n{album_name}\nArtist: {self.get_album().get_artist().stage_name}' \
-               f'\nFeaturing: {", ".join(f.stage_name for f in self.artists_feat)}' \
-               f'\nDuration: {self.duration}\nGenre: {self.get_genre().name}\nCopyright: {self.copyright}'
+
+        ret = {
+            'Title' : get_title(self.id),
+            'Artist' : self.get_album().get_artist().stage_name,
+            'Featuring' : ", ".join(f.stage_name for f in self.artists_feat),
+            'Duration' : self.duration,
+            'Genre' : self.get_genre().name,
+            'Copyright' : self.copyright,
+            'Album' : 'single' if self.get_album().number_of_tracks() > 1 else 'Single'
+        }
+
+        return json.dumps(ret, indent=4)
 
 
 class Playlist(Base):
@@ -175,8 +196,13 @@ class Playlist(Base):
         return artist.stage_name if artist else listener.id
 
     def __repr__(self):
-        playlist_type = 'Private' if self.is_private else 'Public'
-        return f'Title: {get_title(self.id)}\nPlaylist Type: {playlist_type}\nCreator: {self.get_creator_name()}'
+        ret = {
+            'Title' : get_title(self.id),
+            'Playlist Type' : 'Private' if self.is_private else 'Public',
+            'Creator' : self.get_creator_name()
+        }
+
+        return json.dumps(ret, indent=4)
 
 
 guests = Table('guests', Base.metadata,

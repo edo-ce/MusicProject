@@ -82,7 +82,7 @@ function convertCanvasToImageUrl(canvas) {
 function convertStringToImageUrl(stringa) {
   primary = generateHSL(stringa);
   primaryRGB = hslToRgb(primary[0], primary[1], primary[2]);
-  console.log(primaryRGB);
+  //console.log(primaryRGB);
   secondaryRGB = [];
   for (const i in primaryRGB) {
     secondaryRGB.push(255 - primaryRGB[i]);

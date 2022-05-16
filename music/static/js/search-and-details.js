@@ -55,41 +55,51 @@ function search_alert() {
         }
 
 
-        function showElementDetails(element) {
-            element = JSON.parse(element);
-            console.log(element);
-            var img = convertStringToImageUrl(element['title']);
-            var keys = ['duration', 'copyright', 'genre', 'release_date', 'stage_name', 'bio', 'creator'];
-            var stringa = "";
-            for (const key of keys) {
-                if (element.hasOwnProperty(key)) {
-                    if (key == "copyright")
-                        stringa += "<p class='card-text'><small class='text-muted'>" + element[key] + "</small></p>"
-                    else stringa += "<p class='card-text'>" + element[key] + "</p>";
-                }
+        function showElementDetails() {
+
+            let details = $(".details");
+            let reprs = $(".repr");
+
+            for(let index = 0; index<details.length; index++) {
+                details[index].addEventListener("click", function(){
+                    //console.log(reprs[index])
+                    let element = $(".repr").eq(index).data().name;
+                    //console.log(element)
+                    var img = convertStringToImageUrl(element['Title']);
+                    var stringa = "";
+                    for (const key in element) {
+                        if( key=='Title')
+                            continue;
+                        if (key == "Copyright")
+                            stringa += "<p class='card-text'><small class='text-muted'>" + element[key] + "</small></p>"
+                        else
+                            stringa += "<p class='card-text'>" + element[key] + "</p>";
+                    }
+                    Swal.fire({
+                          title: 'Details',
+                          html: "<div class='card mb-3' style='max-width: 500px;'>" +
+                                  "<div class='row no-gutters'>" +
+                                    "<div class='col-md-4'>" +
+                                      "<img src='" + img + "' class='card-img' alt='...'>" +
+                                    "</div>" +
+                                    "<div class='col-md-8'>" +
+                                      "<div class='card-body'>" +
+                                        "<h5 class='card-title'>" + element['Title'] + "</h5>" +
+                                        stringa +
+                                        "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill'></i></span>" +
+                                      "</div>" +
+                                    "</div>" +
+                                  "</div>" +
+                                "</div>",
+                          showConfirmButton: false,
+                          showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                          },
+                          hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                          }
+                        });
+                })
             }
-            Swal.fire({
-                  title: 'Track details',
-                  html: "<div class='card mb-3' style='max-width: 500px;'>" +
-                          "<div class='row no-gutters'>" +
-                            "<div class='col-md-4'>" +
-                              "<img src='" + img + "' class='card-img' alt='...'>" +
-                            "</div>" +
-                            "<div class='col-md-8'>" +
-                              "<div class='card-body'>" +
-                                "<h5 class='card-title'>" + element['title'] + "</h5>" +
-                                stringa +
-                                "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill'></i></span>" +
-                              "</div>" +
-                            "</div>" +
-                          "</div>" +
-                        "</div>",
-                  showConfirmButton: false,
-                  showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                  },
-                  hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                  }
-            });
+
         }

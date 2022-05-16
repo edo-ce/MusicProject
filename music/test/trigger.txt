@@ -1,13 +1,16 @@
-// Vincoli
+// Check
 // 1) la traccia deve essere compresa tra i 2 e 3 minuti
-// 2) album deve contenere almeno una traccia
 // 3) la data di nascità dell'artista/utente  deve essere comrpesa tra 16 - 100 anni
-// 4) Un artisti deve pubblicare almeno un album nella piattaforma per essere considerato tale (scadenza)
-// 5) un brano/ album preferito non piò essere inserito nei preferiti più volte
-
-// Privilegi
-// 1) privilegi di ascolto diversi per i minorenni???????
 
 // Trigger
 // 1) Un'artista non può avere più di un album (o traccia?) con lo stesso nome
 // 2) Un'utente non premium non può salvare più di 5 album...
+// 3) privilegi di ascolto diversi per i minorenni???????
+// 4) album deve contenere almeno una traccia (coinvolge + tabelle)
+// 5) Un artista deve pubblicare almeno un album nella piattaforma per essere considerato tale (scadenza) [on update or insert]
+
+// Permessi
+// differenti in base alle tabelle...
+
+// Indici
+// Su genere / id artista
