@@ -1,8 +1,8 @@
 function search_alert() {
             Swal.fire({
                   title: 'Search!',
-                  html: "<form method='POST' class='form-signup' autocomplete='off'>" +
-                      "<input type='search' id='login' class='swal2-input' placeholder='Search anything...' onclick='showResults(this.value)' >" +
+                  html: "<form action='/search-results' method='POST' class='form-signup' autocomplete='off'>" +
+                      "<input type='search' name='search_text' id='login' class='swal2-input' placeholder='Search anything...' onclick='showResults(this.value)' >" +
                       "<div id='result'></div>" +
                       "<button type='submit' class='btn m-2' style='background-color: #00D1B2; color: white;' value='submit'>Search</button>  " +
                       "" +

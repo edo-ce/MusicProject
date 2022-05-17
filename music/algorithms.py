@@ -26,15 +26,14 @@ def is_premium(code):
 
 
 def search_func(search_result):
-    res = {}
-    elems = session.query(Element).filter_by(title=search_result).all()
-    for elem in elems:
-        e = elem.find_type()
-        if res.get(e.__tablename__):
-            res[e.__tablename__].append(e)
-        else:
-            res[e.__tablename__] = e
-    res['artists'] = session.query(Artist).filter_by(stage_name=search_result).all()
+    res = {'albums': [], 'tracks': [], 'playlists': []}
+    elems = session.query(Element).filter(func.lower(Element.title) == search_result).all()
+    for key in res.keys():
+        for elem in elems:
+            query = session.query(Element.title).join(key).where(Element.id == elem.id and Element.id == key+'id').first()
+            if query:
+                res[key].append(query[0])
+    res['artists'] = session.query(Artist.stage_name).filter_by(stage_name=search_result).all()
     return res
 
 

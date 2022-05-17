@@ -1,6 +1,6 @@
 from music import app
 from flask import render_template, redirect, url_for, flash, request
-from music.forms import SignUpForm, LoginForm, SearchForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, \
+from music.forms import SignUpForm, LoginForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, \
     PlaylistForm, EventForm, PlaylistTrackForm
 from flask_login import login_user, logout_user, login_required, current_user
 from music.algorithms import *
@@ -203,22 +203,11 @@ def view(username):
     return render_template('view.html', elems=elems, artist=artist)
 
 
-@app.route('/search', methods=['GET', 'POST'])
-@login_required
-def search():
-    form = SearchForm()
-    if form.validate_on_submit():
-        res = search_func(form.search.data.lower())
-        return redirect(url_for('search_results', elems=res))
-    return render_template('base.html', form=form)
-
-
-@app.route('/search-results')
+@app.route('/search-results', methods=['GET', 'POST'])
 @login_required
 def search_results():
-    res = request.args.get('res')
-    d = {'Track': ['prima', 'seconda'], 'Album': ['terzo', 'quarto']}
-    return render_template('search.html', dict=d)
+    res = search_func(request.form['search_text'].lower())
+    return render_template('search.html', dict=res)
 
 
 @app.route('/settings')

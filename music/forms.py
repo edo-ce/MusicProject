@@ -54,11 +54,6 @@ class PaymentForm(FlaskForm):
     submit = SubmitField(label='Upgrade to Premium')
 
 
-class SearchForm(FlaskForm):
-    search = SearchField('Search:', validators=[DataRequired()])
-    submit = SubmitField(label='Search')
-
-
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
