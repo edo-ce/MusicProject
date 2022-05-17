@@ -7,6 +7,11 @@ from music.algorithms import *
 from datetime import date
 
 
+@app.context_processor
+def utility_processor():
+    return dict(is_premium=is_premium, is_artist=is_artist)
+
+
 @app.route('/')
 @app.route('/home')
 def home():

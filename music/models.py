@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
 import json
+from datetime import date
 
 @login_manager.user_loader
 def load_user(code):
@@ -80,6 +81,7 @@ saved_elements = Table('saved_elements', Base.metadata,
                        Column('id_element', ForeignKey('elements.id'), primary_key=True),
                        Column('id_listener', ForeignKey('listeners.id'), primary_key=True))
 
+
 class Listener(Base):
     __tablename__ = 'listeners'
 
@@ -105,6 +107,7 @@ class Element(Base):
     def find_type(self):
         return session.query(Track).filter_by(id=self.id).first() or session.query(Album).filter_by(id=self.id)\
             .first() or session.query(Playlist).filter_by(id=self.id).first()
+
 
 class Genre(Base):
     __tablename__ = 'genres'
@@ -236,6 +239,7 @@ class PaymentCard(Base):
     id = Column(Integer, primary_key=True)
     number = Column(String, nullable=False)
     pin = Column(String, nullable=False)
+    # TODO check expiration_date > date.today()
     expiration_date = Column(Date, nullable=False)
     owner = Column(String, nullable=False)
     type = Column(String, nullable=False)

@@ -21,6 +21,10 @@ def username_exists(code):
     return session.query(User).filter_by(username=code).first()
 
 
+def is_premium(code):
+    return session.query(Premium).filter_by(id=code).first() is not None
+
+
 def search_func(search_result):
     res = {}
     elems = session.query(Element).filter_by(title=search_result).all()
@@ -176,6 +180,7 @@ def add_and_commit(table, **kwargs):
 def add_no_commit(table, **kwargs):
     elem = table(**kwargs)
     session.add(elem)
+    flush()
     return elem
 
 
