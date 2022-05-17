@@ -4,12 +4,19 @@
 {% endblock %}
 {% block content %}
 <body class="text-center">
-    <section class="container">
+    <section class="container w-50" style="margin-left: auto; margin-right: auto;">
         {% for key, value in dict.items() %}
             <h1>{{ key }}</h1>
+            <div class="list-group">
             {% for i in value %}
-                <p>{{ i }}</p>
+                <div class="list-group-item list-group-item-action">
+                    <!-- TODO: ON CLICK THE ELEMENT WHAT HAPPEN -->
+                    <a href="/{{ i }}" class="text-decoration-none">{{ i }}</a>
+                    <!-- TODO: ON CLICK THE HEART OF ELEMENT WHAT HAPPEN -->
+                    <span style='cursor: pointer;'><i class='bi bi-heart'></i></span>
+                </div>
             {% endfor %}
+            </div>
         {% endfor %}
     </section>
 </body>
