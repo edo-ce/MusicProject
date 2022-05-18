@@ -26,14 +26,18 @@ def is_premium(code):
 
 
 def search_func(search_result):
-    res = {'albums': [], 'tracks': [], 'playlists': []}
+    res = {'albums': [], 'tracks': [], 'playlists': [], 'artists': []}
     elems = session.query(Element).filter(func.lower(Element.title) == search_result).all()
     for key in res.keys():
-        for elem in elems:
-            query = session.query(Element.title).join(key).where(Element.id == elem.id and Element.id == key+'id').first()
-            if query:
-                res[key].append(query[0])
-    res['artists'] = session.query(Artist.stage_name).filter_by(stage_name=search_result).all()
+        if key == 'artists':
+            artists = session.query(Artist.stage_name).filter(func.lower(Artist.stage_name) == search_result).all()
+            for stage_name in artists:
+                res['artists'].append(stage_name[0])
+        else:
+            for elem in elems:
+                query = session.query(Element.title).join(key).where(Element.id == elem.id and Element.id == key+'id').first()
+                if query:
+                    res[key].append(query[0])
     return res
 
 
@@ -105,6 +109,11 @@ def get_playlists_by_creator(code):
     return session.query(Playlist).filter(Playlist.creator == code).all()
 
 
+def get_payment_card(code):
+    return session.query(PaymentCard).join(Premium).where(
+        Premium.id == code and PaymentCard.id == Premium.payment_card).first()
+
+
 def get_playlist_track(title, album, artist):
     # TODO gestire il caso in cui c'è un artista con il nome uguale e anche il nome di un album uguale
     album_id = session.query(Album.id).join(Element).join(Artist).where(Element.id == Album.id and
@@ -157,10 +166,6 @@ def update_artist_info():
     pass
 
 
-def delete_premium_account():
-    pass
-
-
 def get_table(table):
     return session.query(table).all()
 
@@ -186,7 +191,10 @@ def add_no_commit(table, **kwargs):
 def delete_tuple(table, id):
     try:
         # vedere con user
-        session.query(table).filter_by(id=id).delete()
+        if table == User or table == 'users':
+            session.query(table).filter_by(username=id).delete()
+        else:
+            session.query(table).filter_by(id=id).delete()
         commit()
     except Exception as e:
         rollback()

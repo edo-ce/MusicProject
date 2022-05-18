@@ -85,6 +85,19 @@ def premium():
     return render_template('premium.html', form=form)
 
 
+@app.route('/premium-delete')
+@login_required
+def delete_premium():
+    if is_premium(current_user.username):
+        payment_card = get_payment_card(current_user.username)
+        if session.query(PaymentCard).join(Premium).where(
+                PaymentCard.id == payment_card.id and PaymentCard.id == Premium.payment_card).count() > 1:
+            delete_tuple(Premium, current_user.username)
+        else:
+            delete_tuple(PaymentCard, payment_card.id)
+    return redirect(url_for('private'))
+
+
 @app.route('/upload-track/<number>', methods=['GET', 'POST'])
 @login_required
 def upload_track(number):
