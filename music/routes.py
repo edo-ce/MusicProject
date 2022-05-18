@@ -9,7 +9,7 @@ from datetime import date
 
 @app.context_processor
 def utility_processor():
-    return dict(is_premium=is_premium, is_artist=is_artist)
+    return dict(is_premium=is_premium, is_artist=is_artist, delete_from_saved=delete_from_saved)
 
 
 @app.route('/')
@@ -28,7 +28,7 @@ def signup_artist():
         login_user(get_user(username))
         flash(f"Artist account created successfully! You are logged in {username}", category="success")
         return redirect(url_for('private'))
-    return render_template('signup_artist.html', form=form)
+    return render_template('forms/signup_artist.html', form=form)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -47,7 +47,7 @@ def signup():
     if form.errors != {}:
         for field, message in form.errors.items():
             flash(f"Error: {field} {message}", category="danger")
-    return render_template('signup.html', form=form)
+    return render_template('forms/signup.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -61,7 +61,7 @@ def login():
             return redirect(url_for('private'))
         else:
             flash('Username and password are not correct!', category='danger')
-    return render_template('login.html', form=form)
+    return render_template('forms/login.html', form=form)
 
 
 @app.route('/logout')
@@ -76,13 +76,14 @@ def logout():
 def premium():
     form = PaymentForm()
     if form.validate_on_submit():
+        # TODO gestire il fatto in cui la carta di credito è già registrata
         card = add_no_commit(PaymentCard, number=form.number.data, pin=form.pin.data,
                            expiration_date=form.expiration_date.data,
                            owner=form.holder.data, type=form.type.data)
         add_and_commit(Premium, id=current_user.username, registration_date=date.today(), payment_card=card.id)
         flash('Account Premium create successfully', category='success')
         return redirect(url_for('private'))
-    return render_template('premium.html', form=form)
+    return render_template('forms/premium.html', form=form)
 
 
 @app.route('/premium-delete')
@@ -195,10 +196,10 @@ def private():
         return i.__repr__()
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('private_artist.html', elems=elems, get_title=title, print_info=print_info)
+        return render_template('personal_pages/private_artist.html', elems=elems, get_title=title, print_info=print_info)
     else:
         elems = find_saved_elements(current_user.username)
-        return render_template('private_listener.html', elems=elems, get_title=title, print_info=print_info)
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title, print_info=print_info)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
@@ -213,7 +214,7 @@ def view(username):
         elems = find_saved_elements(username)
     else:
         elems = get_playlists_by_creator(username)
-    return render_template('view.html', elems=elems, artist=artist)
+    return render_template('personal_pages/view.html', elems=elems, artist=artist)
 
 
 @app.route('/search-results', methods=['GET', 'POST'])

@@ -170,6 +170,11 @@ def get_table(table):
     return session.query(table).all()
 
 
+def delete_from_saved(id_element, id_listener):
+    session.query(saved_elements).filter(
+        saved_elements.id_element == id_element and saved_elements.id_listener == id_listener).delete()
+
+
 def add_and_commit(table, **kwargs):
     try:
         elem = table(**kwargs)
