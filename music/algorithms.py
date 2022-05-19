@@ -170,9 +170,15 @@ def get_table(table):
     return session.query(table).all()
 
 
+# TODO ricordarsi il commit alla fine
 def delete_from_saved(id_element, id_listener):
-    session.query(saved_elements).filter(
-        saved_elements.id_element == id_element and saved_elements.id_listener == id_listener).delete()
+    try:
+        session.query(saved_elements).filter(
+            saved_elements.id_element == id_element and saved_elements.id_listener == id_listener).delete()
+        commit()
+    except Exception as e:
+        rollback()
+        raise e
 
 
 def add_and_commit(table, **kwargs):
@@ -193,13 +199,13 @@ def add_no_commit(table, **kwargs):
     return elem
 
 
-def delete_tuple(table, id):
+def delete_tuple(table, code):
     try:
         # vedere con user
         if table == User or table == 'users':
-            session.query(table).filter_by(username=id).delete()
+            session.query(table).filter_by(username=code).delete()
         else:
-            session.query(table).filter_by(id=id).delete()
+            session.query(table).filter_by(id=code).delete()
         commit()
     except Exception as e:
         rollback()

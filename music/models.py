@@ -238,13 +238,21 @@ class PaymentCard(Base):
 
     id = Column(Integer, primary_key=True)
     number = Column(String, nullable=False)
-    pin = Column(String, nullable=False)
+    security_pin = Column(String, nullable=False)
     # TODO check expiration_date > date.today()
     expiration_date = Column(Date, nullable=False)
     owner = Column(String, nullable=False)
     type = Column(String, nullable=False)
 
     premiums = relationship('Premium', backref='card')
+
+    @property
+    def pin(self):
+        return self.pin
+
+    @pin.setter
+    def pin(self, p):
+        self.security_pin = bcrypt.generate_password_hash(p).decode('utf-8')
 
 
 class Premium(Base):

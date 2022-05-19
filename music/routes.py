@@ -94,8 +94,12 @@ def delete_premium():
         if session.query(PaymentCard).join(Premium).where(
                 PaymentCard.id == payment_card.id and PaymentCard.id == Premium.payment_card).count() > 1:
             delete_tuple(Premium, current_user.username)
+            commit()
         else:
             delete_tuple(PaymentCard, payment_card.id)
+            commit()
+        get_listener(current_user.username).elements = []
+        commit()
     return redirect(url_for('private'))
 
 
@@ -192,14 +196,12 @@ def private():
     def title(code):
         return get_title(code)
 
-    def print_info(i):
-        return i.__repr__()
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('personal_pages/private_artist.html', elems=elems, get_title=title, print_info=print_info)
+        return render_template('personal_pages/private_artist.html', elems=elems, get_title=title)
     else:
         elems = find_saved_elements(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title, print_info=print_info)
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
@@ -227,4 +229,7 @@ def search_results():
 @app.route('/settings')
 @login_required
 def settings():
-    pass
+    if is_artist(current_user.username):
+        return render_template('artist_settings.html')
+    else:
+        return render_template('listener_settings.html')
