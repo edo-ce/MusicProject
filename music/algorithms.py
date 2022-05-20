@@ -30,14 +30,14 @@ def search_func(search_result):
     elems = session.query(Element).filter(func.lower(Element.title) == search_result).all()
     for key in res.keys():
         if key == 'artists':
-            artists = session.query(Artist.stage_name).filter(func.lower(Artist.stage_name) == search_result).all()
-            for stage_name in artists:
-                res['artists'].append(stage_name[0])
+            artists = session.query(Artist).filter(func.lower(Artist.stage_name) == search_result).all()
+            res['artists'] = artists
         else:
             for elem in elems:
-                query = session.query(Element.title).join(key).where(Element.id == elem.id and Element.id == key+'id').first()
+                query = session.query(Element).join(key).where(Element.id == elem.id and Element.id == key+'.id')\
+                    .first()
                 if query:
-                    res[key].append(query[0])
+                    res[key].append(query)
     return res
 
 
@@ -85,11 +85,15 @@ def get_element_table(name):
 
 
 def get_user(code):
-    return session.query(User).filter(User.username == code).first()
+    return session.query(User).filter_by(username=code).first()
 
 
 def get_listener(code):
     return session.query(Listener).filter_by(id=code).first()
+
+
+def get_element(code):
+    return session.query(Element).filter_by(id=code).first()
 
 
 def get_playlist(code):
@@ -170,11 +174,29 @@ def get_table(table):
     return session.query(table).all()
 
 
-# TODO ricordarsi il commit alla fine
-def delete_from_saved(id_element, id_listener):
+def is_saved(id_listener, id_save):
+    if type(id_save) == str:
+        return session.query(Follower).filter(Follower.id_artist == id_save and Follower.id_listener == id_listener) \
+               is not None
+    else:
+        return get_element(id_save) in get_listener(id_listener).elements
+
+
+def save_something(id_listener, id_save):
+    if type(id_save) == str:
+        add_and_commit(Follower, id_artist=id_save, id_listener=id_listener)
+    else:
+        get_listener(id_listener).elements.append(get_element(id_save))
+        commit()
+
+
+def delete_from_saved(id_listener, id_saved):
     try:
-        session.query(saved_elements).filter(
-            saved_elements.id_element == id_element and saved_elements.id_listener == id_listener).delete()
+        if type(id_saved) == str:
+            session.query(Follower).filter(Follower.id_artist == id_saved and Follower.id_listener == id_listener)\
+                .delete()
+        else:
+            get_listener(id_listener).elements.remove(get_element(id_saved))
         commit()
     except Exception as e:
         rollback()

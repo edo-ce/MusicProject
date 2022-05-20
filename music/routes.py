@@ -9,7 +9,7 @@ from datetime import date
 
 @app.context_processor
 def utility_processor():
-    return dict(is_premium=is_premium, is_artist=is_artist, delete_from_saved=delete_from_saved)
+    return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved)
 
 
 @app.route('/')
@@ -94,10 +94,8 @@ def delete_premium():
         if session.query(PaymentCard).join(Premium).where(
                 PaymentCard.id == payment_card.id and PaymentCard.id == Premium.payment_card).count() > 1:
             delete_tuple(Premium, current_user.username)
-            commit()
         else:
             delete_tuple(PaymentCard, payment_card.id)
-            commit()
         get_listener(current_user.username).elements = []
         commit()
     return redirect(url_for('private'))
