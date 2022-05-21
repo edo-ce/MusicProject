@@ -20,9 +20,13 @@
                     <!-- TODO: ON CLICK THE HEART OF ELEMENT WHAT HAPPEN -->
 
                     {% if is_saved(current_user.username, i.id) %}
-                    <span style='cursor: pointer;'><i class='bi bi-heart-fill'></i></span>
+                    <span style='cursor: pointer;' onclick="{{ delete_from_saved(current_user.username, i.id) }}">
+                        <i class='bi bi-heart-fill'></i>
+                    </span>
                     {% else %}
-                    <span style='cursor: pointer;'><i class='bi bi-heart'></i></span>
+                    <span style='cursor: pointer;' onclick="{{ save_something(current_user.username, i.id) }}">
+                        <i class='bi bi-heart'></i>
+                    </span>
                     {% endif %}
 
                 </div>

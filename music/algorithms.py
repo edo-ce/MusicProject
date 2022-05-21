@@ -176,17 +176,20 @@ def get_table(table):
 
 def is_saved(id_listener, id_save):
     if type(id_save) == str:
-        return session.query(Follower).filter(Follower.id_artist == id_save and Follower.id_listener == id_listener) \
-               is not None
+        return session.query(Follower).filter(Follower.id_artist == id_save and Follower.id_listener == id_listener)\
+                   .first() is not None
     else:
         return get_element(id_save) in get_listener(id_listener).elements
 
 
 def save_something(id_listener, id_save):
     if type(id_save) == str:
-        add_and_commit(Follower, id_artist=id_save, id_listener=id_listener)
+        add_and_commit(Follower, id_artist=id_save, id_listener=id_listener, following_date=date.today())
     else:
-        get_listener(id_listener).elements.append(get_element(id_save))
+        # get_listener(id_listener).elements.append(get_element(id_save))
+        listener = get_listener(id_listener)
+        elem = get_element(id_save)
+        listener.elements.append(elem)
         commit()
 
 
@@ -196,7 +199,8 @@ def delete_from_saved(id_listener, id_saved):
             session.query(Follower).filter(Follower.id_artist == id_saved and Follower.id_listener == id_listener)\
                 .delete()
         else:
-            get_listener(id_listener).elements.remove(get_element(id_saved))
+            get_listener(id_listener).elements = []
+            # get_listener(id_listener).elements.remove(get_element(id_saved))
         commit()
     except Exception as e:
         rollback()

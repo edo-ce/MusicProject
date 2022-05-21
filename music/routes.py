@@ -9,7 +9,8 @@ from datetime import date
 
 @app.context_processor
 def utility_processor():
-    return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved)
+    return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved,
+                save_something=save_something)
 
 
 @app.route('/')

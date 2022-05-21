@@ -21,7 +21,6 @@
     </section-->
 
     <section>
-        <!-- button onclick="showElementDetails(JSON.stringify({{ element }}))">Test!</button-->
         <h1>My Library</h1>
         {% for elem, values in elems.items() %}
         <div class="cards_landscape_wrap-2">
@@ -33,7 +32,6 @@
                         <!-- MUST PASS AN OBJECT WITH ['duration', 'copyright', 'genre', 'release_date', 'stage_name', 'bio', 'creator']
                          AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
                          TODO REVIEW JINJIA ARGUMENTS -->
-                        <!--<a style="cursor: pointer;" onclick="showElementDetails(JSON.stringify({{ get_title(i.id) }}))">-->
                             <meta class="repr" data-name="{{ i.__repr__() }}" >
                             <a class="details" style="cursor: pointer;">
                             <div class="card-flyer">
@@ -41,14 +39,18 @@
                                     <div class="image-box img-conver">
                                         <!-- Image can be generated from the name
                                                 in img.alt must be the title song/artist name -->
+                                        {% if elem != 'artists' %}
                                         <img src="" alt="{{ get_title(i.id) }}" />
+                                        {% else %}
+                                        <img src="" alt="{{ i.stage_name }}" />
+                                        {% endif %}
                                     </div>
                                     <div class="text-container">
                                         <h6>
                                             {% if elem != 'artists' %}
                                                 {{ get_title(i.id) }}
                                             {% else %}
-                                                {{ i }}
+                                                {{ i.stage_name }}
                                             {% endif %}
                                         </h6>
                                     </div>
