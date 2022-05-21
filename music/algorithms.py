@@ -249,3 +249,8 @@ def advice_func():
 
 def get_genre_id(name):
     return session.query(Genre.id).filter(Genre.name == name).first()
+
+# STATISTICS
+# TODO check if it works
+def get_followers(artist):
+    return session.query(Artist.followers).filter_by(Artist.stage_name == artist).count();
