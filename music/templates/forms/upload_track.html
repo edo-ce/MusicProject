@@ -17,7 +17,9 @@
         {% endwith %}
         <br>
         {{ form.featuring.label() }}
-        {{ form.featuring }}
+        {% for feat in form.featuring %}
+            {{ feat.label }}{{ feat }}
+        {% endfor %}
         <br>
       <div class="form-group">
           {{ form.submit(class="btn btn-primary") }}

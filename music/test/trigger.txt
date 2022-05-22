@@ -8,6 +8,7 @@
 // 3) privilegi di ascolto diversi per i minorenni???????
 // 4) album deve contenere almeno una traccia (coinvolge + tabelle)
 // 5) Un artista deve pubblicare almeno un album nella piattaforma per essere considerato tale (scadenza) [on update or insert]
+// 6) Un artista non può essere ospite al suo stesso evento o un feat nella sua stessa traccia
 
 // Permessi
 // differenti in base alle tabelle...

@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from music.models import session, User, Artist, Listener
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
-    IntegerField, FieldList, SearchField, TimeField, URLField
-from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange
+    IntegerField, FieldList, SearchField, TimeField, URLField, FormField
+from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange, URL
 
 
 # TODO add constraints
@@ -54,12 +54,16 @@ class PaymentForm(FlaskForm):
     submit = SubmitField(label='Upgrade to Premium')
 
 
+class FeatForm(FlaskForm):
+    feat = StringField(label='Feat:')
+
+
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
     duration = IntegerField(label='Duration (seconds):', validators=[DataRequired(), NumberRange(min=0)])
     genre = StringField(label='Genre:', validators=[DataRequired()])
-    featuring = FieldList(StringField(label='Feat:', validators=[DataRequired()]))
+    featuring = FieldList(FormField(FeatForm), min_entries=1)
     submit = SubmitField(label='Upload Track')
 
 
@@ -89,6 +93,6 @@ class EventForm(FlaskForm):
     start_time = TimeField(label='Start Time:', validators=[DataRequired()])
     end_time = TimeField(label='End Time:', validators=[DataRequired()])
     location = StringField(label='Location:', validators=[DataRequired()])
-    link = URLField(label='Link:', validators=[DataRequired()])
-    guests = StringField(label='Guests')
+    link = URLField(label='Link:', validators=[URL(), DataRequired()])
+    guests = StringField(label='Guests username:')
     submit = SubmitField(label='Upload')

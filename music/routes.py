@@ -143,32 +143,33 @@ def upload_event():
         event = add_no_commit(Event, name=form.name.data, date=form.date.data, start_time=form.start_time.data,
                       end_time=form.end_time.data, location=form.location.data, link=form.link.data,
                       creator=current_user.username)
-        for artist in form.guests.data.split():
-            if is_artist(artist) is None:
-                flash(f'Artist {artist} does not exist!', category='danger')
-                rollback()
-                return redirect(url_for('upload_event'))
-            else:
-                event.artists_guests.append(is_artist(artist))
+        if form.guests.data:
+            for artist in form.guests.data.split():
+                if is_artist(artist) is None:
+                    flash(f'Artist {artist} does not exist!', category='danger')
+                    rollback()
+                    return redirect(url_for('upload_event'))
+                else:
+                    event.artists_guests.append(is_artist(artist))
+                    flush()
         commit()
         flash('Event uploaded successfully!', category='success')
         return redirect(url_for('private'))
-    return render_template('forms/upload_event.html')
+    return render_template('forms/upload_event.html', form=form)
 
 
-@app.route('/add-playlist-track/<number>', methods=['GET', 'POST'])
+@app.route('/add-<playlist>-track/<number>', methods=['GET', 'POST'])
 @login_required
-def add_playlist_track(number):
+def add_playlist_track(playlist, number):
     number = int(number)
-    playlist = request.args.get('playlist')
+    playlist = int(playlist)
     form = PlaylistTrackForm()
     if form.validate_on_submit():
         track = get_playlist_track(form.title.data.lower(), form.album.data.lower(), form.artist.data.lower())
         if track is None:
             flash(f'Track {form.title.data} does not exist!', category='danger')
-            rollback()
-            return redirect(url_for('add_playlist_track', number=number))
-        p = get_playlist(int(playlist))
+            return redirect(url_for('add_playlist_track', number=number, playlist=playlist))
+        p = get_playlist(playlist)
         already = False
         for e in p.tracks_id:
             if e.id == track.id:
@@ -176,8 +177,7 @@ def add_playlist_track(number):
                 break
         if already:
             flash(f'Track is already in the playlist', category='danger')
-            rollback()
-            return redirect(url_for('add_playlist_track', number=number))
+            return redirect(url_for('add_playlist_track', number=number, playlist=playlist))
         p.tracks_id.append(track)
         flush()
         if number != 1:

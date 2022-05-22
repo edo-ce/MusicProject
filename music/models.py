@@ -216,7 +216,7 @@ class Event(Base):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
-    name = Column(Integer, nullable=False)
+    name = Column(String, nullable=False)
     date = Column(Date, nullable=False)
     start_time = Column(String, nullable=False)
     end_time = Column(String, nullable=False)
@@ -234,7 +234,7 @@ class Event(Base):
     def __repr__(self):
         ret = {
             'Name': f'{self.name} - {session.query(Artist.stage_name).filter_by(id=self.creator).first()[0]}',
-            'Date': self.date,
+            'Date': str(self.date),
             'Time': f'{self.start_time} - {self.end_time}',
             'Location': self.location,
             'Link': self.link
