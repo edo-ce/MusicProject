@@ -36,7 +36,8 @@ def search_func(search_result):
             for elem in elems:
                 query = session.query(Element).join(key).where(Element.id == elem.id and Element.id == key+'.id')\
                     .first()
-                if query:
+                if query and (key != 'playlists'
+                              or not session.query(Playlist.is_private).filter_by(id=query.id).first()[0]):
                     res[key].append(query)
     return res
 
@@ -49,11 +50,14 @@ def find_saved_elements(listener):
             table_elems = get_element_table(elem)
             listener_elems = get_listener(listener).elements
             for e in listener_elems:
-                if session.query(table_elems).filter_by(id=e.id).first():
-                    elems[elem].append(session.query(table_elems).filter_by(id=e.id).first())
+                val = session.query(table_elems).filter_by(id=e.id).first()
+                if val is not None and (table_elems != Playlist or val.creator != listener):
+                    elems[elem].append(val)
         else:
             res = session.query(Artist).join(Follower).join(Listener).where(Listener.id == listener).all()
             elems[elem] = res
+
+    elems['own playlists'] = get_playlists_by_creator(listener)
 
     return elems
 
@@ -101,16 +105,15 @@ def get_playlist(code):
 
 
 def get_artists_events(code):
-    # TODO
-    pass
+    return session.query(Event).filter_by(creator=code).all()
 
 
 def get_artist_albums(code):
-    return session.query(Album).filter(Album.artist_id == code).all()
+    return session.query(Album).filter_by(artist_id=code).all()
 
 
 def get_playlists_by_creator(code):
-    return session.query(Playlist).filter(Playlist.creator == code).all()
+    return session.query(Playlist).filter_by(creator=code).all()
 
 
 def get_payment_card(code):
@@ -120,12 +123,14 @@ def get_payment_card(code):
 
 def get_playlist_track(title, album, artist):
     # TODO gestire il caso in cui c'è un artista con il nome uguale e anche il nome di un album uguale
-    album_id = session.query(Album.id).join(Element).join(Artist).where(Element.id == Album.id and
-                                                                        Album.artist_id == Artist.id and
-                                                                        Artist.stage_name == artist and
-                                                                        Element.title == album).first()
-    return session.query(Track).join(Element).where(Element.id == Track.id and Element.title == title and
-                                                    Track.album_id == album_id).first()
+    album_id = session.query(Album.id).join(Element).join(Artist).filter(func.lower(Artist.stage_name) == artist)\
+        .filter(func.lower(Element.title) == album).filter(Element.id == Album.id).filter(Album.artist_id == Artist.id)\
+        .first()
+    if album_id is None:
+        return None
+    else:
+        return session.query(Track).join(Element).filter(func.lower(Element.title) == title)\
+            .filter(Track.album_id == album_id[0]).filter(Element.id == Track.id).first()
 
 
 def get_album_tracks(code):

@@ -46,7 +46,9 @@
                   <span class="navbar-toggler-icon"></span>
               </button>
               {% if current_user.is_authenticated %}
+              {% if not is_artist(current_user.username) %}
               <span class="nav-item no-switch" onclick="search_alert()" style="cursor: pointer;">Search <i class="bi bi-search"></i></span>
+              {% endif %}
               <div class="navbar-collapse collapse justify-content-end" id="navbarResponsive">
                   <ul class="navbar-nav ms-auto">
                       {% if not is_artist(current_user.username) %}

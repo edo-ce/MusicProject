@@ -78,7 +78,7 @@ class PlaylistTrackForm(FlaskForm):
 
 class PlaylistForm(FlaskForm):
     title = StringField(label='Playlist Title:', validators=[DataRequired()])
-    private = BooleanField(label='Is Private:', validators=[DataRequired()])
+    private = BooleanField(label='Is Private:', default=False, false_values=('False', 'false', ''))
     number_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField(label='Upload Playlist')
 

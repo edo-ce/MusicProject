@@ -163,19 +163,30 @@ def add_playlist_track(number):
     playlist = request.args.get('playlist')
     form = PlaylistTrackForm()
     if form.validate_on_submit():
-        track = get_playlist_track(form.title.data, form.album.data, form.artist.data)
+        track = get_playlist_track(form.title.data.lower(), form.album.data.lower(), form.artist.data.lower())
         if track is None:
             flash(f'Track {form.title.data} does not exist!', category='danger')
             rollback()
-            return redirect(url_for('upload_event'))
-        get_playlist(playlist).tracks_id.append(track.id)
+            return redirect(url_for('add_playlist_track', number=number))
+        p = get_playlist(int(playlist))
+        already = False
+        for e in p.tracks_id:
+            if e.id == track.id:
+                already = True
+                break
+        if already:
+            flash(f'Track is already in the playlist', category='danger')
+            rollback()
+            return redirect(url_for('add_playlist_track', number=number))
+        p.tracks_id.append(track)
+        flush()
         if number != 1:
-            return redirect(url_for(f'add-playlist-track/{str(number-1)}', playlist=playlist))
+            return redirect(url_for('add_playlist_track', number=number-1, playlist=playlist))
         else:
             commit()
             flash('Playlist uploaded successfully!', category='success')
             return redirect(url_for('private'))
-    return render_template('add_playlist_track.html')
+    return render_template('forms/add_playlist_track.html', form=form)
 
 
 @app.route('/create-playlist', methods=['GET', 'POST'])
@@ -183,10 +194,10 @@ def add_playlist_track(number):
 def create_playlist():
     form = PlaylistForm()
     if form.validate_on_submit():
-        code = add_no_commit(Element, title=form.title.data)
+        code = add_no_commit(Element, title=form.title.data).id
         add_no_commit(Playlist, id=code, is_private=form.private.data, creator=current_user.username)
-        return redirect(url_for(f'add-playlist-track/{str(form.number_tracks.data)}', playlist=code))
-    return render_template('create_playlist.html')
+        return redirect(url_for('add_playlist_track', number=form.number_tracks.data, playlist=code))
+    return render_template('forms/create_playlist.html', form=form)
 
 
 @app.route('/private')
@@ -197,7 +208,7 @@ def private():
 
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('personal_pages/private_artist.html', elems=elems, get_title=title)
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title)
     else:
         elems = find_saved_elements(current_user.username)
         return render_template('personal_pages/private_listener.html', elems=elems, get_title=title)

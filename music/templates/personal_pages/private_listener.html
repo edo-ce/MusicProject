@@ -4,22 +4,6 @@
 {% endblock %}
 {% block content %}
 <body class="text-center">
-    <!--section class="container">
-        <h1>My Library</h1>
-        {% for elem, values in elems.items() %}
-            <br>
-            <table>
-                <thead>My {{ elem }}</thead>
-                {% for i in values %}
-                <tr>
-                    <th>{{ i }}</th>
-                    <th>Info</th>
-                </tr>
-                {% endfor %}
-            </table>
-        {% endfor %}
-    </section-->
-
     <section>
         <h1>My Library</h1>
         {% for elem, values in elems.items() %}
@@ -39,18 +23,22 @@
                                     <div class="image-box img-conver">
                                         <!-- Image can be generated from the name
                                                 in img.alt must be the title song/artist name -->
-                                        {% if elem != 'artists' %}
-                                        <img src="" alt="{{ get_title(i.id) }}" />
-                                        {% else %}
+                                        {% if elem == 'artists' %}
                                         <img src="" alt="{{ i.stage_name }}" />
+                                        {% elif elem == 'events' %}
+                                        <img src="" alt="{{ i.name }}" />
+                                        {% else %}
+                                        <img src="" alt="{{ get_title(i.id) }}" />
                                         {% endif %}
                                     </div>
                                     <div class="text-container">
                                         <h6>
-                                            {% if elem != 'artists' %}
-                                                {{ get_title(i.id) }}
-                                            {% else %}
+                                            {% if elem == 'artists' %}
                                                 {{ i.stage_name }}
+                                            {% elif elem == 'events' %}
+                                                {{ i.name }}
+                                            {% else %}
+                                                {{ get_title(i.id) }}
                                             {% endif %}
                                         </h6>
                                     </div>
@@ -63,6 +51,10 @@
             </div>
         </div>
         {% endfor %}
+
+        <br>
+        <a href="{{ url_for('create_playlist') }}"><h2>Create a playlist</h2></a>
+
     </section>
 
 

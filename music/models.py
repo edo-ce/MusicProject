@@ -69,11 +69,10 @@ class Artist(Base):
 
     def __repr__(self):
         ret = {
-           'Stage Name' : self.stage_name + ("Solo" if self.is_solo else "group"),
-            'Bio' : self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
+           'Stage Name': self.stage_name,
+            'Type': "Solo" if self.is_solo else "group",
+            'Bio': self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
         }
-
-
         return json.dumps(ret, indent=4)
 
 
@@ -144,11 +143,11 @@ class Album(Base):
         return session.query(Artist).filter_by(id=self.artist_id).first()
 
     def __repr__(self):
-        a = { 'Title' : get_title(self.id) ,
-              'Release Date' : str(self.release_date) ,
-              'Artist' : self.get_artist().stage_name
+        a = {'Title': get_title(self.id),
+              'Release Date': str(self.release_date),
+              'Artist': self.get_artist().stage_name
               }
-        return json.dumps(a, indent = 4)
+        return json.dumps(a, indent=4)
 
 
 class Track(Base):
@@ -170,17 +169,18 @@ class Track(Base):
         return session.query(Genre).filter_by(id=self.genre).first()
 
     # TODO vedere aggiungere genere
+    # TODO sistemare la durata
 
     def __repr__(self):
 
         ret = {
-            'Title' : get_title(self.id),
-            'Artist' : self.get_album().get_artist().stage_name,
-            'Featuring' : ", ".join(f.stage_name for f in self.artists_feat),
-            'Duration' : self.duration,
-            'Genre' : self.get_genre().name,
-            'Copyright' : self.copyright,
-            'Album' : 'single' if self.get_album().number_of_tracks() > 1 else 'Single'
+            'Title': get_title(self.id),
+            'Artist': self.get_album().get_artist().stage_name,
+            'Featuring': ", ".join(f.stage_name for f in self.artists_feat),
+            'Duration': self.duration,
+            'Genre': self.get_genre().name,
+            'Copyright': self.copyright,
+            'Album': 'single' if self.get_album().number_of_tracks() > 1 else 'Single'
         }
 
         return json.dumps(ret, indent=4)
@@ -200,11 +200,10 @@ class Playlist(Base):
 
     def __repr__(self):
         ret = {
-            'Title' : get_title(self.id),
-            'Playlist Type' : 'Private' if self.is_private else 'Public',
-            'Creator' : self.get_creator_name()
+            'Title': get_title(self.id),
+            'Playlist Type': 'Private' if self.is_private else 'Public',
+            'Creator': self.get_creator_name()
         }
-
         return json.dumps(ret, indent=4)
 
 
@@ -231,6 +230,16 @@ class Event(Base):
     __table_args__ = (
         CheckConstraint('end_time > start_time'),
     )
+
+    def __repr__(self):
+        ret = {
+            'Name': f'{self.name} - {session.query(Artist.stage_name).filter_by(id=self.creator).first()[0]}',
+            'Date': self.date,
+            'Time': f'{self.start_time} - {self.end_time}',
+            'Location': self.location,
+            'Link': self.link
+        }
+        return json.dumps(ret, indent=4)
 
 
 class PaymentCard(Base):
