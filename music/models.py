@@ -132,7 +132,7 @@ class Album(Base):
 
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     release_date = Column(Date, nullable=False)
-    artist_id = Column(ForeignKey(Artist.id, ondelete='CASCADE'), unique=True)
+    artist_id = Column(ForeignKey(Artist.id, ondelete='CASCADE'))
 
     tracks_in = relationship('Track', backref='album_in')
 

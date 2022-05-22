@@ -1,26 +1,24 @@
 {% extends 'base.html' %}
 {% block title %}
-    Create Playlist Page
+    Upload Track Page
 {% endblock %}
 {% block content %}
 <body class="text-center">
     <section class="container">
-    <form method="POST" class="form-create-playlist w-50" style="margin-left: auto; margin-right: auto;">
+    <form method="POST" class="form-upload-track w-50" style="margin-left: auto; margin-right: auto;">
       {{ form.hidden_tag() }}
-      <h1>Create Playlist</h1>
+      <h1>Upload Track</h1>
       <br>
-        {% with array='title number_tracks' %}
+        {% with array='title copyright duration genre' %}
             {% for x in array.split() %}
                 {{ form[x].label() }}
                 {{ form[x](class="form-control", placeholder=x.capitalize())}}
             {% endfor %}
         {% endwith %}
-        {% if not is_artist(current_user.username) %}
         <br>
-        {{ form.private.label() }}
-        {{ form.private }}
-        {% endif %}
-      <br>
+        {{ form.featuring.label() }}
+        {{ form.featuring }}
+        <br>
       <div class="form-group">
           {{ form.submit(class="btn btn-primary") }}
       </div>

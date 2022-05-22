@@ -52,6 +52,10 @@
         </div>
         {% endfor %}
 
+        {% if is_artist(current_user.username) %}
+        <br>
+        <a href="{{ url_for('upload_album') }}"><h2>Upload an album</h2></a>
+        {% endif %}
         <br>
         <a href="{{ url_for('create_playlist') }}"><h2>Create a playlist</h2></a>
 

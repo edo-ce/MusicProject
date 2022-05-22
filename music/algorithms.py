@@ -205,7 +205,6 @@ def delete_from_saved(id_listener, id_saved):
                 .delete()
         else:
             get_listener(id_listener).elements = []
-            # get_listener(id_listener).elements.remove(get_element(id_saved))
         commit()
     except Exception as e:
         rollback()
@@ -257,7 +256,10 @@ def advice_func():
 # TO CHANGE
 
 def get_genre_id(name):
-    return session.query(Genre.id).filter(Genre.name == name).first()
+    if session.query(Genre.id).filter(func.lower(Genre.name) == name).first():
+        return session.query(Genre.id).filter(func.lower(Genre.name) == name).first()[0]
+    else:
+        return None
 
 # STATISTICS
 # TODO check if it works

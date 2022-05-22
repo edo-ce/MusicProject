@@ -109,19 +109,19 @@ def upload_track(number):
     album = request.args.get('album')
     form = TrackForm()
     if form.validate_on_submit():
+        # TODO vedere più pezzi con lo stesso titolo
+        code = add_no_commit(Element, title=form.title.data).id
+        if get_genre_id(form.genre.data.lower()) is None:
+            add_no_commit(Genre, name=form.genre.data)
+        add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data.lower()),
+                      copyright=form.copyright.data, album_id=int(album))
         if number != 1:
-            code = add_no_commit(Element, title=form.title.data)
-            add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
-                          copywright=form.copyright.data, album_id=album)
-            return redirect(url_for(f'upload_track/{number-1}', album=album))
+            return redirect(url_for('upload_track', number=number-1, album=album))
         else:
-            code = add_no_commit(Element, title=form.title.data)
-            add_and_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data),
-                          copywright=form.copyright.data, album_id=album)
             flash('Album uploaded successfully!', category='success')
             return redirect(url_for('private'))
         # TODO featuring
-    return render_template('upload_track.html', form=form)
+    return render_template('forms/upload_track.html', form=form)
 
 
 @app.route('/upload-album', methods=['GET', 'POST'])
@@ -129,10 +129,10 @@ def upload_track(number):
 def upload_album():
     form = AlbumForm()
     if form.validate_on_submit():
-        code = add_no_commit(Element, title=form.title.data)
+        code = add_no_commit(Element, title=form.title.data).id
         add_no_commit(Album, id=code, release_date=date.today(), artist_id=current_user.username)
-        return redirect(url_for(f'upload_track/{str(form.num_tracks.data)}', album=code))
-    return render_template('upload_album.html', form=form)
+        return redirect(url_for('upload_track', number=form.num_tracks.data, album=code))
+    return render_template('forms/upload_album.html', form=form)
 
 
 @app.route('/upload-event', methods=['GET', 'POST'])
@@ -153,7 +153,7 @@ def upload_event():
         commit()
         flash('Event uploaded successfully!', category='success')
         return redirect(url_for('private'))
-    return render_template('upload_event.html')
+    return render_template('forms/upload_event.html')
 
 
 @app.route('/add-playlist-track/<number>', methods=['GET', 'POST'])
