@@ -86,3 +86,7 @@ if __name__ == '__main__':
 
     # upload single element
     upload_element(l)
+
+    # Add follower
+    f = Follower(id_artist=artist_obj.id, id_listener=l.id, following_date=date.today())
+    upload_element(f)
