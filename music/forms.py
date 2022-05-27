@@ -2,7 +2,8 @@ from flask_wtf import FlaskForm
 from music.models import session, User, Artist, Listener
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
     IntegerField, FieldList, SearchField, TimeField, URLField, FormField
-from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange, URL
+from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange, URL, \
+    Optional
 
 
 # TODO add constraints
@@ -43,6 +44,25 @@ class LoginForm(FlaskForm):
     username = StringField(label='Username:', validators=[DataRequired()])
     password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Login')
+
+
+class UserSettingsForm(FlaskForm):
+    email = StringField(label='Email:', validators=[Optional(), Email()])
+    name = StringField(label='Name:', validators=[Optional(), Length(min=2, max=30)])
+    lastname = StringField(label='Lastname:', validators=[Optional(), Length(min=2, max=30)])
+    country = StringField(label='Country:', validators=[Optional(), Length(min=2, max=30)])
+    submit = SubmitField(label='Upload changes')
+
+    def email_check(self, email):
+        email_res = session.query(User).filter_by(email=email.data).first()
+        if email_res:
+            raise ValidationError('Email already exists!')
+
+
+class ArtistSettingsForm(UserSettingsForm):
+    stage_name = StringField(label='Stage Name:', validators=[Optional(), Length(min=2, max=30)])
+    solo_group = SelectField(label='Solo/Group:', validators=[Optional()], choices=['Solo', 'Group'])
+    bio = TextAreaField(label='Bio:')
 
 
 class PaymentForm(FlaskForm):

@@ -243,7 +243,10 @@ def delete_tuple(table, code):
 
 
 def update_tuple(table, code, **kwargs):
-    row = session.query(table).filter_by(id=code).first()
+    if table == User or table == 'users':
+        row = session.query(table).filter_by(username=code).first()
+    else:
+        row = session.query(table).filter_by(id=code).first()
     for attribute, value in kwargs.items():
         setattr(row, attribute, value)
     commit()
@@ -261,7 +264,7 @@ def get_genre_id(name):
     else:
         return None
 
+
 # STATISTICS
-# TODO check if it works
 def get_followers(artist):
-    return session.query(Artist.followers).filter_by(Artist.stage_name == artist).count();
+    return session.query(Follower).filter_by(id_artist=artist).count()

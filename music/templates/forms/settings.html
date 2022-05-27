@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}
+    Settings Page
+{% endblock %}
+{% block content %}
+<body class="text-center">
+    <section class="container">
+    <form method="POST" class="form-settings w-50" style="margin-left: auto; margin-right: auto;">
+      {{ form.hidden_tag() }}
+      <h1>Settings</h1>
+      <br>
+        {% with array=fields %}
+            {% for x in array.split() %}
+                {{ form[x].label() }}
+                {{ form[x](class="form-control", placeholder=x.capitalize())}}
+            {% endfor %}
+        {% endwith %}
+      <br>
+      <div class="form-group">
+          {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </form>
+    </section>
+</body>
+{% endblock %}

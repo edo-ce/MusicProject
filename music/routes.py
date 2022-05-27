@@ -1,7 +1,7 @@
 from music import app
 from flask import render_template, redirect, url_for, flash, request
 from music.forms import SignUpForm, LoginForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, \
-    PlaylistForm, EventForm, PlaylistTrackForm
+    PlaylistForm, EventForm, PlaylistTrackForm, UserSettingsForm, ArtistSettingsForm
 from flask_login import login_user, logout_user, login_required, current_user
 from music.algorithms import *
 from datetime import date
@@ -143,6 +143,7 @@ def upload_event():
         event = add_no_commit(Event, name=form.name.data, date=form.date.data, start_time=form.start_time.data,
                       end_time=form.end_time.data, location=form.location.data, link=form.link.data,
                       creator=current_user.username)
+        # TODO vedere i guests
         if form.guests.data:
             for artist in form.guests.data.split():
                 if is_artist(artist) is None:
@@ -200,18 +201,21 @@ def create_playlist():
     return render_template('forms/create_playlist.html', form=form)
 
 
+def title(code):
+    return get_title(code)
+
+
 @app.route('/private')
 @login_required
 def private():
-    def title(code):
-        return get_title(code)
-
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title)
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title,
+                               username=current_user.username)
     else:
         elems = find_saved_elements(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title)
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title,
+                               username=current_user.username)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
@@ -223,10 +227,12 @@ def view(username):
         return redirect(url_for('home'))
     artist = is_artist(username) is not None
     if artist:
-        elems = find_saved_elements(username)
+        elems = display_artist_contents(username)
     else:
-        elems = get_playlists_by_creator(username)
-    return render_template('personal_pages/view.html', elems=elems, artist=artist)
+        elems = dict()
+        elems['playlists'] = get_playlists_by_creator(username)
+    return render_template('personal_pages/private_listener.html', elems=elems, artist=artist, username=username,
+                           get_title=get_title)
 
 
 @app.route('/search-results', methods=['GET', 'POST'])
@@ -236,10 +242,31 @@ def search_results():
     return render_template('search.html', dict=res)
 
 
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
+    fields = 'email name lastname country'
+    form = None
     if is_artist(current_user.username):
-        return render_template('artist_settings.html')
+        form = ArtistSettingsForm()
+        fields = fields + ' stage_name solo_group bio'
     else:
-        return render_template('listener_settings.html')
+        form = UserSettingsForm()
+
+    user_changes = dict()
+    artist_changes = dict()
+
+    if form.validate_on_submit():
+        for key, value in form.data.items():
+            if value != '':
+                if key != 'stage_name' and key != 'solo_group' and key != 'bio':
+                    user_changes[key] = value
+                else:
+                    artist_changes[key] = value
+
+        update_tuple(User, current_user.username, **user_changes)
+        update_tuple(Artist, current_user.username, **artist_changes)
+
+        flash('Changes uploaded successfully!', category='success')
+        return redirect(url_for('private'))
+    return render_template('forms/settings.html', form=form, fields=fields)

@@ -5,11 +5,27 @@
 {% block content %}
 <body class="text-center">
     <section>
-        <h1>My Library</h1>
+
+        {% if username == current_user.username %}
+            {% if is_artist(current_user.username) %}
+            <h1>My Uploads</h1>
+            {% else %}
+            <h1>My Library</h1>
+            {% endif %}
+        {% else %}
+            {% if artist %}
+            <h1>{{ is_artist(username).stage_name }}}</h1>
+            {% else %}
+            <h1> {{ username }} </h1>
+            {% endif %}
+        {% endif %}
+
         {% for elem, values in elems.items() %}
         <div class="cards_landscape_wrap-2">
             <div class="container">
-                <h1 class="fw-light">My {{ elem }}</h1>
+                <h1 class="fw-light">
+                    {% if username == current_user.username %}My{% else %}{{ username }}'s{% endif %} {{ elem }}
+                </h1>
                 <div class="row">
                     {% for i in values %}
                     <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 albums">
