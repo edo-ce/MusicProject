@@ -110,14 +110,32 @@ def upload_track(number):
     form = TrackForm()
     if form.validate_on_submit():
         # TODO vedere più pezzi con lo stesso titolo
+
+        # utilizzare gli id per i featuring
+        feats = list()
+        if form.featuring.data != '':
+            feats = [is_artist(x.strip()) for x in form.featuring.data.split(',')]
+            for artist in feats:
+                if artist is None:
+                    flash(f'Artist {artist} does not exist!', category='danger')
+                    return redirect(url_for('upload_track', number=number, album=album))
+                elif artist.id == current_user.username:
+                    flash(f'Artist {artist} is the current user!', category='danger')
+                    return redirect(url_for('upload_track', number=number, album=album))
+
         code = add_no_commit(Element, title=form.title.data).id
         if get_genre_id(form.genre.data.lower()) is None:
             add_no_commit(Genre, name=form.genre.data)
+
         add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data.lower()),
-                      copyright=form.copyright.data, album_id=int(album))
+                      copyright=form.copyright.data, album_id=int(album), artists_feat=feats)
+
+        # new_track.artists_feat = feats
+
         if number != 1:
             return redirect(url_for('upload_track', number=number-1, album=album))
         else:
+            commit()
             flash('Album uploaded successfully!', category='success')
             return redirect(url_for('private'))
         # TODO featuring
@@ -201,20 +219,16 @@ def create_playlist():
     return render_template('forms/create_playlist.html', form=form)
 
 
-def title(code):
-    return get_title(code)
-
-
 @app.route('/private')
 @login_required
 def private():
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title,
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
                                username=current_user.username)
     else:
         elems = find_saved_elements(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=title,
+        return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
                                username=current_user.username)
 
 

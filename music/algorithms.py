@@ -104,6 +104,10 @@ def get_playlist(code):
     return session.query(Playlist).filter_by(id=code).first()
 
 
+def get_track(code):
+    return session.query(Track).filter_by(id=code).first()
+
+
 def get_artists_events(code):
     return session.query(Event).filter_by(creator=code).all()
 

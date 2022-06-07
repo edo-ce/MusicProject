@@ -9,17 +9,14 @@
       {{ form.hidden_tag() }}
       <h1>Upload Track</h1>
       <br>
-        {% with array='title copyright duration genre' %}
+        {% with array='title copyright duration genre featuring' %}
             {% for x in array.split() %}
                 {{ form[x].label() }}
                 {{ form[x](class="form-control", placeholder=x.capitalize())}}
             {% endfor %}
         {% endwith %}
         <br>
-        {{ form.featuring.label() }}
-        {% for feat in form.featuring %}
-            {{ feat.label }}{{ feat }}
-        {% endfor %}
+
         <br>
       <div class="form-group">
           {{ form.submit(class="btn btn-primary") }}

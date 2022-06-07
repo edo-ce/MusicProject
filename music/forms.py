@@ -83,7 +83,8 @@ class TrackForm(FlaskForm):
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
     duration = IntegerField(label='Duration (seconds):', validators=[DataRequired(), NumberRange(min=0)])
     genre = StringField(label='Genre:', validators=[DataRequired()])
-    featuring = FieldList(FormField(FeatForm), min_entries=1)
+    featuring = StringField(label='Featuring', validators=[Optional()])
+    # featuring = FieldList(FormField(FeatForm), min_entries=1)
     submit = SubmitField(label='Upload Track')
 
 
