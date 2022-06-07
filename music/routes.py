@@ -120,7 +120,7 @@ def upload_track(number):
                     flash(f'Artist {artist} does not exist!', category='danger')
                     return redirect(url_for('upload_track', number=number, album=album))
                 elif artist.id == current_user.username:
-                    flash(f'Artist {artist} is the current user!', category='danger')
+                    flash(f'Artist {artist.id} is the current user!', category='danger')
                     return redirect(url_for('upload_track', number=number, album=album))
 
         code = add_no_commit(Element, title=form.title.data).id
@@ -130,15 +130,12 @@ def upload_track(number):
         add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data.lower()),
                       copyright=form.copyright.data, album_id=int(album), artists_feat=feats)
 
-        # new_track.artists_feat = feats
-
         if number != 1:
             return redirect(url_for('upload_track', number=number-1, album=album))
         else:
             commit()
             flash('Album uploaded successfully!', category='success')
             return redirect(url_for('private'))
-        # TODO featuring
     return render_template('forms/upload_track.html', form=form)
 
 
@@ -158,20 +155,21 @@ def upload_album():
 def upload_event():
     form = EventForm()
     if form.validate_on_submit():
-        event = add_no_commit(Event, name=form.name.data, date=form.date.data, start_time=form.start_time.data,
-                      end_time=form.end_time.data, location=form.location.data, link=form.link.data,
-                      creator=current_user.username)
-        # TODO vedere i guests
-        if form.guests.data:
-            for artist in form.guests.data.split():
-                if is_artist(artist) is None:
-                    flash(f'Artist {artist} does not exist!', category='danger')
-                    rollback()
+        guests = list()
+        if form.guests.data != '':
+            guests = [is_artist(x.strip()) for x in form.guests.data.split(',')]
+            for artist in guests:
+                if artist is None:
+                    flash(f'Artist does not exist!', category='danger')
                     return redirect(url_for('upload_event'))
-                else:
-                    event.artists_guests.append(is_artist(artist))
-                    flush()
-        commit()
+                elif artist.id == current_user.username:
+                    flash(f'Artist {artist.id} is the current user!', category='danger')
+                    return redirect(url_for('upload_event'))
+
+        add_and_commit(Event, name=form.name.data, date=form.date.data, start_time=form.start_time.data,
+                      end_time=form.end_time.data, location=form.location.data, link=form.link.data,
+                      creator=current_user.username, artists_guests=guests)
+
         flash('Event uploaded successfully!', category='success')
         return redirect(url_for('private'))
     return render_template('forms/upload_event.html', form=form)

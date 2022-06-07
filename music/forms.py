@@ -74,17 +74,12 @@ class PaymentForm(FlaskForm):
     submit = SubmitField(label='Upgrade to Premium')
 
 
-class FeatForm(FlaskForm):
-    feat = StringField(label='Feat:')
-
-
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
     duration = IntegerField(label='Duration (seconds):', validators=[DataRequired(), NumberRange(min=0)])
     genre = StringField(label='Genre:', validators=[DataRequired()])
     featuring = StringField(label='Featuring', validators=[Optional()])
-    # featuring = FieldList(FormField(FeatForm), min_entries=1)
     submit = SubmitField(label='Upload Track')
 
 
@@ -115,5 +110,5 @@ class EventForm(FlaskForm):
     end_time = TimeField(label='End Time:', validators=[DataRequired()])
     location = StringField(label='Location:', validators=[DataRequired()])
     link = URLField(label='Link:', validators=[URL(), DataRequired()])
-    guests = StringField(label='Guests username:')
+    guests = StringField(label='Guests username:', validators=[Optional()])
     submit = SubmitField(label='Upload')

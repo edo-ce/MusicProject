@@ -9,17 +9,13 @@
       {{ form.hidden_tag() }}
       <h1>Upload Event</h1>
       <br>
-        {% with array='name date start_time end_time location link' %}
+        {% with array='name date start_time end_time location link guests' %}
             {% for x in array.split() %}
                 {{ form[x].label() }}
                 {{ form[x](class="form-control", placeholder=x.capitalize())}}
             {% endfor %}
         {% endwith %}
         <br>
-        {{ form.guests.label() }}
-        {% for guest in form.featuring %}
-            {{ guest.label }}{{ guest }}
-        {% endfor %}
         <br>
       <div class="form-group">
           {{ form.submit(class="btn btn-primary") }}
