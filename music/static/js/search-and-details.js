@@ -65,10 +65,11 @@ function search_alert() {
                     //console.log(reprs[index])
                     let element = $(".repr").eq(index).data().name;
                     //console.log(element)
-                    var img = convertStringToImageUrl(element['Title']);
+                    let first_key = Object.keys(element)[0]
+                    var img = convertStringToImageUrl(element[first_key]);
                     var stringa = "";
                     for (const key in element) {
-                        if( key=='Title')
+                        if( key==first_key)
                             continue;
                         if (key == "Copyright")
                             stringa += "<p class='card-text'><small class='text-muted'>" + element[key] + "</small></p>"
@@ -84,7 +85,7 @@ function search_alert() {
                                     "</div>" +
                                     "<div class='col-md-8'>" +
                                       "<div class='card-body'>" +
-                                        "<h5 class='card-title'>" + element['Title'] + "</h5>" +
+                                        "<h5 class='card-title'>" + element[first_key] + "</h5>" +
                                         stringa +
                                         "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill'></i></span>" +
                                       "</div>" +
