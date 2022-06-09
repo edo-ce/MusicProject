@@ -259,6 +259,7 @@ def update_tuple(table, code, **kwargs):
 def advice_func():
     pass
 
+
 # TO CHANGE
 def get_genre_id(name):
     if session.query(Genre.id).filter(func.lower(Genre.name) == name).first():
@@ -268,5 +269,15 @@ def get_genre_id(name):
 
 
 # STATISTICS
+'''
+    follower
+    elementi salvati nelle playlist
+    sesso ascoltatori (può essere null)
+    nazionalità
+    età (può essere null)
+    numero tracce salvate
+    tracce più salvate
+    album più seguito
+'''
 def get_followers(artist):
     return session.query(Follower).filter_by(id_artist=artist).count()
