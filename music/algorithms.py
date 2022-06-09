@@ -259,9 +259,7 @@ def update_tuple(table, code, **kwargs):
 def advice_func():
     pass
 
-
 # TO CHANGE
-
 def get_genre_id(name):
     if session.query(Genre.id).filter(func.lower(Genre.name) == name).first():
         return session.query(Genre.id).filter(func.lower(Genre.name) == name).first()[0]
