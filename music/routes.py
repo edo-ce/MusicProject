@@ -254,6 +254,30 @@ def search_results():
     return render_template('search.html', dict=res)
 
 
+@app.route('/delete/<id_elem>', methods=['GET', 'POST'])
+@login_required
+def delete_route(id_elem):
+    try:
+        id_elem = int(id_elem)
+    except ValueError:
+        pass
+    delete_from_saved(current_user.username, id_elem)
+    # TODO redirect
+    return redirect(url_for('private'))
+
+
+@app.route('/save/<id_elem>', methods=['GET', 'POST'])
+@login_required
+def save_route(id_elem):
+    try:
+        id_elem = int(id_elem)
+    except ValueError:
+        pass
+    save_something(current_user.username, id_elem)
+    # TODO redirect
+    return redirect(url_for('private'))
+
+
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():

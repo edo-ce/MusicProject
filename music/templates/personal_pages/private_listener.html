@@ -5,7 +5,7 @@
 {% block content %}
 <body class="text-center">
     <section>
-
+        {% with art = is_artist(current_user.username) %}
         {% if username == current_user.username %}
             {% if is_artist(current_user.username) %}
             <h1>My Uploads</h1>
@@ -20,6 +20,13 @@
             {% endif %}
         {% endif %}
 
+        {% if art %}
+            <meta class="art" data-name="artist">
+        {% else %}
+            <meta class="art" data-name="user">
+        {% endif %}
+        {% endwith %}
+
         {% for elem, values in elems.items() %}
         <div class="cards_landscape_wrap-2">
             <div class="container">
@@ -33,6 +40,7 @@
                          AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
                          TODO REVIEW JINJIA ARGUMENTS -->
                             <meta class="repr" data-name="{{ i.__repr__() }}" >
+                            <meta class="id_elem" data-name="{{ i.id }}" >
                             <a class="details" style="cursor: pointer;">
                             <div class="card-flyer">
                                 <div class="text-box">

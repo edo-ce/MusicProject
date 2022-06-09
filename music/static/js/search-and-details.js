@@ -58,7 +58,6 @@ function search_alert() {
         function showElementDetails() {
 
             let details = $(".details");
-            let reprs = $(".repr");
 
             for(let index = 0; index<details.length; index++) {
                 details[index].addEventListener("click", function(){
@@ -76,6 +75,12 @@ function search_alert() {
                         else
                             stringa += "<p class='card-text'>" + element[key] + "</p>";
                     }
+
+                    let art = $('.art').eq(0).data().name;
+                    let id_elem = $(".id_elem").eq(index).data().name;
+                    let route = 'location.href="/delete/' + id_elem +'"';
+                    if (art === "user")
+                        stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route +"></i></span>"
                     Swal.fire({
                           title: 'Details',
                           html: "<div class='card mb-3' style='max-width: 500px;'>" +
@@ -87,7 +92,6 @@ function search_alert() {
                                       "<div class='card-body'>" +
                                         "<h5 class='card-title'>" + element[first_key] + "</h5>" +
                                         stringa +
-                                        "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill'></i></span>" +
                                       "</div>" +
                                     "</div>" +
                                   "</div>" +
