@@ -281,3 +281,10 @@ def get_genre_id(name):
 '''
 def get_followers(artist):
     return session.query(Follower).filter_by(id_artist=artist).count()
+
+def get_saved_element(creator):
+    return session.query(Playlist).filter_by(creator=creator).count()
+
+def get_genre_listener(album):
+    # selezione il conteggio dei generi dai users (listeners) joinnati con l'album in questione
+    session.query(Album, Listener).select_from(User.gender).join(Listener, User).where(id=album)
