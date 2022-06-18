@@ -1,28 +1,8 @@
-from music.models import *
-from sqlalchemy import func
+from music.utils import *
 from sqlalchemy.sql import text
+from random import shuffle
 
 # TODO controllare tutto il testo con lowercase
-
-
-def commit():
-    session.commit()
-
-
-def rollback():
-    session.rollback()
-
-
-def flush():
-    session.flush()
-
-
-def username_exists(code):
-    return session.query(User).filter_by(username=code).first()
-
-
-def is_premium(code):
-    return session.query(Premium).filter_by(id=code).first() is not None
 
 
 def search_func(search_result):
@@ -77,112 +57,6 @@ def display_artist_contents(artist):
     return elems
 
 
-# GET
-
-def get_element_table(name):
-    if Album.__tablename__ == name:
-        return Album
-    elif Track.__tablename__ == name:
-        return Track
-    else:
-        return Playlist
-
-
-def get_user(code):
-    return session.query(User).filter_by(username=code).first()
-
-
-def get_listener(code):
-    return session.query(Listener).filter_by(id=code).first()
-
-
-def get_element(code):
-    return session.query(Element).filter_by(id=code).first()
-
-
-def get_playlist(code):
-    return session.query(Playlist).filter_by(id=code).first()
-
-
-def get_track(code):
-    return session.query(Track).filter_by(id=code).first()
-
-
-def get_artists_events(code):
-    return session.query(Event).filter_by(creator=code).all()
-
-
-def get_artist_albums(code):
-    return session.query(Album).filter_by(artist_id=code).all()
-
-
-def get_playlists_by_creator(code):
-    return session.query(Playlist).filter_by(creator=code).all()
-
-
-def get_payment_card(code):
-    return session.query(PaymentCard).join(Premium).where(
-        Premium.id == code and PaymentCard.id == Premium.payment_card).first()
-
-
-def get_playlist_track(title, album, artist):
-    # TODO gestire il caso in cui c'è un artista con il nome uguale e anche il nome di un album uguale
-    album_id = session.query(Album.id).join(Element).join(Artist).filter(func.lower(Artist.stage_name) == artist)\
-        .filter(func.lower(Element.title) == album).filter(Element.id == Album.id).filter(Album.artist_id == Artist.id)\
-        .first()
-    if album_id is None:
-        return None
-    else:
-        return session.query(Track).join(Element).filter(func.lower(Element.title) == title)\
-            .filter(Track.album_id == album_id[0]).filter(Element.id == Track.id).first()
-
-
-def get_album_tracks(code):
-    return session.query(Track).join(Album).where(Album.id == code).all()
-
-
-def get_playlist_tracks(code):
-    return session.query(Track).join(Playlist).where(Playlist.id == code).all()
-
-
-def is_artist(username):
-    return session.query(Artist).filter_by(id=username).first()
-
-
-# FIND
-
-
-def find_creator_artist(code):
-    pass
-
-
-def find_playlist(code):
-    return session.query(Element).join(Playlist).where(Playlist.id == code).first()
-
-
-def find_album(code):
-    return session.query(Element).join(Album).where(Album.id == code).first()
-
-
-def find_track(code):
-    return session.query(Element).join(Track).where(Track.id == code).first()
-
-
-# OPERATIONS
-
-
-def update_user_info():
-    pass
-
-
-def update_artist_info():
-    pass
-
-
-def get_table(table):
-    return session.query(table).all()
-
-
 def is_saved(id_listener, id_save):
     if type(id_save) == str:
         return session.query(Follower).filter(Follower.id_artist == id_save and Follower.id_listener == id_listener)\
@@ -195,7 +69,6 @@ def save_something(id_listener, id_save):
     if type(id_save) == str:
         add_and_commit(Follower, id_artist=id_save, id_listener=id_listener, following_date=date.today())
     else:
-        # get_listener(id_listener).elements.append(get_element(id_save))
         listener = get_listener(id_listener)
         elem = get_element(id_save)
         listener.elements.append(elem)
@@ -215,57 +88,73 @@ def delete_from_saved(id_listener, id_saved):
         raise e
 
 
-def add_and_commit(table, **kwargs):
-    try:
-        elem = table(**kwargs)
-        session.add(elem)
-        commit()
-        return elem
-    except Exception as e:
-        rollback()
-        raise e
+# TRACKS
+# consiglia le tracce più ascoltate dagli altri utenti dello stesso genere preferito del mio utente
+def advice_func_tracks(username):
+    genre = get_favorite_genre(username)
+    listener = get_listener(username)
+    res = dict()
+    tracks = session.query(Track).filter_by(genre=genre).all()
+    for track in tracks:
+        if get_element(track.id) not in listener.elements:
+            res[track] = session.query(saved_elements).filter_by(id_element=track.id).count()
+    return [k for k, v in sorted(res.items(), key=lambda item: item[1], reverse=True)]
 
 
-def add_no_commit(table, **kwargs):
-    elem = table(**kwargs)
-    session.add(elem)
-    flush()
-    return elem
+# ALBUMS
+# consiglia album che non ho già salvato degli artisti del mio utente
+def advice_func_albums(username):
+    listener = get_listener(username)
+    artists = get_listener_artists(username)
+    all_albums = list()
+    for artist in artists:
+        albums = get_artist_albums(artist.id)
+        for album in albums:
+            if get_element(album.id) not in listener.elements:
+                all_albums.append(album)
+    shuffle(all_albums)
+    return all_albums
 
 
-def delete_tuple(table, code):
-    try:
-        # vedere con user
-        if table == User or table == 'users':
-            session.query(table).filter_by(username=code).delete()
-        else:
-            session.query(table).filter_by(id=code).delete()
-        commit()
-    except Exception as e:
-        rollback()
-        raise e
+# PLAYLISTS
+# consiglia playlist contenenti tracce presenti nelle playlist già salvate
+def advice_func_playlists(username):
+    listener = get_listener(username)
+    tracks_in = set()
+    res = list()
+    for elem in listener.elements:
+        if elem is Playlist:
+            tracks_in.union(set(elem.tracks_id))
+    for playlist in get_all(Playlist):
+        if get_element(playlist.id) not in listener.elements:
+            for track in playlist.tracks_id:
+                if track in tracks_in:
+                    res.append(playlist)
+                    break
+    shuffle(res)
+    return res
 
 
-def update_tuple(table, code, **kwargs):
-    if table == User or table == 'users':
-        row = session.query(table).filter_by(username=code).first()
-    else:
-        row = session.query(table).filter_by(id=code).first()
-    for attribute, value in kwargs.items():
-        setattr(row, attribute, value)
-    commit()
+# ARTISTS
+# consiglia gli artisti che compaiono nei featuring delle tracce salvate
+def advice_func_artists(username):
+    listener = get_listener(username)
+    res = set()
+    for elem in listener.elements:
+        if elem is Track:
+            res.union(set(get_track(elem.id).artists_feat))
+    res = list(res)
+    shuffle(res)
+    return res
 
 
-def advice_func():
-    pass
-
-
-# TO CHANGE
-def get_genre_id(name):
-    if session.query(Genre.id).filter(func.lower(Genre.name) == name).first():
-        return session.query(Genre.id).filter(func.lower(Genre.name) == name).first()[0]
-    else:
-        return None
+def advice_func(username):
+    return {
+        'tracks': advice_func_tracks(username)[:5],
+        'albums': advice_func_albums(username)[:5],
+        'playlists': advice_func_playlists(username)[:5],
+        'artists': advice_func_artists(username)[:5]
+    }
 
 
 # STATISTICS
@@ -279,12 +168,7 @@ def get_genre_id(name):
     tracce più salvate
     album più seguito
 '''
-def get_followers(artist):
-    return session.query(Follower).filter_by(id_artist=artist).count()
 
-def get_saved_element(creator):
-    return session.query(Playlist).filter_by(creator=creator).count()
 
-def get_genre_listener(album):
-    # selezione il conteggio dei generi dai users (listeners) joinnati con l'album in questione
-    session.query(Album, Listener).select_from(User.gender).join(Listener, User).where(id=album)
+def stats():
+    pass

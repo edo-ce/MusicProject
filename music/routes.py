@@ -10,7 +10,7 @@ from datetime import date
 @app.context_processor
 def utility_processor():
     return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved,
-                save_something=save_something)
+                save_something=save_something, advice_func=advice_func)
 
 
 @app.route('/')
@@ -66,6 +66,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out! See you soon', category='info')
@@ -222,12 +223,11 @@ def create_playlist():
 def private():
     if is_artist(current_user.username):
         elems = display_artist_contents(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
-                               username=current_user.username)
     else:
         elems = find_saved_elements(current_user.username)
-        return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
-                               username=current_user.username)
+        print(advice_func(current_user.username))
+    return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
+                           username=current_user.username)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
@@ -243,6 +243,7 @@ def view(username):
     else:
         elems = dict()
         elems['playlists'] = get_playlists_by_creator(username)
+    # TODO gestire il caso in cui si cerchi se stessi
     return render_template('personal_pages/private_listener.html', elems=elems, artist=artist, username=username,
                            get_title=get_title)
 
@@ -278,6 +279,7 @@ def save_route(id_elem):
     return redirect(url_for('private'))
 
 
+# TODO aggiungere nel frontend
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
