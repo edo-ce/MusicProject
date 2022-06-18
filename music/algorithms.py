@@ -123,8 +123,8 @@ def advice_func_playlists(username):
     tracks_in = set()
     res = list()
     for elem in listener.elements:
-        if elem is Playlist:
-            tracks_in.union(set(elem.tracks_id))
+        if get_playlist(elem.id) is Playlist:
+            tracks_in.union(set(get_playlist(elem.id).tracks_id))
     for playlist in get_all(Playlist):
         if get_element(playlist.id) not in listener.elements:
             for track in playlist.tracks_id:
@@ -141,7 +141,7 @@ def advice_func_artists(username):
     listener = get_listener(username)
     res = set()
     for elem in listener.elements:
-        if elem is Track:
+        if get_track(elem.id) is Track:
             res.union(set(get_track(elem.id).artists_feat))
     res = list(res)
     shuffle(res)
