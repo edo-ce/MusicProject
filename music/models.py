@@ -1,6 +1,6 @@
 from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
-from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
+from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint, column
 from sqlalchemy.orm import relationship
 import json
 from datetime import date
@@ -77,8 +77,8 @@ class Artist(Base):
 
 
 saved_elements = Table('saved_elements', Base.metadata,
-                       Column('id_element', ForeignKey('elements.id'), primary_key=True),
-                       Column('id_listener', ForeignKey('listeners.id'), primary_key=True))
+                       Column('id_element', ForeignKey('elements.id', ondelete='CASCADE'), primary_key=True),
+                       Column('id_listener', ForeignKey('listeners.id', ondelete='CASCADE'), primary_key=True))
 
 
 class Listener(Base):
@@ -118,13 +118,13 @@ class Genre(Base):
 
 
 featuring = Table('featuring', Base.metadata,
-                  Column('id_artist', ForeignKey('artists.id'), primary_key=True),
-                  Column('id_track', ForeignKey('tracks.id'), primary_key=True))
+                  Column('id_artist', ForeignKey('artists.id', ondelete='CASCADE'), primary_key=True),
+                  Column('id_track', ForeignKey('tracks.id', ondelete='CASCADE'), primary_key=True))
 
 
 playlist_tracks = Table('playlist_tracks', Base.metadata,
-                        Column('id_track', ForeignKey('tracks.id'), primary_key=True),
-                        Column('id_playlist', ForeignKey('playlists.id'), primary_key=True),)
+                        Column('id_track', ForeignKey('tracks.id', ondelete='CASCADE'), primary_key=True),
+                        Column('id_playlist', ForeignKey('playlists.id', ondelete='CASCADE'), primary_key=True),)
 
 
 class Album(Base):
@@ -153,7 +153,7 @@ class Album(Base):
 class Track(Base):
     __tablename__ = 'tracks'
 
-    id = Column(ForeignKey(Element.id), primary_key=True)
+    id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     duration = Column(Integer, nullable=False)
     copyright = Column(String, nullable=False)
     genre = Column(ForeignKey(Genre.id, ondelete='CASCADE'), nullable=False)
@@ -208,8 +208,8 @@ class Playlist(Base):
 
 
 guests = Table('guests', Base.metadata,
-                  Column('id_artist', ForeignKey('artists.id'), primary_key=True),
-                  Column('id_event', ForeignKey('events.id'), primary_key=True))
+                  Column('id_artist', ForeignKey('artists.id', ondelete='CASCADE'), primary_key=True),
+                  Column('id_event', ForeignKey('events.id', ondelete='CASCADE'), primary_key=True))
 
 
 class Event(Base):

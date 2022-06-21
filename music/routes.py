@@ -219,6 +219,15 @@ def create_playlist():
     return render_template('forms/create_playlist.html', form=form)
 
 
+@app.route('/delete/<table>/<code>')
+@login_required
+def delete_elements(table, code):
+    deletable_tables = ('albums', 'playlists', 'events')
+    if table in deletable_tables:
+        delete_tuple(table, code)
+    return redirect(url_for('private'))
+
+
 @app.route('/private')
 @login_required
 def private():
@@ -238,13 +247,14 @@ def private():
 def view(username):
     if not username_exists(username):
         return redirect(url_for('home'))
+    if username == current_user.username:
+        return redirect(url_for('private'))
     artist = is_artist(username) is not None
     if artist:
         elems = display_artist_contents(username)
     else:
         elems = dict()
         elems['playlists'] = get_playlists_by_creator(username)
-    # TODO gestire il caso in cui si cerchi se stessi
     return render_template('personal_pages/private_listener.html', elems=elems, artist=artist, username=username,
                            get_title=get_title)
 

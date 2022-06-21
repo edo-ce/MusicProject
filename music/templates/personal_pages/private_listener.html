@@ -9,22 +9,21 @@
         {% if username == current_user.username %}
             {% if art %}
             <h1>My Uploads</h1>
+            <meta class="art" data-name="artist">
             {% else %}
             <h1>My Library</h1>
+            <meta class="art" data-name="user">
             {% endif %}
         {% else %}
             {% if artist %}
             <h1>{{ is_artist(username).stage_name }}}</h1>
+            <meta class="art" data-name="visit_artist">
             {% else %}
             <h1> {{ username }} </h1>
+            <meta class="art" data-name="visit_user">
             {% endif %}
         {% endif %}
 
-        {% if art %}
-            <meta class="art" data-name="artist">
-        {% else %}
-            <meta class="art" data-name="user">
-        {% endif %}
         {% endwith %}
 
         {% for elem, values in elems.items() %}
