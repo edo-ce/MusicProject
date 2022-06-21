@@ -4,12 +4,12 @@
 
 // Trigger
 // 1) Un'artista non può avere più di un album (o traccia?) con lo stesso nome
-// 2) Un'utente non premium non può salvare più di 5 album...
+// 2) Un'utente non premium non può salvare più di 5 elementi...
 // 3) privilegi di ascolto diversi per i minorenni???????
 // 4) album deve contenere almeno una traccia (coinvolge + tabelle)
 // 5) Un artista deve pubblicare almeno un album nella piattaforma per essere considerato tale (scadenza) [on update or insert]
 // 6) Un artista non può essere ospite al suo stesso evento o un feat nella sua stessa traccia
-// 7) Un utente può creare una playlist solo se è un utente premium
+// 7) Un utente può creare una playlist pubblica solo se è un utente premium
 
 // Permessi
 // differenti in base alle tabelle...

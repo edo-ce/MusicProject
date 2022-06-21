@@ -98,6 +98,7 @@ def delete_premium():
             delete_tuple(Premium, current_user.username)
         else:
             delete_tuple(PaymentCard, payment_card.id)
+        # TODO eliminare queste due righe se il trigger funziona correttamente
         get_listener(current_user.username).elements = []
         commit()
     return redirect(url_for('private'))
