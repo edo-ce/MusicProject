@@ -1,9 +1,10 @@
 from music import login_manager, Base, bcrypt, session
 from flask_login import UserMixin
-from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint, column
+from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
 from sqlalchemy.orm import relationship
 import json
 from datetime import date
+
 
 @login_manager.user_loader
 def load_user(code):
@@ -69,7 +70,7 @@ class Artist(Base):
 
     def __repr__(self):
         ret = {
-           'Stage Name': self.stage_name,
+            'Stage Name': self.stage_name,
             'Type': "Solo" if self.is_solo else "group",
             'Bio': self.bio[0:30] + '...' if len(self.bio) > 30 else self.bio[0:30]
         }
@@ -139,14 +140,20 @@ class Album(Base):
     def number_of_tracks(self):
         return session.query(Album).join(Track).where(Track.album_id == self.id).count()
 
+    def get_tracks(self):
+        return session.query(Track).filter_by(album_id=self.id).all()
+
     def get_artist(self):
         return session.query(Artist).filter_by(id=self.artist_id).first()
 
     def __repr__(self):
-        a = {'Title': get_title(self.id),
-              'Release Date': str(self.release_date),
-              'Artist': self.get_artist().stage_name
-              }
+        a = {
+            'Title': get_title(self.id),
+            'Release Date': str(self.release_date),
+            'Artist': self.get_artist().stage_name
+        }
+        if self.number_of_tracks() > 1:
+            a['Tracks'] = ', '.join(session.query(Element.title).filter_by(id=x.id).first()[0] for x in self.get_tracks())
         return json.dumps(a, indent=4)
 
 

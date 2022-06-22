@@ -50,6 +50,20 @@ def get_album(code):
     return session.query(Album).filter_by(id=code).first()
 
 
+def get_event(code):
+    return session.query(Event).filter_by(id=code).first()
+
+
+def get_element_creator(table, code):
+    if table == 'albums':
+        return get_album(code).artist_id
+    if table == 'tracks':
+        return get_track(code).get_album().artist_id
+    if table == 'playlists':
+        return get_playlist(code).creator
+    return None
+
+
 def get_listener_artists(code):
     artists_id = session.query(Follower.id_artist).filter_by(id_listener=code).all()
     if len(artists_id) > 0:
@@ -84,14 +98,6 @@ def get_playlist_track(title, album, artist):
     else:
         return session.query(Track).join(Element).filter(func.lower(Element.title) == title)\
             .filter(Track.album_id == album_id[0]).filter(Element.id == Track.id).first()
-
-
-def get_album_tracks(code):
-    return session.query(Track).join(Album).where(Album.id == code).all()
-
-
-def get_playlist_tracks(code):
-    return session.query(Track).join(Playlist).where(Playlist.id == code).all()
 
 
 def is_artist(username):

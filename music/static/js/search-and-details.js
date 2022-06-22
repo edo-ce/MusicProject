@@ -68,9 +68,9 @@ function search_alert() {
                     var img = convertStringToImageUrl(element[first_key]);
                     var stringa = "";
                     for (const key in element) {
-                        if( key==first_key)
+                        if( key ===first_key)
                             continue;
-                        if (key == "Copyright")
+                        if (key === "Copyright")
                             stringa += "<p class='card-text'><small class='text-muted'>" + element[key] + "</small></p>"
                         else
                             stringa += "<p class='card-text'>" + element[key] + "</p>";
@@ -78,9 +78,13 @@ function search_alert() {
 
                     let art = $('.art').eq(0).data().name;
                     let id_elem = $(".id_elem").eq(index).data().name;
-                    let route = 'location.href="/delete/' + id_elem +'"';
+                    let table_elem = $(".table_elem").eq(index).data().name;
+                    let route_user = 'location.href="/delete/' + id_elem +'"';
+                    let route_artist = 'location.href="/delete/' + table_elem + '/' + id_elem + '"';
                     if (art === "user")
-                        stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route +"></i></span>"
+                        stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route_user +"></i></span>"
+                    else if (art === "artist")
+                        stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick="+ route_artist +"></i></span>"
                     Swal.fire({
                           title: 'Details',
                           html: "<div class='card mb-3' style='max-width: 500px;'>" +

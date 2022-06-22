@@ -170,3 +170,29 @@ BEGIN
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
+
+/* TODO controllare se possibile fare con sqlalchemy */
+CREATE TRIGGER delete_tracks
+AFTER DELETE
+ON tracks
+FOR EACH ROW
+EXECUTE FUNCTION delete_elements();
+
+CREATE TRIGGER delete_albums
+AFTER DELETE
+ON albums
+FOR EACH ROW
+EXECUTE FUNCTION delete_elements();
+
+CREATE TRIGGER delete_playlists
+AFTER DELETE
+ON playlists
+FOR EACH ROW
+EXECUTE FUNCTION delete_elements();
+
+CREATE FUNCTION delete_elements() RETURNS trigger AS $$
+BEGIN
+    DELETE FROM elements
+    WHERE id = OLD.id;
+END;
+$$ LANGUAGE plpgsql;

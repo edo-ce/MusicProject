@@ -1,14 +1,21 @@
 from music.models import *
 
-tables = (User, Listener, Artist, Element, Album, Track, Playlist, Event, PaymentCard, Premium, Follower)
+tables = {'users': User,
+          'listeners': Listener,
+          'artists': Artist,
+          'elements': Element,
+          'albums': Album,
+          'tracks': Track,
+          'playlists': Playlist,
+          'events': Event,
+          'payment_cards': PaymentCard,
+          'premiums': Premium,
+          'followers': Follower}
 
 
 def convert_table(table):
-    if isinstance(table, str):
-        for t in tables:
-            if table == t.__tablename__:
-                table = t
-                break
+    if table in tables.keys():
+        table = tables[table]
     return table
 
 

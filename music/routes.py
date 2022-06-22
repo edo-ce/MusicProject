@@ -222,9 +222,11 @@ def create_playlist():
 @app.route('/delete/<table>/<code>')
 @login_required
 def delete_elements(table, code):
-    deletable_tables = ('albums', 'playlists', 'events')
-    if table in deletable_tables:
-        delete_tuple(table, code)
+    deletable_tables = ('albums', 'tracks', 'playlists')
+    if table in deletable_tables and get_element_creator(table, code) == current_user.username:
+        delete_tuple(Element, code)
+    elif table == 'events' and get_event(code).creator == current_user.username:
+        delete_tuple(Event, code)
     return redirect(url_for('private'))
 
 
@@ -266,7 +268,7 @@ def search_results():
     return render_template('search.html', dict=res)
 
 
-@app.route('/delete/<id_elem>', methods=['GET', 'POST'])
+@app.route('/delete/<id_elem>')
 @login_required
 def delete_route(id_elem):
     try:
@@ -288,6 +290,15 @@ def save_route(id_elem):
     save_something(current_user.username, id_elem)
     # TODO redirect
     return redirect(url_for('private'))
+
+
+@app.route('/delete-user')
+@login_required
+def delete_user():
+    code = current_user.username
+    logout_user()
+    delete_tuple(User, code)
+    return redirect(url_for('home'))
 
 
 # TODO aggiungere nel frontend
