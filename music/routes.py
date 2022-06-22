@@ -237,7 +237,6 @@ def private():
         elems = display_artist_contents(current_user.username)
     else:
         elems = find_saved_elements(current_user.username)
-        print(advice_func(current_user.username))
     return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
                            username=current_user.username)
 
@@ -283,12 +282,12 @@ def delete_route(id_elem):
 @app.route('/save/<id_elem>', methods=['GET', 'POST'])
 @login_required
 def save_route(id_elem):
+    # TODO sistemare
     try:
         id_elem = int(id_elem)
     except ValueError:
         pass
     save_something(current_user.username, id_elem)
-    # TODO redirect
     return redirect(url_for('private'))
 
 

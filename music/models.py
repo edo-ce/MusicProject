@@ -153,7 +153,7 @@ class Album(Base):
             'Artist': self.get_artist().stage_name
         }
         if self.number_of_tracks() > 1:
-            a['Tracks'] = ', '.join(session.query(Element.title).filter_by(id=x.id).first()[0] for x in self.get_tracks())
+            a['Tracks'] = ', '.join(get_title(x.id) for x in self.get_tracks())
         return json.dumps(a, indent=4)
 
 
@@ -187,7 +187,7 @@ class Track(Base):
             'Duration': self.duration,
             'Genre': self.get_genre().name,
             'Copyright': self.copyright,
-            'Album': 'single' if self.get_album().number_of_tracks() > 1 else 'Single'
+            'Album': get_title(self.get_album().id) if self.get_album().number_of_tracks() > 1 else 'Single'
         }
 
         return json.dumps(ret, indent=4)

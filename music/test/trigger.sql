@@ -1,11 +1,12 @@
 /* 2) */
+DROP TRIGGER IF EXISTS check_saved_elements ON saved_elements;
 CREATE TRIGGER check_saved_elements
 BEFORE INSERT OR UPDATE
 ON saved_elements
 FOR EACH ROW
 EXECUTE FUNCTION check_saved_elements();
 
-CREATE FUNCTION check_saved_elements() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION check_saved_elements() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
                  FROM Premiums
@@ -21,13 +22,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS delete_premium_elements ON premiums;
 CREATE TRIGGER delete_premium_elements
 AFTER DELETE /* TODO UPDATE? */
 ON premiums
 FOR EACH ROW
 EXECUTE FUNCTION delete_premium_elements();
 
-CREATE FUNCTION delete_premium_elements() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION delete_premium_elements() RETURNS trigger AS $$
 BEGIN
     DELETE FROM saved_elements
     WHERE id_listener = OLD.id;
@@ -38,6 +40,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* 1) Un'artista non può avere più di un album (o traccia?) con lo stesso nome */
+DROP TRIGGER IF EXISTS only_one_name ON elements;
 CREATE TRIGGER only_one_name
 BEFORE INSERT OR UPDATE
 ON elements
@@ -45,7 +48,7 @@ FOR EACH ROW
 WHEN elements.album == New.album
 EXECUTE FUNCTION only_one_name();
 
-CREATE FUNCTION only_one_name() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION only_one_name() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
                  FROM Artist
@@ -58,13 +61,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* 4) album deve contenere almeno una traccia (coinvolge + tabelle)*/
+DROP TRIGGER IF EXISTS at_least_one_track ON albums;
 CREATE TRIGGER at_least_one_track
 BEFORE INSERT OR UPDATE
 ON albums
 FOR EACH ROW
 EXECUTE FUNCTION at_least_one_track();
 
-CREATE FUNCTION at_least_one_track() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION at_least_one_track() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
                  FROM tracks
@@ -76,12 +80,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* se viene eliminata l'ultima traccia elimino l'album */
+DROP TRIGGER IF EXISTS not_last_track ON tracks;
 CREATE TRIGGER not_last_track
 AFTER DELETE OR UPDATE ON tracks
 FOR EACH ROW /* TODO TABLE? */
 EXECUTE FUNCTION not_last_track();
 
-CREATE FUNCTION not_last_track() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION not_last_track() RETURNS trigger AS $$
 BEGIN
     IF ( NOT EXISTS( SELECT *
                  FROM tracks
@@ -94,13 +99,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 /*5) Un artista deve pubblicare almeno un album nella piattaforma per essere considerato tale (scadenza)*/
+DROP TRIGGER IF EXISTS deadline_artist ON artists;
 CREATE TRIGGER deadline_artist
 BEFORE INSERT OR UPDATE
 ON Artist
 FOR EACH ROW
 EXECUTE FUNCTION deadline_artist();
 
-CREATE FUNCTION deadline_artist() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION deadline_artist() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT tracks_in
                  FROM Album
@@ -117,13 +123,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* 6) Un artista non può essere ospite al suo stesso evento o un feat nella sua stessa traccia */
+DROP TRIGGER IF EXISTS not_creator_equals_guest ON guests;
 CREATE TRIGGER not_creator_equals_guest
 BEFORE INSERT OR UPDATE
 ON guests
 FOR EACH ROW
 EXECUTE FUNCTION not_creator_equals_guest();
 
-CREATE FUNCTION not_creator_equals_guest() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION not_creator_equals_guest() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
                  FROM events
@@ -134,13 +141,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS not_creator_equals_feat ON featuring;
 CREATE TRIGGER not_creator_equals_feat
 BEFORE INSERT OR UPDATE
 ON featuring
 FOR EACH ROW
 EXECUTE FUNCTION not_creator_equals_feat();
 
-CREATE FUNCTION not_creator_equals_feat() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION not_creator_equals_feat() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
                  FROM tracks t JOIN albums a on t.album_id = a.id
@@ -153,6 +161,7 @@ $$ LANGUAGE plpgsql;
 
 /* 7) Un utente può creare una playlist pubblica solo se è un utente premium */
 /* Il caso in cui un utente non sia più premium viene gestito in delete_premium_elements */
+DROP TRIGGER IF EXISTS check_public_playlist ON playlists;
 CREATE TRIGGER check_public_playlist
 BEFORE INSERT OR UPDATE
 ON playlists
@@ -160,7 +169,7 @@ FOR EACH ROW
 WHEN ( NOT NEW.is_private )
 EXECUTE FUNCTION check_public_playlist();
 
-CREATE FUNCTION check_public_playlist() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION check_public_playlist() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
                  FROM premiums
@@ -172,25 +181,28 @@ END;
 $$ LANGUAGE plpgsql;
 
 /* TODO controllare se possibile fare con sqlalchemy */
+DROP TRIGGER IF EXISTS delete_tracks ON tracks;
 CREATE TRIGGER delete_tracks
 AFTER DELETE
 ON tracks
 FOR EACH ROW
 EXECUTE FUNCTION delete_elements();
 
+DROP TRIGGER IF EXISTS delete_albums ON albums;
 CREATE TRIGGER delete_albums
 AFTER DELETE
 ON albums
 FOR EACH ROW
 EXECUTE FUNCTION delete_elements();
 
+DROP TRIGGER IF EXISTS delete_playlists ON playlists;
 CREATE TRIGGER delete_playlists
 AFTER DELETE
 ON playlists
 FOR EACH ROW
 EXECUTE FUNCTION delete_elements();
 
-CREATE FUNCTION delete_elements() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION delete_elements() RETURNS trigger AS $$
 BEGIN
     DELETE FROM elements
     WHERE id = OLD.id;
