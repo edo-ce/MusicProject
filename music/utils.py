@@ -126,16 +126,6 @@ def get_favorite_genre(code):
     return res
 
 
-# TODO CHANGE get_genre_id get_favorite_genre advice_func_tracks
-
-
-def get_genre_id(name):
-    if session.query(Genre.id).filter(func.lower(Genre.name) == name).first():
-        return session.query(Genre.id).filter(func.lower(Genre.name) == name).first()[0]
-    else:
-        return None
-
-
 # STATISTICS
 
 

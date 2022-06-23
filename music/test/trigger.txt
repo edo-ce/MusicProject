@@ -11,6 +11,10 @@
 // 6) Un artista non può essere ospite al suo stesso evento o un feat nella sua stessa traccia
 // 7) Un utente può creare una playlist pubblica solo se è un utente premium
 
+
+// TODO Trigger
+// 8) following_date dopo data iscrizione del listener
+
 // Permessi
 // differenti in base alle tabelle...
 

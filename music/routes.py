@@ -126,11 +126,9 @@ def upload_track(number):
                     return redirect(url_for('upload_track', number=number, album=album))
 
         code = add_no_commit(Element, title=form.title.data).id
-        if get_genre_id(form.genre.data.lower()) is None:
-            add_no_commit(Genre, name=form.genre.data)
 
-        add_no_commit(Track, id=code, duration=form.duration.data, genre=get_genre_id(form.genre.data.lower()),
-                      copyright=form.copyright.data, album_id=int(album), artists_feat=feats)
+        add_no_commit(Track, id=code, duration=form.duration.data, copyright=form.copyright.data,
+                      genre=form.genre.data, album_id=int(album), artists_feat=feats)
 
         if number != 1:
             return redirect(url_for('upload_track', number=number-1, album=album))
@@ -270,12 +268,12 @@ def search_results():
 @app.route('/delete/<id_elem>')
 @login_required
 def delete_route(id_elem):
+    # TODO sistemare
     try:
         id_elem = int(id_elem)
     except ValueError:
         pass
     delete_from_saved(current_user.username, id_elem)
-    # TODO redirect
     return redirect(url_for('private'))
 
 
@@ -291,6 +289,7 @@ def save_route(id_elem):
     return redirect(url_for('private'))
 
 
+# TODO aggiungere nel frontend
 @app.route('/delete-user')
 @login_required
 def delete_user():

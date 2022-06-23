@@ -1,9 +1,12 @@
-from music import login_manager, Base, bcrypt, session
+from music.engine import *
+from music import login_manager, bcrypt
 from flask_login import UserMixin
-from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint
+from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint, Text
 from sqlalchemy.orm import relationship
 import json
-from datetime import date
+
+
+create_schema()
 
 
 @login_manager.user_loader
@@ -20,7 +23,7 @@ class User(Base, UserMixin):
 
     username = Column(String(length=30), primary_key=True)
     email = Column(String(length=30), nullable=False, unique=True)
-    hashed_password = Column(String, nullable=False)
+    hashed_password = Column(Text, nullable=False)
     name = Column(String)
     lastname = Column(String)
     gender = Column(String)
@@ -47,9 +50,9 @@ class User(Base, UserMixin):
 
     def __repr__(self):
         ret = {
-            'username' : self.username,
-            'password' : self.hashed_password,
-            'email' : self.email
+            'username': self.username,
+            'password': self.hashed_password,
+            'email': self.email
         }
         return json.dumps(ret, indent=4)
 
@@ -109,15 +112,6 @@ class Element(Base):
             .first() or session.query(Playlist).filter_by(id=self.id).first()
 
 
-class Genre(Base):
-    __tablename__ = 'genres'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-
-    tracks = relationship('Track', backref='genre_id')
-
-
 featuring = Table('featuring', Base.metadata,
                   Column('id_artist', ForeignKey('artists.id', ondelete='CASCADE'), primary_key=True),
                   Column('id_track', ForeignKey('tracks.id', ondelete='CASCADE'), primary_key=True))
@@ -163,7 +157,7 @@ class Track(Base):
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
     duration = Column(Integer, nullable=False)
     copyright = Column(String, nullable=False)
-    genre = Column(ForeignKey(Genre.id, ondelete='CASCADE'), nullable=False)
+    genre = Column(String, nullable=False)
     album_id = Column(ForeignKey(Album.id, ondelete='CASCADE'), nullable=False)
 
     artists_feat = relationship("Artist", secondary=featuring, backref="tracks_feat")
@@ -171,9 +165,6 @@ class Track(Base):
 
     def get_album(self):
         return session.query(Album).filter_by(id=self.album_id).first()
-
-    def get_genre(self):
-        return session.query(Genre).filter_by(id=self.genre).first()
 
     # TODO vedere aggiungere genere
     # TODO sistemare la durata
@@ -185,7 +176,7 @@ class Track(Base):
             'Artist': self.get_album().get_artist().stage_name,
             'Featuring': ", ".join(f.stage_name for f in self.artists_feat),
             'Duration': self.duration,
-            'Genre': self.get_genre().name,
+            'Genre': self.genre,
             'Copyright': self.copyright,
             'Album': get_title(self.get_album().id) if self.get_album().number_of_tracks() > 1 else 'Single'
         }
@@ -254,7 +245,7 @@ class PaymentCard(Base):
 
     id = Column(Integer, primary_key=True)
     number = Column(String, nullable=False)
-    security_pin = Column(String, nullable=False)
+    security_pin = Column(Text, nullable=False)
     # TODO check expiration_date > date.today()
     expiration_date = Column(Date, nullable=False)
     owner = Column(String, nullable=False)
@@ -285,3 +276,11 @@ class Follower(Base):
     id_artist = Column(ForeignKey(Artist.id, ondelete='CASCADE'), primary_key=True)
     id_listener = Column(ForeignKey(Listener.id, ondelete='CASCADE'), primary_key=True)
     following_date = Column(Date, nullable=False)
+
+
+Base.metadata.create_all(engine)
+
+
+populate()
+create_trigger()
+#create_roles()
