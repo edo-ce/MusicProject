@@ -29,6 +29,7 @@ class User(Base, UserMixin):
     gender = Column(String)
     country = Column(String, nullable=False)
     birth_date = Column(Date)
+    role = Column(String)
 
     artists = relationship('Artist', backref='user')
     listeners = relationship('Listener', backref='user')
@@ -36,6 +37,9 @@ class User(Base, UserMixin):
 
     def get_id(self):
         return self.username
+
+    def allowed(self, role_level):
+        return self.role == 'admin' or self.role == role_level
 
     @property
     def password(self):
@@ -94,7 +98,7 @@ class Listener(Base):
     followers = relationship('Follower', backref='listeners')
     premiums_id = relationship('Premium', backref='listener_id')
 
-    elements = relationship("Element", secondary=saved_elements, backref="listeners")
+    elements = relationship('Element', secondary=saved_elements, backref='listeners')
 
 
 class Element(Base):
@@ -184,6 +188,7 @@ class Track(Base):
         return json.dumps(ret, indent=4)
 
 
+# TODO stampa la lista delle tracce nel __repr__ come per album
 class Playlist(Base):
     __tablename__ = 'playlists'
 

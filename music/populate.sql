@@ -1,8 +1,8 @@
 CREATE EXTENSION pgcrypto;
 
-INSERT INTO musicsql.public.users VALUES ('edo', 'edo@mail.com', crypt('passedo', gen_salt('bf', 8)), 'Edoardo', 'Cecchinato', 'M', 'Italy', '2000-06-17');
-INSERT INTO musicsql.public.users VALUES ('tia', 'tia@mail.com', crypt('passtia', gen_salt('bf', 8)), 'Mattia', 'Dei Rossi', 'M', 'Italy', '2000-04-04');
-INSERT INTO musicsql.public.users VALUES ('leo', 'leo@mail.com', crypt('passleo', gen_salt('bf', 8)), 'Leonardo', 'Sartori', 'M', 'Italy', '2000-02-20');
+INSERT INTO users VALUES ('edo', 'edo@mail.com', crypt('passedo', gen_salt('bf', 8)), 'Edoardo', 'Cecchinato', 'M', 'Italy', '2000-06-17', 'listener');
+INSERT INTO users VALUES ('tia', 'tia@mail.com', crypt('passtia', gen_salt('bf', 8)), 'Mattia', 'Dei Rossi', 'M', 'Italy', '2000-04-04', 'listener');
+INSERT INTO users VALUES ('leo', 'leo@mail.com', crypt('passleo', gen_salt('bf', 8)), 'Leonardo', 'Sartori', 'M', 'Italy', '2000-02-20', 'artist');
 
 
 INSERT INTO listeners VALUES ('edo', '2022-06-05');

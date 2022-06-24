@@ -1,10 +1,15 @@
 from music import app
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, request
 from music.forms import SignUpForm, LoginForm, SignUpFormArtist, PaymentForm, AlbumForm, TrackForm, \
     PlaylistForm, EventForm, PlaylistTrackForm, UserSettingsForm, ArtistSettingsForm
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required
 from music.algorithms import *
 from datetime import date
+
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    return str(e)
 
 
 @app.context_processor
@@ -36,11 +41,13 @@ def signup_artist():
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
-        add_no_commit(User, username=form.username.data, email=form.email.data, password=form.password.data,
+        user = add_no_commit(User, username=form.username.data, email=form.email.data, password=form.password.data,
                     name=form.name.data, lastname=form.lastname.data, country=form.country.data,
                     gender=form.gender.data, birth_date=form.birth_date.data)
         if form.user_type.data == 'Artist':
+            user.role = roles['ARTIST']
             return redirect(url_for('signup_artist', username=form.username.data))
+        user.role = roles['LISTENER']
         add_and_commit(Listener, id=form.username.data, registration_date=date.today())
         login_user(get_user(form.username.data))
         flash(f"Listener account created successfully! You are logged in {form.username.data}", category="success")
@@ -75,6 +82,7 @@ def logout():
 
 @app.route('/premium-upgrade', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['LISTENER'])
 def premium():
     form = PaymentForm()
     if form.validate_on_submit():
@@ -90,6 +98,7 @@ def premium():
 
 @app.route('/premium-delete')
 @login_required
+@roles_required(roles['LISTENER'])
 def delete_premium():
     if is_premium(current_user.username):
         payment_card = get_payment_card(current_user.username)
@@ -106,6 +115,7 @@ def delete_premium():
 
 @app.route('/upload-track/<number>', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['ARTIST'])
 def upload_track(number):
     number = int(number)
     album = request.args.get('album')
@@ -141,6 +151,7 @@ def upload_track(number):
 
 @app.route('/upload-album', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['ARTIST'])
 def upload_album():
     form = AlbumForm()
     if form.validate_on_submit():
@@ -152,6 +163,7 @@ def upload_album():
 
 @app.route('/upload-event', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['ARTIST'])
 def upload_event():
     form = EventForm()
     if form.validate_on_submit():
@@ -177,6 +189,7 @@ def upload_event():
 
 @app.route('/add-<playlist>-track/<number>', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['ARTIST'])
 def add_playlist_track(playlist, number):
     number = int(number)
     playlist = int(playlist)
@@ -208,6 +221,7 @@ def add_playlist_track(playlist, number):
 
 @app.route('/create-playlist', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['ARTIST'])
 def create_playlist():
     form = PlaylistForm()
     if form.validate_on_submit():
@@ -219,6 +233,7 @@ def create_playlist():
 
 @app.route('/delete/<table>/<code>')
 @login_required
+@roles_required(roles['ARTIST'])
 def delete_elements(table, code):
     deletable_tables = ('albums', 'tracks', 'playlists')
     if table in deletable_tables and get_element_creator(table, code) == current_user.username:
@@ -243,6 +258,7 @@ def private():
 # per visualizzare la pagina di un utente (playlist)
 @app.route('/view/<username>')
 @login_required
+@roles_required(roles['LISTENER'])
 def view(username):
     if not username_exists(username):
         return redirect(url_for('home'))
@@ -260,6 +276,7 @@ def view(username):
 
 @app.route('/search-results', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['LISTENER'])
 def search_results():
     res = search_func(request.form['search_text'].lower())
     return render_template('search.html', dict=res)
@@ -267,6 +284,7 @@ def search_results():
 
 @app.route('/delete/<id_elem>')
 @login_required
+@roles_required(roles['LISTENER'])
 def delete_route(id_elem):
     # TODO sistemare
     try:
@@ -279,6 +297,7 @@ def delete_route(id_elem):
 
 @app.route('/save/<id_elem>', methods=['GET', 'POST'])
 @login_required
+@roles_required(roles['LISTENER'])
 def save_route(id_elem):
     # TODO sistemare
     try:

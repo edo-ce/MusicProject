@@ -1,1 +1,11 @@
+DROP USER IF EXISTS admin;
+CREATE USER admin WITH PASSWORD 'admin';
+GRANT USAGE ON SCHEMA public TO admin;
 
+DROP USER IF EXISTS listener;
+CREATE USER admin WITH PASSWORD 'listener';
+GRANT USAGE ON SCHEMA public TO listener;
+
+DROP USER IF EXISTS artist;
+CREATE USER admin WITH PASSWORD 'artist';
+GRANT USAGE ON SCHEMA public TO artist;

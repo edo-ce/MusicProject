@@ -1,4 +1,7 @@
 from music.models import *
+from functools import wraps
+from flask import redirect, url_for, flash
+from flask_login import current_user
 
 tables = {'users': User,
           'listeners': Listener,
@@ -11,6 +14,9 @@ tables = {'users': User,
           'payment_cards': PaymentCard,
           'premiums': Premium,
           'followers': Follower}
+
+
+roles = {'ADMIN': 'admin', 'LISTENER': 'listener', 'ARTIST': 'artist'}
 
 
 def convert_table(table):
@@ -43,6 +49,7 @@ def add_and_commit(table, **kwargs):
         raise e
 
 
+# TODO sqlalchemyexception
 def add_no_commit(table, **kwargs):
     try:
         table = convert_table(table)
@@ -81,3 +88,17 @@ def update_tuple(table, code, **kwargs):
     except Exception as e:
         rollback()
         raise e
+
+
+def roles_required(role_required):
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            print(current_user.role)
+            print(role_required)
+            if not current_user.allowed(role_required):
+                flash("You don't have permission to access this resource.", "warning")
+                return redirect(url_for('private'))
+            return func(*args, **kwargs)
+        return decorated_function
+    return decorator
