@@ -17,8 +17,10 @@
         {% endwith %}
         {% if not is_artist(current_user.username) %}
         <br>
+        {% if is_premium(current_user.username) %}
         {{ form.private.label() }}
         {{ form.private }}
+        {% endif %}
         {% endif %}
       <br>
       <div class="form-group">

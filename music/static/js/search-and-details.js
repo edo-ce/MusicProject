@@ -67,6 +67,7 @@ function search_alert() {
                     let first_key = Object.keys(element)[0]
                     var img = convertStringToImageUrl(element[first_key]);
                     var stringa = "";
+                    let creator = ""
                     for (const key in element) {
                         if( key ===first_key)
                             continue;
@@ -74,15 +75,21 @@ function search_alert() {
                             stringa += "<p class='card-text'><small class='text-muted'>" + element[key] + "</small></p>"
                         else
                             stringa += "<p class='card-text'>" + element[key] + "</p>";
+                        if (key === "Creator")
+                            creator = element[key]
                     }
 
                     let art = $('.art').eq(0).data().name;
+                    let current_user = $('.current_user').eq(0).data().name;
                     let id_elem = $(".id_elem").eq(index).data().name;
                     let table_elem = $(".table_elem").eq(index).data().name;
                     let route_user = 'location.href="/delete/' + id_elem +'"';
                     let route_artist = 'location.href="/delete/' + table_elem + '/' + id_elem + '"';
                     if (art === "user")
-                        stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route_user +"></i></span>"
+                        if (table_elem === "playlists" && current_user === creator)
+                            stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick="+ route_artist +"></i></span>"
+                        else
+                            stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route_user +"></i></span>"
                     else if (art === "artist")
                         stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick="+ route_artist +"></i></span>"
                     Swal.fire({

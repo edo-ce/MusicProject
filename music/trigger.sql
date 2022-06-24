@@ -27,6 +27,7 @@ BEGIN
     WHERE id_listener = OLD.id;
     DELETE FROM playlists
     WHERE creator = OLD.id AND NOT is_private;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -63,10 +64,11 @@ CREATE OR REPLACE FUNCTION not_last_track() RETURNS trigger AS $$
 BEGIN
     IF ( NOT EXISTS( SELECT *
                  FROM tracks
-                 WHERE album_id == OLD.id_album ) ) THEN
+                 WHERE album_id == OLD.album_id ) ) THEN
         DELETE FROM albums
-        WHERE id = OLD.id_album;
+        WHERE id = OLD.album_id;
     END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -141,6 +143,7 @@ CREATE OR REPLACE FUNCTION delete_elements() RETURNS trigger AS $$
 BEGIN
     DELETE FROM elements
     WHERE id = OLD.id;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 

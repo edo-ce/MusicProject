@@ -2,6 +2,7 @@ from music.models import *
 from functools import wraps
 from flask import redirect, url_for, flash
 from flask_login import current_user
+from sqlalchemy.exc import IntegrityError
 
 tables = {'users': User,
           'listeners': Listener,
@@ -44,12 +45,11 @@ def add_and_commit(table, **kwargs):
         session.add(elem)
         commit()
         return elem
-    except Exception as e:
+    except IntegrityError as e:
         rollback()
         raise e
 
 
-# TODO sqlalchemyexception
 def add_no_commit(table, **kwargs):
     try:
         table = convert_table(table)
@@ -57,7 +57,7 @@ def add_no_commit(table, **kwargs):
         session.add(elem)
         flush()
         return elem
-    except Exception as e:
+    except IntegrityError as e:
         rollback()
         raise e
 
@@ -70,7 +70,7 @@ def delete_tuple(table, code):
         else:
             session.query(table).filter_by(id=code).delete()
         commit()
-    except Exception as e:
+    except IntegrityError as e:
         rollback()
         raise e
 
@@ -85,7 +85,7 @@ def update_tuple(table, code, **kwargs):
         for attribute, value in kwargs.items():
             setattr(row, attribute, value)
         commit()
-    except Exception as e:
+    except IntegrityError as e:
         rollback()
         raise e
 

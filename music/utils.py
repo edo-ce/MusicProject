@@ -88,6 +88,13 @@ def get_payment_card(code):
         Premium.id == code and PaymentCard.id == Premium.payment_card).first()
 
 
+def get_payment_card_by_number_and_pin(number, pin):
+    card = session.query(PaymentCard).filter_by(number=number).first()
+    if card and card.pin_check(pin):
+        return card
+    return None
+
+
 def get_playlist_track(title, album, artist):
     # TODO gestire il caso in cui c'è un artista con il nome uguale e anche il nome di un album uguale
     album_id = session.query(Album.id).join(Element).join(Artist).filter(func.lower(Artist.stage_name) == artist)\

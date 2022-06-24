@@ -1,9 +1,10 @@
 from music.engine import *
 from music import login_manager, bcrypt
 from flask_login import UserMixin
-from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint, Text
+from sqlalchemy import Column, String, Integer, Date, ForeignKey, Boolean, Table, CheckConstraint, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 import json
+from datetime import date
 
 
 create_schema()
@@ -159,7 +160,7 @@ class Track(Base):
     __tablename__ = 'tracks'
 
     id = Column(ForeignKey(Element.id, ondelete='CASCADE'), primary_key=True)
-    duration = Column(Integer, nullable=False)
+    duration = Column(Integer, CheckConstraint('duration > 0'), nullable=False)
     copyright = Column(String, nullable=False)
     genre = Column(String, nullable=False)
     album_id = Column(ForeignKey(Album.id, ondelete='CASCADE'), nullable=False)
@@ -170,11 +171,7 @@ class Track(Base):
     def get_album(self):
         return session.query(Album).filter_by(id=self.album_id).first()
 
-    # TODO vedere aggiungere genere
-    # TODO sistemare la durata
-
     def __repr__(self):
-
         ret = {
             'Title': get_title(self.id),
             'Artist': self.get_album().get_artist().stage_name,
@@ -184,11 +181,9 @@ class Track(Base):
             'Copyright': self.copyright,
             'Album': get_title(self.get_album().id) if self.get_album().number_of_tracks() > 1 else 'Single'
         }
-
         return json.dumps(ret, indent=4)
 
 
-# TODO stampa la lista delle tracce nel __repr__ come per album
 class Playlist(Base):
     __tablename__ = 'playlists'
 
@@ -205,7 +200,8 @@ class Playlist(Base):
         ret = {
             'Title': get_title(self.id),
             'Playlist Type': 'Private' if self.is_private else 'Public',
-            'Creator': self.get_creator_name()
+            'Creator': self.get_creator_name(),
+            'Tracks': ', '.join(get_title(x.id) for x in self.tracks_id)
         }
         return json.dumps(ret, indent=4)
 
@@ -240,7 +236,8 @@ class Event(Base):
             'Date': str(self.date),
             'Time': f'{self.start_time} - {self.end_time}',
             'Location': self.location,
-            'Link': self.link
+            'Link': self.link,
+            'Guests': ', '.join(x.stage_name for x in self.artists_guests)
         }
         return json.dumps(ret, indent=4)
 
@@ -251,12 +248,17 @@ class PaymentCard(Base):
     id = Column(Integer, primary_key=True)
     number = Column(String, nullable=False)
     security_pin = Column(Text, nullable=False)
-    # TODO check expiration_date > date.today()
-    expiration_date = Column(Date, nullable=False)
+    expiration_date = Column(Date, CheckConstraint('expiration_date > today'), nullable=False)
     owner = Column(String, nullable=False)
     type = Column(String, nullable=False)
 
+    __table_args__ = (
+        UniqueConstraint('number', 'security_pin'),
+    )
+
     premiums = relationship('Premium', backref='card')
+
+    today = Column(Date, default=date.today())
 
     @property
     def pin(self):
@@ -265,6 +267,9 @@ class PaymentCard(Base):
     @pin.setter
     def pin(self, p):
         self.security_pin = bcrypt.generate_password_hash(p).decode('utf-8')
+
+    def pin_check(self, p):
+        return bcrypt.check_password_hash(self.security_pin, p)
 
 
 class Premium(Base):

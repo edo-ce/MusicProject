@@ -86,10 +86,11 @@ def logout():
 def premium():
     form = PaymentForm()
     if form.validate_on_submit():
-        # TODO gestire il fatto in cui la carta di credito è già registrata
-        card = add_no_commit(PaymentCard, number=form.number.data, pin=form.pin.data,
-                           expiration_date=form.expiration_date.data,
-                           owner=form.holder.data, type=form.type.data)
+        card = get_payment_card_by_number_and_pin(form.number.data, form.pin.data)
+        if card is None:
+            card = add_no_commit(PaymentCard, number=form.number.data, pin=form.pin.data,
+                               expiration_date=form.expiration_date.data,
+                               owner=form.holder.data, type=form.type.data)
         add_and_commit(Premium, id=current_user.username, registration_date=date.today(), payment_card=card.id)
         flash('Account Premium create successfully', category='success')
         return redirect(url_for('private'))
@@ -107,9 +108,6 @@ def delete_premium():
             delete_tuple(Premium, current_user.username)
         else:
             delete_tuple(PaymentCard, payment_card.id)
-        # TODO eliminare queste due righe se il trigger funziona correttamente
-        get_listener(current_user.username).elements = []
-        commit()
     return redirect(url_for('private'))
 
 
@@ -189,7 +187,6 @@ def upload_event():
 
 @app.route('/add-<playlist>-track/<number>', methods=['GET', 'POST'])
 @login_required
-@roles_required(roles['ARTIST'])
 def add_playlist_track(playlist, number):
     number = int(number)
     playlist = int(playlist)
@@ -221,7 +218,6 @@ def add_playlist_track(playlist, number):
 
 @app.route('/create-playlist', methods=['GET', 'POST'])
 @login_required
-@roles_required(roles['ARTIST'])
 def create_playlist():
     form = PlaylistForm()
     if form.validate_on_submit():
@@ -233,7 +229,6 @@ def create_playlist():
 
 @app.route('/delete/<table>/<code>')
 @login_required
-@roles_required(roles['ARTIST'])
 def delete_elements(table, code):
     deletable_tables = ('albums', 'tracks', 'playlists')
     if table in deletable_tables and get_element_creator(table, code) == current_user.username:
@@ -286,7 +281,6 @@ def search_results():
 @login_required
 @roles_required(roles['LISTENER'])
 def delete_route(id_elem):
-    # TODO sistemare
     try:
         id_elem = int(id_elem)
     except ValueError:
@@ -299,7 +293,6 @@ def delete_route(id_elem):
 @login_required
 @roles_required(roles['LISTENER'])
 def save_route(id_elem):
-    # TODO sistemare
     try:
         id_elem = int(id_elem)
     except ValueError:
