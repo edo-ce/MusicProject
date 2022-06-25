@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-    Listener Page
+    User Page
 {% endblock %}
 {% block content %}
 <body class="text-center">
@@ -16,7 +16,7 @@
             {% endif %}
         {% else %}
             {% if artist %}
-            <h1>{{ is_artist(username).stage_name }}}</h1>
+            <h1>{{ is_artist(username).stage_name }}</h1>
             <meta class="art" data-name="visit_artist">
             {% else %}
             <h1> {{ username }} </h1>
@@ -78,6 +78,7 @@
         </div>
         {% endfor %}
 
+        {% if username == current_user.username %}
         {% if is_artist(current_user.username) %}
         <br>
         <a href="{{ url_for('upload_album') }}"><h3>Upload an album</h3></a>
@@ -93,6 +94,7 @@
         <a href="{{ url_for('settings') }}"><h3>Settings</h3></a>
         <br>
         <a href="{{ url_for('delete_user') }}"><h3>Delete account</h3></a>
+        {% endif %}
 
     </section>
 

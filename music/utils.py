@@ -136,8 +136,14 @@ def get_favorite_genre(code):
 # STATISTICS
 
 
-def get_followers(artist):
-    return session.query(Follower).filter_by(id_artist=artist).count()
+def get_followers_count(code):
+    return session.query(Follower).filter_by(id_artist=code).count()
+
+
+def get_male_listener(code):
+    number_users = session.query(User).join(Follower).where(Follower.id_artist == code).count()
+    number_male = session.query(User).join(Follower).where(Follower.id_artist == code).where(User.gender == 'M').count()
+    return number_male / number_users
 
 
 def get_saved_element(creator):

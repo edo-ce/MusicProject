@@ -16,7 +16,7 @@ def handle_error(e):
 @app.context_processor
 def utility_processor():
     return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved,
-                save_something=save_something, advice_func=advice_func)
+                save_something=save_something, advice_func=advice_func, get_title=get_title)
 
 
 @app.route('/')
@@ -246,17 +246,17 @@ def private():
         elems = display_artist_contents(current_user.username)
     else:
         elems = find_saved_elements(current_user.username)
-    return render_template('personal_pages/private_listener.html', elems=elems, get_title=get_title,
-                           username=current_user.username)
+    return render_template('personal_pages/private_listener.html', elems=elems, username=current_user.username)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
 # per visualizzare la pagina di un utente (playlist)
-@app.route('/view/<username>')
+@app.route('/view-<username>')
 @login_required
 @roles_required(roles['LISTENER'])
 def view(username):
     if not username_exists(username):
+        flash('The user does not exists!', 'warning')
         return redirect(url_for('home'))
     if username == current_user.username:
         return redirect(url_for('private'))
@@ -266,8 +266,7 @@ def view(username):
     else:
         elems = dict()
         elems['playlists'] = get_playlists_by_creator(username)
-    return render_template('personal_pages/private_listener.html', elems=elems, artist=artist, username=username,
-                           get_title=get_title)
+    return render_template('personal_pages/private_listener.html', elems=elems, artist=artist, username=username)
 
 
 @app.route('/search-results', methods=['GET', 'POST'])

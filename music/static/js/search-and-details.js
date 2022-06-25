@@ -2,8 +2,7 @@ function search_alert() {
             Swal.fire({
                   title: 'Search!',
                   html: "<form action='/search-results' method='POST' class='form-signup' autocomplete='off'>" +
-                      "<input type='search' name='search_text' id='login' class='swal2-input' placeholder='Search anything...' onclick='showResults(this.value)' >" +
-                      "<div id='result'></div>" +
+                      "<input type='search' name='search_text' id='login' class='swal2-input' placeholder='Search anything...'>" +
                       "<button type='submit' class='btn m-2' style='background-color: #00D1B2; color: white;' value='submit'>Search</button>  " +
                       "" +
                       "</form>",
@@ -15,43 +14,6 @@ function search_alert() {
                     popup: 'animate__animated animate__fadeOutUp'
                   }
             });
-        }
-
-        /**
-         *
-         *
-         * PASSARE L'ARRAY TRACKS PER LE TRACCE CONSIGLIATE
-         *
-         *
-         */
-
-
-
-        function autocompleteMatch(input) {
-          if (input == '') {
-            return search_terms;
-          }
-          var reg = new RegExp(input)
-          return search_terms.filter(function(term) {
-              if (term.match(reg)) {
-              return term;
-              }
-          });
-        }
-
-        function showResults(val) {
-          res = document.getElementById("result");
-          res.innerHTML = '';
-          let list = '';
-          let terms = autocompleteMatch(val);
-          for (i=0; i<terms.length; i++) {
-            list += '<li class="list-group-item">' + terms[i] + '</li>';
-          }
-          let stringa = '';
-          if (terms.length > 0)
-              stringa += '<span>We recommend:</span>'
-          stringa += '<ul class="list-group">' + list + '</ul>';
-          res.innerHTML = stringa;
         }
 
 
