@@ -4,3 +4,9 @@
     right: 25px;
     display: none;
 }
+
+.button-settings {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+}
