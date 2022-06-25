@@ -3,10 +3,31 @@
     Home Page
 {% endblock %}
 {% block content %}
+    <style>
+    .masthead {
+        height: 100vh;
+        min-height: 500px;
+        background-image: url('{{ url_for('static', filename='images/background-home.jpg') }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: black;
+        border-color: rgba(13, 110, 253, 0.91);
+        border-style: solid;
+        border-width: thick;
+    }
+    </style>
 <body class="text-center">
-    <section class="container">
-        <h1>Welcome {{ current_user.username }}</h1>
-        <a class="btn btn-primary" href="{{ url_for('private') }}">Get Started</a>
-    </section>
+    <header class="masthead">
+      <div class="container h-100">
+        <div class="row h-100 align-items-center">
+          <div class="col-12 text-center">
+            <h1 class="text-primary" style="font-size: 54px; font-style: italic;">Welcome {{ current_user.username }}</h1>
+            <p class="lead"><a class="btn btn-primary" href="{{ url_for('private') }}">Get Started</a></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
 </body>
 {% endblock %}
