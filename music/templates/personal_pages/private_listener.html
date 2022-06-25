@@ -79,21 +79,22 @@
         {% endfor %}
 
         {% if username == current_user.username %}
-        {% if is_artist(current_user.username) %}
-        <br>
-        <a href="{{ url_for('upload_album') }}"><h3>Upload an album</h3></a>
-        <br>
-        <a href="{{ url_for('upload_event') }}"><h3>Upload an event</h3></a>
-        {% endif %}
-        <br>
-        <a href="{{ url_for('create_playlist') }}"><h3>Create a playlist</h3></a>
 
-        <br>
-        <br>
-        <br>
-        <a href="{{ url_for('settings') }}"><h3>Settings</h3></a>
-        <br>
-        <a href="{{ url_for('delete_user') }}"><h3>Delete account</h3></a>
+        <div class="dropup button-settings">
+            <button type="button" class="btn btn-light btn-lg btn-group" data-bs-toggle="dropdown"><i class="bi bi-gear"></i></button>
+            <div class="dropdown-menu">
+                {% if is_artist(current_user.username) %}
+                    <a href="{{ url_for('upload_album') }}" class="dropdown-item"><h5>Upload an album</h5></a>
+                    <a href="{{ url_for('upload_event') }}" class="dropdown-item"><h5>Upload an event</h5></a>
+                    <div class="dropdown-divider"></div>
+                {% endif %}
+                <a href="{{ url_for('create_playlist') }}" class="dropdown-item"><h5>Create a playlist</h5></a>
+                <a href="{{ url_for('settings') }}" class="dropdown-item"><h5>Settings</h5></a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('delete_user') }}" class="dropdown-item text-danger"><h5>Delete account</h5></a>
+            </div>
+        </div>
+
         {% endif %}
 
     </section>
