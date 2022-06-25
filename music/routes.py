@@ -6,17 +6,18 @@ from flask_login import login_user, logout_user, login_required
 from music.algorithms import *
 from datetime import date
 
-
+'''
 @app.errorhandler(Exception)
 def handle_error(e):
     rollback()
     return str(e)
-
+'''
 
 @app.context_processor
 def utility_processor():
     return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved,
-                save_something=save_something, advice_func=advice_func, get_title=get_title)
+                save_something=save_something, advice_func=advice_func, get_title=get_title,
+                get_element_creator=get_element_creator)
 
 
 @app.route('/')
@@ -112,7 +113,7 @@ def delete_premium():
     return redirect(url_for('private'))
 
 
-@app.route('/upload-track/<number>', methods=['GET', 'POST'])
+@app.route('/upload-track-<number>', methods=['GET', 'POST'])
 @login_required
 @roles_required(roles['ARTIST'])
 def upload_track(number):
@@ -186,7 +187,7 @@ def upload_event():
     return render_template('forms/upload_event.html', form=form)
 
 
-@app.route('/add-<playlist>-track/<number>', methods=['GET', 'POST'])
+@app.route('/add-<playlist>-track-<number>', methods=['GET', 'POST'])
 @login_required
 def add_playlist_track(playlist, number):
     number = int(number)
@@ -228,7 +229,7 @@ def create_playlist():
     return render_template('forms/create_playlist.html', form=form)
 
 
-@app.route('/delete/<table>/<code>')
+@app.route('/delete-<table>-<code>')
 @login_required
 def delete_elements(table, code):
     deletable_tables = ('albums', 'tracks', 'playlists')
@@ -246,7 +247,7 @@ def private():
         elems = display_artist_contents(current_user.username)
     else:
         elems = find_saved_elements(current_user.username)
-    return render_template('personal_pages/private_listener.html', elems=elems, username=current_user.username)
+    return render_template('personal_page.html', elems=elems, username=current_user.username)
 
 
 # per visualizzare la pagina di un'artista (album, playlist, eventi)
@@ -266,7 +267,7 @@ def view(username):
     else:
         elems = dict()
         elems['playlists'] = get_playlists_by_creator(username)
-    return render_template('personal_pages/private_listener.html', elems=elems, artist=artist, username=username)
+    return render_template('personal_page.html', elems=elems, artist=artist, username=username)
 
 
 @app.route('/search-results', methods=['GET', 'POST'])
@@ -279,7 +280,7 @@ def search_results():
     return render_template('search.html', advice=advice, dict=res)
 
 
-@app.route('/delete/<id_elem>')
+@app.route('/delete-<id_elem>')
 @login_required
 @roles_required(roles['LISTENER'])
 def delete_route(id_elem):
@@ -291,7 +292,7 @@ def delete_route(id_elem):
     return redirect(url_for('private'))
 
 
-@app.route('/save/<id_elem>', methods=['GET', 'POST'])
+@app.route('/save-<id_elem>', methods=['GET', 'POST'])
 @login_required
 @roles_required(roles['LISTENER'])
 def save_route(id_elem):
@@ -303,7 +304,6 @@ def save_route(id_elem):
     return redirect(url_for('private'))
 
 
-# TODO aggiungere nel frontend
 @app.route('/delete-user')
 @login_required
 def delete_user():
@@ -313,7 +313,6 @@ def delete_user():
     return redirect(url_for('home'))
 
 
-# TODO aggiungere nel frontend
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
@@ -342,3 +341,10 @@ def settings():
         flash('Changes uploaded successfully!', category='success')
         return redirect(url_for('private'))
     return render_template('forms/settings.html', form=form, fields=fields)
+
+
+@app.route('/stats', methods=['GET', 'POST'])
+@login_required
+@roles_required(roles['ARTIST'])
+def stats():
+    return render_template('Chart/statistics.html', get_gender_listener=get_gender_listener)

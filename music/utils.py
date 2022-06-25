@@ -140,10 +140,14 @@ def get_followers_count(code):
     return session.query(Follower).filter_by(id_artist=code).count()
 
 
-def get_male_listener(code):
-    number_users = session.query(User).join(Follower).where(Follower.id_artist == code).count()
-    number_male = session.query(User).join(Follower).where(Follower.id_artist == code).where(User.gender == 'M').count()
-    return number_male / number_users
+def get_gender_listener(code):
+    number_users = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
+        .filter(Follower.id_artist == code).count()
+    number_male = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
+        .filter(Follower.id_artist == code).filter(User.gender == 'M').count()
+    number_female = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
+        .filter(Follower.id_artist == code).filter(User.gender == 'F').count()
+    return f"{number_male/number_users},{number_female/number_male},{(number_users-number_male-number_female)/number_users}"
 
 
 def get_saved_element(creator):

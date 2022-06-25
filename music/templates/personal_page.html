@@ -17,11 +17,10 @@
         {% else %}
             {% if artist %}
             <h1>{{ is_artist(username).stage_name }}</h1>
-            <meta class="art" data-name="visit_artist">
             {% else %}
             <h1> {{ username }} </h1>
-            <meta class="art" data-name="visit_user">
             {% endif %}
+        <meta class="art" data-name="visit">
         {% endif %}
 
         {% endwith %}
@@ -43,6 +42,11 @@
                             <meta class="repr" data-name="{{ i.__repr__() }}" >
                             <meta class="id_elem" data-name="{{ i.id }}" >
                             <meta class="table_elem" data-name="{{ i.__tablename__ }}" >
+                            {% if not is_artist(current_user.username) and is_saved(current_user.username, i.id) %}
+                            <meta class="is_saved" data-name="{{ True }}" >
+                            {% else %}
+                            <meta class="is_saved" data-name="{{ False }}" >
+                            {% endif %}
                             <a class="details" style="cursor: pointer;">
                             <div class="card-flyer">
                                 <div class="text-box">
@@ -86,9 +90,12 @@
                 {% if is_artist(current_user.username) %}
                     <a href="{{ url_for('upload_album') }}" class="dropdown-item"><h5>Upload an album</h5></a>
                     <a href="{{ url_for('upload_event') }}" class="dropdown-item"><h5>Upload an event</h5></a>
-                    <div class="dropdown-divider"></div>
                 {% endif %}
                 <a href="{{ url_for('create_playlist') }}" class="dropdown-item"><h5>Create a playlist</h5></a>
+                <div class="dropdown-divider"></div>
+                {% if is_artist(current_user.username) %}
+                <a href="{{ url_for('stats') }}" class="dropdown-item"><h5>View statistics</h5></a>
+                {% endif %}
                 <a href="{{ url_for('settings') }}" class="dropdown-item"><h5>Settings</h5></a>
                 <div class="dropdown-divider"></div>
                 <a href="{{ url_for('delete_user') }}" class="dropdown-item text-danger"><h5>Delete account</h5></a>

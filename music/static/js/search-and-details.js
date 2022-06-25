@@ -3,6 +3,7 @@ function search_alert() {
                   title: 'Search!',
                   html: "<form action='/search-results' method='POST' class='form-signup' autocomplete='off'>" +
                       "<input type='search' name='search_text' id='login' class='swal2-input' placeholder='Search anything...'>" +
+                      "<br>"+
                       "<button type='submit' class='btn m-2' style='background-color: #00D1B2; color: white;' value='submit'>Search</button>  " +
                       "" +
                       "</form>",
@@ -23,9 +24,8 @@ function search_alert() {
 
             for(let index = 0; index<details.length; index++) {
                 details[index].addEventListener("click", function(){
-                    //console.log(reprs[index])
                     let element = $(".repr").eq(index).data().name;
-                    //console.log(element)
+                    let is_saved = $('.is_saved').eq(index).data().name;
                     let first_key = Object.keys(element)[0]
                     var img = convertStringToImageUrl(element[first_key]);
                     var stringa = "";
@@ -45,8 +45,9 @@ function search_alert() {
                     let current_user = $('.current_user').eq(0).data().name;
                     let id_elem = $(".id_elem").eq(index).data().name;
                     let table_elem = $(".table_elem").eq(index).data().name;
-                    let route_user = 'location.href="/delete/' + id_elem +'"';
-                    let route_artist = 'location.href="/delete/' + table_elem + '/' + id_elem + '"';
+                    let route_user = 'location.href="/delete-' + id_elem +'"';
+                    let route_artist = 'location.href="/delete-' + table_elem + '-' + id_elem + '"';
+                    let route_save = 'location.href="/save-' + id_elem +'"';
                     if (art === "user")
                         if (table_elem === "playlists" && current_user === creator)
                             stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick="+ route_artist +"></i></span>"
@@ -54,6 +55,10 @@ function search_alert() {
                             stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route_user +"></i></span>"
                     else if (art === "artist")
                         stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick="+ route_artist +"></i></span>"
+                    else if (is_saved === "True")
+                        stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick="+ route_user +"></i></span>"
+                    else
+                        stringa += "<span style='cursor: pointer;'>Save <i class='bi bi-heart' onclick="+ route_save +"></i></span>"
                     Swal.fire({
                           title: 'Details',
                           html: "<div class='card mb-3' style='max-width: 500px;'>" +

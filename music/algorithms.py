@@ -78,10 +78,11 @@ def save_something(id_listener, id_save):
 def delete_from_saved(id_listener, id_saved):
     try:
         if type(id_saved) == str:
-            session.query(Follower).filter(Follower.id_artist == id_saved and Follower.id_listener == id_listener)\
-                .delete()
+            session.query(Follower).filter(Follower.id_artist == id_saved)\
+                .filter(Follower.id_listener == id_listener).delete()
         else:
-            get_listener(id_listener).elements = []
+            session.query(saved_elements).filter(saved_elements.c.id_listener == id_listener).\
+                filter(saved_elements.c.id_element == id_saved).delete()
         commit()
     except Exception as e:
         rollback()
