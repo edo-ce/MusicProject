@@ -9,6 +9,7 @@ from datetime import date
 
 @app.errorhandler(Exception)
 def handle_error(e):
+    rollback()
     return str(e)
 
 
@@ -273,8 +274,10 @@ def view(username):
 @login_required
 @roles_required(roles['LISTENER'])
 def search_results():
+    # TODO advice non funziona con artist
+    advice = advice_func(current_user.username)
     res = search_func(request.form['search_text'].lower())
-    return render_template('search.html', dict=res)
+    return render_template('search.html', advice=advice, dict=res)
 
 
 @app.route('/delete/<id_elem>')

@@ -94,8 +94,6 @@ def roles_required(role_required):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            print(current_user.role)
-            print(role_required)
             if not current_user.allowed(role_required):
                 flash("You don't have permission to access this resource.", "warning")
                 return redirect(url_for('private'))

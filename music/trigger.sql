@@ -38,22 +38,24 @@ ON premiums
 FOR EACH ROW
 EXECUTE FUNCTION delete_premium_elements();
 
-
+-- TODO at_least_one_track
 
 CREATE OR REPLACE FUNCTION at_least_one_track() RETURNS trigger AS $$
 BEGIN
-    IF ( EXISTS( SELECT *
+    IF ( NOT EXISTS( SELECT *
                  FROM tracks
-                 WHERE album_id == NEW.id ) ) THEN
-        RETURN NEW;
+                 WHERE album_id = NEW.id ) ) THEN
+        DELETE FROM albums
+        WHERE id = NEW.id;
+        RAISE EXCEPTION 'Album non caricato correttamente';
     END IF;
-    RAISE EXCEPTION 'Un album deve contenere almeno una traccia!';
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS at_least_one_track ON albums;
 CREATE TRIGGER at_least_one_track
-BEFORE INSERT OR UPDATE
+AFTER INSERT OR UPDATE
 ON albums
 FOR EACH ROW
 EXECUTE FUNCTION at_least_one_track();
@@ -64,7 +66,7 @@ CREATE OR REPLACE FUNCTION not_last_track() RETURNS trigger AS $$
 BEGIN
     IF ( NOT EXISTS( SELECT *
                  FROM tracks
-                 WHERE album_id == OLD.album_id ) ) THEN
+                 WHERE album_id = OLD.album_id ) ) THEN
         DELETE FROM albums
         WHERE id = OLD.album_id;
     END IF;

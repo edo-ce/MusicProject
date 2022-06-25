@@ -5,9 +5,45 @@
 {% block content %}
 <body class="text-center">
     <section class="container w-50" style="margin-left: auto; margin-right: auto;">
+        <h1>App advice</h1>
+        <br>
+        {% for key, value in advice.items() %}
+            {% if advice[key] %}
+            <h3>{{ key }}</h3>
+            <div class="list-group">
+            {% for i in value %}
+                <div class="list-group-item list-group-item-action">
+                    <!-- TODO: ON CLICK THE ELEMENT WHAT HAPPEN -->
+                    {% if key == 'artists' %}
+                    <a href="/{{ i }}" class="text-decoration-none">{{ i.stage_name }}</a>
+                    {% else %}
+                    <a href="/{{ i }}" class="text-decoration-none">{{ i.title }}</a>
+                    {% endif %}
+                    <!-- TODO: ON CLICK THE HEART OF ELEMENT WHAT HAPPEN -->
+
+                    {% if is_saved(current_user.username, i.id) %}
+                    <span style='cursor: pointer;' onclick="location.href='/delete/{{ i.id }}'">
+                        <i class='bi bi-heart-fill'></i>
+                    </span>
+                    {% else %}
+                    <span style='cursor: pointer;' onclick="location.href='/save/{{ i.id }}'">
+                        <i class='bi bi-heart'></i>
+                    </span>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+            {% endif %}
+            </div>
+        {% endfor %}
+        <br>
+
+        <br>
+        <h1>Search results</h1>
+        <br>
         {% for key, value in dict.items() %}
             {% if dict[key] %}
-            <h1>{{ key }}</h1>
+            <h3>{{ key }}</h3>
             <div class="list-group">
             {% for i in value %}
                 <div class="list-group-item list-group-item-action">

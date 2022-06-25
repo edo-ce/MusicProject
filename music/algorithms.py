@@ -98,7 +98,7 @@ def advice_func_tracks(username):
     for track in tracks:
         if get_element(track.id) not in listener.elements:
             res[track] = session.query(saved_elements).filter_by(id_element=track.id).count()
-    return [k for k, v in sorted(res.items(), key=lambda item: item[1], reverse=True)]
+    return [get_element(k.id) for k, v in sorted(res.items(), key=lambda item: item[1], reverse=True)]
 
 
 # ALBUMS
@@ -111,7 +111,7 @@ def advice_func_albums(username):
         albums = get_artist_albums(artist.id)
         for album in albums:
             if get_element(album.id) not in listener.elements:
-                all_albums.append(album)
+                all_albums.append(get_element(album.id))
     shuffle(all_albums)
     return all_albums
 
@@ -129,7 +129,7 @@ def advice_func_playlists(username):
         if get_element(playlist.id) not in listener.elements:
             for track in playlist.tracks_id:
                 if track in tracks_in:
-                    res.append(playlist)
+                    res.append(get_element(playlist.id))
                     break
     shuffle(res)
     return res

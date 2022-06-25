@@ -293,4 +293,4 @@ Base.metadata.create_all(engine)
 
 populate()
 create_trigger()
-#create_roles()
+create_roles()
