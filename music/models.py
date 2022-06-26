@@ -223,7 +223,6 @@ class Event(Base):
     link = Column(String, nullable=False)
     creator = Column(ForeignKey(Artist.id, ondelete='CASCADE'), nullable=False)
 
-    # TODO change schema
     artists_guests = relationship("Artist", secondary=guests, backref="events_guests")
 
     __table_args__ = (

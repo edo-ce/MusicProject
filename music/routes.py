@@ -280,7 +280,7 @@ def search_results():
     return render_template('search.html', advice=advice, dict=res)
 
 
-@app.route('/delete-<id_elem>')
+@app.route('/delete-<id_elem>', methods=['GET', 'POST'])
 @login_required
 @roles_required(roles['LISTENER'])
 def delete_route(id_elem):

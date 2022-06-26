@@ -17,6 +17,15 @@
         {% else %}
             {% if artist %}
             <h1>{{ is_artist(username).stage_name }}</h1>
+            {% if not is_saved(current_user.username, username) %}
+            <form action='/save-{{ username }}' method='POST' class='form-follow' autocomplete='off'>
+            <button type="submit" class="btn btn-success">Follow</button>
+            </form>
+            {% else %}
+            <form action='/delete-{{ username }}' method='POST' class='form-unfollow' autocomplete='off'>
+            <button type="submit" class="btn btn-danger" onclick="">Unfollow</button>
+            </form>
+            {% endif %}
             {% else %}
             <h1> {{ username }} </h1>
             {% endif %}
