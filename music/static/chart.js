@@ -4,7 +4,7 @@ $(document).ready(function(){
 
     //get values from jinja
     let vector = $('.values').eq(0).data().name;
-    console.log(vector);
+    //console.log(vector);
     let numbers = vector.split(',');
     var values = [numbers[0],numbers[1],numbers[2]];
     if( numbers[0]==0 && numbers[1]==0 && numbers[2]==0) {

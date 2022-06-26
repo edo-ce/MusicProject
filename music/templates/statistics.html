@@ -1,16 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}
-    Home Page
+    Statistics
 {% endblock %}
 {% block content %}
 
-<head>
-<title>Statistics</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-<script src="../../static/js/chart.js"></script>
 
-</head>
 
 <body>
 
@@ -19,6 +13,8 @@
    <canvas id="myChart" width="600" height="600" style="background-size: contain;" ></canvas>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+<script src="{{url_for('static', filename='chart.js')}}"></script>
 
 
 
