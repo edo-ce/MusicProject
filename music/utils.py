@@ -148,7 +148,7 @@ def get_gender_listener(code):
     number_female = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'F').count()
 
-    if(number_users == 0):
+    if number_users == 0:
         return f"{0},{0},{0}"
 
     return f"{number_male/number_users},{number_female/number_users},{(number_users-number_male-number_female)/number_users}"

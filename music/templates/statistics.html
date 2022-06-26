@@ -9,12 +9,12 @@
 <body>
 
 <meta class="values" data-name="{{ get_gender_listener(current_user.username) }}">
-<div class="chart-container" style="position: absolute; height:600; width:600;">
+<div class="chart-container" style="position: absolute; height:600px; width:600px;">
    <canvas id="myChart" width="600" height="600" style="background-size: contain;" ></canvas>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
-<script src="{{url_for('static', filename='chart.js')}}"></script>
+<script src="../static/js/chart.js"></script>
 
 
 

@@ -18,7 +18,7 @@ class SignUpForm(FlaskForm):
     password_check = PasswordField(label='Confirm Password:', validators=[EqualTo('password'), DataRequired()])
     country = StringField(label='Country:', validators=[Length(min=2, max=30), DataRequired()])
     birth_date = DateField(label='Birth Date:', validators=[Optional()])
-    gender = SelectField(label='Gender', choices=['M', 'F'])
+    gender = SelectField(label='Gender', choices=['', 'M', 'F'])
     user_type = SelectField(label='User Type:', choices=['Listener', 'Artist'], validators=[DataRequired()])
     submit = SubmitField(label='Create Account')
 

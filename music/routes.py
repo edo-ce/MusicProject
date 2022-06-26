@@ -6,12 +6,12 @@ from flask_login import login_user, logout_user, login_required
 from music.algorithms import *
 from datetime import date
 
-'''
+
 @app.errorhandler(Exception)
 def handle_error(e):
     rollback()
     return str(e)
-'''
+
 
 @app.context_processor
 def utility_processor():
@@ -123,7 +123,6 @@ def upload_track(number):
     if form.validate_on_submit():
         # TODO vedere più pezzi con lo stesso titolo
 
-        # utilizzare gli id per i featuring
         feats = list()
         if form.featuring.data != '':
             feats = [is_artist(x.strip()) for x in form.featuring.data.split(',')]

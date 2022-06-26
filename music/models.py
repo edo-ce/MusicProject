@@ -36,6 +36,10 @@ class User(Base, UserMixin):
     listeners = relationship('Listener', backref='user')
     playlists = relationship('Playlist', backref='user')
 
+    __table_args__ = (
+        CheckConstraint("gender = 'M' or gender = 'F' or gender = ''"),
+    )
+
     def get_id(self):
         return self.username
 
@@ -247,12 +251,13 @@ class PaymentCard(Base):
     id = Column(Integer, primary_key=True)
     number = Column(String, nullable=False)
     security_pin = Column(Text, nullable=False)
-    expiration_date = Column(Date, CheckConstraint('expiration_date > today'), nullable=False)
+    expiration_date = Column(Date, nullable=False)
     owner = Column(String, nullable=False)
     type = Column(String, nullable=False)
 
     __table_args__ = (
         UniqueConstraint('number', 'security_pin'),
+        CheckConstraint('expiration_date > today'),
     )
 
     premiums = relationship('Premium', backref='card')
