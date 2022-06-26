@@ -147,7 +147,11 @@ def get_gender_listener(code):
         .filter(Follower.id_artist == code).filter(User.gender == 'M').count()
     number_female = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'F').count()
-    return f"{number_male/number_users},{number_female/number_male},{(number_users-number_male-number_female)/number_users}"
+
+    if(number_users == 0):
+        return f"{0},{0},{0}"
+
+    return f"{number_male/number_users},{number_female/number_users},{(number_users-number_male-number_female)/number_users}"
 
 
 def get_saved_element(creator):
