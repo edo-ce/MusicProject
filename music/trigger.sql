@@ -10,7 +10,7 @@ BEGIN
                 WHERE NEW.id_listener = saved_elements.id_listener ) ) THEN
         RETURN NEW;
     END IF;
-    RAISE EXCEPTION 'Il numero massimo di elementi che un utente premium può salvare è 5!';
+    RAISE EXCEPTION 'Il numero massimo di elementi che un utente non premium può salvare è 5!';
 END;
 $$ LANGUAGE plpgsql;
 
@@ -38,7 +38,44 @@ ON premiums
 FOR EACH ROW
 EXECUTE FUNCTION delete_premium_elements();
 
--- TODO at_least_one_track
+CREATE OR REPLACE FUNCTION no_same_title_track() RETURNS trigger AS $$
+BEGIN
+    IF ( NEW.title = ANY( SELECT e.title
+                          FROM elements e NATURAL JOIN tracks t
+                          WHERE t.album_id = NEW.album_id ) ) THEN
+        RAISE EXCEPTION 'Non possono esserci due tracce con lo stesso titolo nello stesso album!';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS no_same_title_track ON tracks;
+CREATE TRIGGER no_same_title_track
+BEFORE INSERT OR UPDATE
+ON tracks
+FOR EACH ROW
+EXECUTE FUNCTION no_same_title_track();
+
+CREATE OR REPLACE FUNCTION no_same_title_track_element() RETURNS trigger AS $$
+BEGIN
+    IF ( EXISTS( SELECT * FROM tracks WHERE id = NEW.id
+                 AND album_id = ANY(SELECT a.id
+                                    FROM elements e NATURAL JOIN tracks t JOIN albums a on t.album_id = a.id
+                                    WHERE e.title = NEW.title) ) ) THEN
+        RAISE EXCEPTION 'Non possono esserci due tracce con lo stesso titolo nello stesso album!';
+    END IF;
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS no_same_title_track_element ON elements;
+CREATE TRIGGER no_same_title_track_element
+BEFORE UPDATE
+ON elements
+FOR EACH ROW
+EXECUTE FUNCTION no_same_title_track_element();
+
+
 
 CREATE OR REPLACE FUNCTION at_least_one_track() RETURNS trigger AS $$
 BEGIN
@@ -49,7 +86,7 @@ BEGIN
         WHERE id = NEW.id;
         RAISE EXCEPTION 'Album non caricato correttamente';
     END IF;
-    RETURN NULL;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -59,6 +96,7 @@ AFTER INSERT OR UPDATE
 ON albums
 FOR EACH ROW
 EXECUTE FUNCTION at_least_one_track();
+
 
 
 
@@ -100,6 +138,8 @@ ON guests
 FOR EACH ROW
 EXECUTE FUNCTION not_creator_equals_guest();
 
+
+
 CREATE OR REPLACE FUNCTION not_creator_equals_feat() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
@@ -140,7 +180,6 @@ WHEN ( NOT NEW.is_private )
 EXECUTE FUNCTION check_public_playlist();
 
 
--- TODO vedere se anche update
 
 CREATE OR REPLACE FUNCTION delete_elements() RETURNS trigger AS $$
 BEGIN

@@ -1,7 +1,5 @@
 CREATE EXTENSION pgcrypto;
 
--- Users
-
 INSERT INTO users VALUES ('edo', 'edo@mail.com', crypt('passedo', gen_salt('bf', 8)), 'Edoardo', 'Cecchinato', 'M', 'Italy', '2000-06-17', 'listener');
 INSERT INTO users VALUES ('tia', 'tia@mail.com', crypt('passtia', gen_salt('bf', 8)), 'Mattia', 'Dei Rossi', 'M', 'Italy', '2000-04-04', 'listener');
 INSERT INTO users VALUES ('leo', 'leo@mail.com', crypt('passleo', gen_salt('bf', 8)), 'Leonardo', 'Sartori', 'M', 'Italy', '2000-02-20', 'artist');
@@ -17,7 +15,6 @@ INSERT INTO users VALUES ('sofi', 'sofi@mail.com', crypt('passsofi', gen_salt('b
 INSERT INTO users VALUES ('moni', 'moni@mail.com', crypt('passmoni', gen_salt('bf', 8)), 'Monika', 'Fisher', 'F', 'Germany', '1098-02-21', 'listener');
 INSERT INTO users VALUES ('luka', 'luka@mail.com', crypt('passluka', gen_salt('bf', 8)), 'Luka', 'Schneider', 'M', 'Germany', '1097-06-01', 'listener');
 
--- Listeners
 
 INSERT INTO listeners VALUES ('edo', '2022-06-05');
 INSERT INTO listeners VALUES ('tia', '2022-06-05');
@@ -26,7 +23,6 @@ INSERT INTO listeners VALUES ('sofi', '2022-06-07');
 INSERT INTO listeners VALUES ('moni', '2022-06-08');
 INSERT INTO listeners VALUES ('luka', '2022-06-09');
 
--- Artists
 
 INSERT INTO artists VALUES ('leo', 'Leonardo Sartori', true, 'bio leo');
 INSERT INTO artists VALUES ('gem', 'Gemitaiz', true, 'bio gem');
@@ -37,7 +33,6 @@ INSERT INTO artists VALUES ('bb', 'Backstreet Boys', false, 'bio bb');
 INSERT INTO artists VALUES ('tay', 'Taylor Swift', true, 'bio tay');
 INSERT INTO artists VALUES ('lp', 'Linking Park', false, 'bio lp');
 
--- Elements
 
 INSERT INTO elements VALUES (1001, 'Notturno'); INSERT INTO elements VALUES (1002, 'Notturno');
 INSERT INTO elements VALUES (1003, 'Falling Snow');
@@ -94,7 +89,6 @@ INSERT INTO elements VALUES (1053, 'In the end');
 INSERT INTO elements VALUES (1054, 'Numb');
 INSERT INTO elements VALUES (1055, 'Numb');
 
--- Albums
 
 INSERT INTO albums VALUES (1001, '2021-04-26', 'leo');
 INSERT INTO albums VALUES (1003, '2021-12-24', 'leo');
@@ -115,7 +109,6 @@ INSERT INTO albums VALUES (1047, '2015-05-17', 'tay');
 INSERT INTO albums VALUES (1050, '2000-10-24', 'lp');
 INSERT INTO albums VALUES (1054, '2003-03-24', 'lp');
 
--- Tracks
 
 INSERT INTO tracks VALUES (1002, 274, 'copyright', 'neoclassical', 1001);
 INSERT INTO tracks VALUES (1004, 172, 'copyright', 'neoclassical', 1003);
@@ -151,7 +144,6 @@ INSERT INTO tracks VALUES (1052, 222, 'copyright', 'rock', 1050);
 INSERT INTO tracks VALUES (1053, 222, 'copyright', 'rock', 1050);
 INSERT INTO tracks VALUES (1055, 222, 'copyright', 'rock', 1054);
 
--- Featuring
 
 INSERT INTO featuring VALUES ('leo', 1008);
 INSERT INTO featuring VALUES ('eminem', 1013);
@@ -159,24 +151,20 @@ INSERT INTO featuring VALUES ('tay', 1024);
 INSERT INTO featuring VALUES ('ade', 1039);
 INSERT INTO featuring VALUES ('bb', 1048);
 
--- Playlists
 
 INSERT INTO playlists VALUES (1005, true, 'edo');
 INSERT INTO playlists VALUES (1006, false, 'tia');
 INSERT INTO playlists VALUES (1016, false, 'ade');
 INSERT INTO playlists VALUES (1049, false, 'tay');
 
--- PaymentCards
 
 INSERT INTO payment_cards VALUES (2000, '1234567890123456', crypt('123', gen_salt('bf', 8)), '2024-07-05', 'Mattia Dei Rossi', 'debit card');
 INSERT INTO payment_cards VALUES (2001, '1234567890123457', crypt('321', gen_salt('bf', 8)), '2024-08-06', 'Luka Schneider', 'debit card');
 
--- Premiums
 
 INSERT INTO premiums VALUES ('tia', '2022-06-12', 2000);
 INSERT INTO premiums VALUES ('luka', '2022-06-12', 2001);
 
--- Followers
 
 INSERT INTO followers VALUES ('leo', 'edo', '2022-06-06');
 INSERT INTO followers VALUES ('leo', 'tia', '2022-06-06');
@@ -198,7 +186,6 @@ INSERT INTO followers VALUES ('ed', 'luka', '2022-06-06');
 INSERT INTO followers VALUES ('tay', 'luka', '2022-06-06');
 INSERT INTO followers VALUES ('leo', 'luka', '2022-06-06');
 
--- Saved Elements         1001 - 1055
 
 INSERT INTO saved_elements VALUES (1001, 'edo');
 INSERT INTO saved_elements VALUES (1022, 'edo');
@@ -233,7 +220,6 @@ INSERT INTO saved_elements VALUES (1042, 'luka');
 INSERT INTO saved_elements VALUES (1050, 'luka');
 INSERT INTO saved_elements VALUES (1036, 'luka');
 
--- Playlist Tracks
 
 INSERT INTO playlist_tracks VALUES (1002, 1005);
 INSERT INTO playlist_tracks VALUES (1004, 1005);
@@ -245,12 +231,10 @@ INSERT INTO playlist_tracks VALUES (1048, 1049);
 INSERT INTO playlist_tracks VALUES (1039, 1049);
 INSERT INTO playlist_tracks VALUES (1043, 1049);
 
--- Events
 
 INSERT INTO events VALUES (1001, 'Gemitaiz - Arena di Verona', '2022-09-05', '21:00:00', '23:00:00', 'Verona (Italy)', 'https://www.gemitaiz.com', 'gem');
 INSERT INTO events VALUES (1002, 'Coachella', '2023-04-14', '21:00:00', '23:00:00', 'Indio (USA)', 'https://www.coachella.com', 'tay');
 
--- Guests
 
 INSERT INTO guests VALUES ('leo', 1001);
 INSERT INTO guests VALUES ('bb', 1002);

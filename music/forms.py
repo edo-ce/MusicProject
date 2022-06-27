@@ -74,7 +74,7 @@ class PaymentForm(FlaskForm):
 class TrackForm(FlaskForm):
     title = StringField(label='Track Title:', validators=[DataRequired()])
     copyright = StringField(label='Copyright:', validators=[DataRequired()])
-    duration = IntegerField(label='Duration (seconds):', validators=[DataRequired(), NumberRange(min=0)])
+    duration = IntegerField(label='Duration (seconds):', validators=[DataRequired(), NumberRange(min=1)])
     genre = StringField(label='Genre:', validators=[DataRequired()])
     featuring = StringField(label='Featuring', validators=[Optional()])
     submit = SubmitField(label='Upload Track')
@@ -96,7 +96,7 @@ class PlaylistTrackForm(FlaskForm):
 class PlaylistForm(FlaskForm):
     title = StringField(label='Playlist Title:', validators=[DataRequired()])
     private = BooleanField(label='Is Private:', default=True)
-    number_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=0)])
+    number_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField(label='Upload Playlist')
 
 

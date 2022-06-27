@@ -11,14 +11,15 @@ from sqlalchemy.exc import InternalError
 @app.errorhandler(IntegrityError)
 def handle_error(e):
     rollback()
-    flash('Problems with database operations!', 'danger')
+    flash(str(e), 'danger')
+    # flash('Problems with database operations!', 'danger')
     return redirect(url_for('home'))
 
 
 @app.errorhandler(InternalError)
 def handle_error(e):
     rollback()
-    flash('Internal error', 'danger')
+    flash(str(e), 'danger')
     return redirect(url_for('home'))
 
 
@@ -138,8 +139,6 @@ def upload_track(number):
     album = request.args.get('album')
     form = TrackForm()
     if form.validate_on_submit():
-        # TODO vedere più pezzi con lo stesso titolo
-
         feats = list()
         if form.featuring.data != '':
             feats = [is_artist(x.strip()) for x in form.featuring.data.split(',')]
@@ -150,9 +149,8 @@ def upload_track(number):
                 elif artist.id == current_user.username:
                     flash(f'Artist {artist.id} is the current user!', category='danger')
                     return redirect(url_for('upload_track', number=number, album=album))
-
         code = add_no_commit(Element, title=form.title.data).id
-        add_no_commit(Track, id=code, duration=form.duration.data, copyright=form.copyright.data,
+        add_and_commit(Track, id=code, duration=form.duration.data, copyright=form.copyright.data,
                       genre=form.genre.data, album_id=int(album), artists_feat=feats)
 
         if number != 1:
@@ -171,7 +169,7 @@ def upload_album():
     form = AlbumForm()
     if form.validate_on_submit():
         code = add_no_commit(Element, title=form.title.data).id
-        add_no_commit(Album, id=code, release_date=date.today(), artist_id=current_user.username)
+        add_and_commit(Album, id=code, release_date=date.today(), artist_id=current_user.username)
         return redirect(url_for('upload_track', number=form.num_tracks.data, album=code))
     return render_template('forms/upload_album.html', form=form)
 
