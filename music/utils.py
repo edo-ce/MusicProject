@@ -186,5 +186,6 @@ def get_country_listener(code):
     countries = session.query(User.country, func.count()).join(Follower, Follower.id_listener == User.username)\
         .filter(Follower.id_artist == code).group_by(User.country)
     for country in countries:
-        res += f'{country[0]},{country[1]/number_users}'
+        res += f'{country[0]},{country[1]/number_users},'
+    res = res[:-1]
     return res
