@@ -5,13 +5,28 @@ from music.forms import SignUpForm, LoginForm, SignUpFormArtist, PaymentForm, Al
 from flask_login import login_user, logout_user, login_required
 from music.algorithms import *
 from datetime import date
+from sqlalchemy.exc import InternalError
 
-'''
+
+@app.errorhandler(IntegrityError)
+def handle_error(e):
+    rollback()
+    flash('Problems with database operations!', 'danger')
+    return redirect(url_for('home'))
+
+
+@app.errorhandler(InternalError)
+def handle_error(e):
+    rollback()
+    flash('Internal error', 'danger')
+    return redirect(url_for('home'))
+
+
 @app.errorhandler(Exception)
 def handle_error(e):
     rollback()
-    return str(e)
-'''
+    flash(str(e), 'danger')
+    return redirect(url_for('home'))
 
 
 @app.context_processor
@@ -137,7 +152,6 @@ def upload_track(number):
                     return redirect(url_for('upload_track', number=number, album=album))
 
         code = add_no_commit(Element, title=form.title.data).id
-
         add_no_commit(Track, id=code, duration=form.duration.data, copyright=form.copyright.data,
                       genre=form.genre.data, album_id=int(album), artists_feat=feats)
 
@@ -169,6 +183,9 @@ def upload_event():
     form = EventForm()
     if form.validate_on_submit():
         guests = list()
+        if form.end_time.data <= form.start_time.data:
+            flash('End time must be greater than start time!', 'danger')
+            return redirect(url_for('upload_event'))
         if form.guests.data != '':
             guests = [is_artist(x.strip()) for x in form.guests.data.split(',')]
             for artist in guests:
@@ -324,7 +341,6 @@ def delete_user():
 @login_required
 def settings():
     fields = 'email name lastname country'
-    form = None
     if is_artist(current_user.username):
         form = ArtistSettingsForm()
         fields = fields + ' stage_name solo_group bio'

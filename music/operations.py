@@ -46,7 +46,6 @@ def add_and_commit(table, **kwargs):
         commit()
         return elem
     except IntegrityError as e:
-        rollback()
         raise e
 
 
@@ -58,7 +57,6 @@ def add_no_commit(table, **kwargs):
         flush()
         return elem
     except IntegrityError as e:
-        rollback()
         raise e
 
 
@@ -71,7 +69,6 @@ def delete_tuple(table, code):
             session.query(table).filter_by(id=code).delete()
         commit()
     except IntegrityError as e:
-        rollback()
         raise e
 
 
@@ -86,7 +83,6 @@ def update_tuple(table, code, **kwargs):
             setattr(row, attribute, value)
         commit()
     except IntegrityError as e:
-        rollback()
         raise e
 
 

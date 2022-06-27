@@ -58,8 +58,8 @@ def display_artist_contents(artist):
 
 def is_saved(id_listener, id_save):
     if type(id_save) == str:
-        return session.query(Follower).filter(Follower.id_artist == id_save and Follower.id_listener == id_listener)\
-                   .first() is not None
+        return session.query(Follower).filter(Follower.id_artist == id_save)\
+                   .filter(Follower.id_listener == id_listener).first() is not None
     else:
         return get_element(id_save) in get_listener(id_listener).elements
 
