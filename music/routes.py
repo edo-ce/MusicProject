@@ -225,7 +225,13 @@ def create_playlist():
     form = PlaylistForm()
     if form.validate_on_submit():
         code = add_no_commit(Element, title=form.title.data).id
-        add_no_commit(Playlist, id=code, is_private=form.private.data, creator=current_user.username)
+        if is_artist(current_user.username):
+            is_private = False
+        elif not is_premium(current_user.username):
+            is_private = True
+        else:
+            is_private = form.private.data
+        add_no_commit(Playlist, id=code, is_private=is_private, creator=current_user.username)
         return redirect(url_for('add_playlist_track', number=form.number_tracks.data, playlist=code))
     return render_template('forms/create_playlist.html', form=form)
 

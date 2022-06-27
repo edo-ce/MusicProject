@@ -48,19 +48,18 @@ function search_alert() {
                     let route_user = 'location.href="/delete-' + id_elem +'"';
                     let route_artist = 'location.href="/delete-' + table_elem + '-' + id_elem + '"';
                     let route_save = 'location.href="/save-' + id_elem +'"';
-                    if (table_elem !== "events") {
-                        if (art === "user")
-                            if (table_elem === "playlists" && current_user === creator)
-                                stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick=" + route_artist + "></i></span>"
-                            else
-                                stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick=" + route_user + "></i></span>"
-                        else if (art === "artist")
+
+                    if (art === "user")
+                        if (table_elem === "playlists" && current_user === creator)
                             stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick=" + route_artist + "></i></span>"
-                        else if (is_saved === "True")
-                            stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick=" + route_user + "></i></span>"
                         else
-                            stringa += "<span style='cursor: pointer;'>Save <i class='bi bi-heart' onclick=" + route_save + "></i></span>"
-                    }
+                            stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick=" + route_user + "></i></span>"
+                    else if (art === "artist")
+                        stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick=" + route_artist + "></i></span>"
+                    else if (art === "visit" && is_saved === "True")
+                        stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick=" + route_user + "></i></span>"
+                    else if (art === "visit")
+                        stringa += "<span style='cursor: pointer;'>Save <i class='bi bi-heart' onclick=" + route_save + "></i></span>"
                     Swal.fire({
                           title: 'Details',
                           html: "<div class='card mb-3' style='max-width: 500px;'>" +
