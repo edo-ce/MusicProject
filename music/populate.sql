@@ -50,6 +50,8 @@ INSERT INTO premiums VALUES ('tia', '2022-06-12', 2000);
 
 INSERT INTO followers VALUES ('leo', 'edo', '2022-06-06');
 INSERT INTO followers VALUES ('leo', 'tia', '2022-06-06');
+INSERT INTO followers VALUES ('gem', 'edo', '2022-06-06');
+INSERT INTO followers VALUES ('gem', 'edo', '2022-06-06');
 
 
 INSERT INTO saved_elements VALUES (1001, 'edo');

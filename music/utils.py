@@ -55,11 +55,11 @@ def get_event(code):
 
 
 def get_element_creator(table, code):
-    if table == 'albums':
+    if table == 'albums' and get_album(code):
         return get_album(code).artist_id
-    if table == 'tracks':
+    if table == 'tracks' and get_track(code):
         return get_track(code).get_album().artist_id
-    if table == 'playlists':
+    if table == 'playlists' and get_playlist(code):
         return get_playlist(code).creator
     return None
 
@@ -133,6 +133,33 @@ def get_favorite_genre(code):
     return res
 
 
+# TOP LIST
+
+
+def top_three_artists(country=None):
+    if country is None:
+        res = session.query(Artist)\
+            .join(Follower, Artist.id == Follower.id_artist).group_by(Artist.id).order_by(func.count(Follower.id_listener).desc())
+    else:
+        res = session.query(Artist) \
+            .join(Follower, Artist.id == Follower.id_artist).join(User, Artist.id == User.username)\
+            .filter(User.country == country).group_by(Artist.id).order_by(func.count(Follower.id_listener).desc())
+    return res[:3]
+
+
+def top_three_elements(table, country=None):
+    if country is None:
+        res = session.query(table)\
+            .join(Element, Element.id == table.id).join(saved_elements, table.id == saved_elements.c.id_element)\
+            .group_by(table.id).order_by(func.count(saved_elements.c.id_listener).desc())
+    else:
+        res = session.query(table) \
+            .join(Element, Element.id == table.id).join(saved_elements, table.id == saved_elements.c.id_element)\
+            .join(User, saved_elements.c.id_listener == User.username).filter(User.country == country)\
+            .group_by(table.id).order_by(func.count(saved_elements.c.id_listener).desc())
+    return res[:3]
+
+
 # STATISTICS
 
 # Artist
@@ -141,23 +168,23 @@ def get_followers_count(code):
 
 
 def get_gender_listener(code):
-    number_users = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
-        .filter(Follower.id_artist == code).count()
+    number_users = session.query(Follower).filter_by(id_artist=code).count()
+    if number_users == 0:
+        return f"{0},{0},{0}"
     number_male = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'M').count()
     number_female = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'F').count()
-
-    if number_users == 0:
-        return f"{0},{0},{0}"
-
     return f"{number_male/number_users},{number_female/number_users},{(number_users-number_male-number_female)/number_users}"
 
-# ----
-def get_saved_element(creator):
-    return session.query(Playlist).filter_by(creator=creator).count()
 
-
-def get_genre_listener(album):
-    # selezione il conteggio dei generi dai users (listeners) joinnati con l'album in questione
-    session.query(Album, Listener).select_from(User.gender).join(Listener, User).where(id=album)
+def get_country_listener(code):
+    res = ''
+    number_users = session.query(Follower).filter_by(id_artist=code).count()
+    if number_users == 0:
+        return res
+    countries = session.query(User.country, func.count()).join(Follower, Follower.id_listener == User.username)\
+        .filter(Follower.id_artist == code).group_by(User.country)
+    for country in countries:
+        res += f'{country[0]},{country[1]/number_users}'
+    return res

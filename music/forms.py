@@ -1,12 +1,9 @@
 from flask_wtf import FlaskForm
-from music.models import session, User, Artist, Listener
+from music.models import session, User
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
-    IntegerField, FieldList, SearchField, TimeField, URLField, FormField
+    IntegerField, TimeField, URLField
 from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange, URL, \
     Optional
-
-
-# TODO add constraints
 
 
 class SignUpForm(FlaskForm):
@@ -85,7 +82,7 @@ class TrackForm(FlaskForm):
 
 class AlbumForm(FlaskForm):
     title = StringField(label='Album Title:', validators=[DataRequired()])
-    num_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=0)])
+    num_tracks = IntegerField(label='Number of tracks:', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField(label='Upload Album')
 
 

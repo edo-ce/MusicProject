@@ -6,11 +6,12 @@ from flask_login import login_user, logout_user, login_required
 from music.algorithms import *
 from datetime import date
 
-
+'''
 @app.errorhandler(Exception)
 def handle_error(e):
     rollback()
     return str(e)
+'''
 
 
 @app.context_processor
@@ -23,7 +24,8 @@ def utility_processor():
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    top = top_int_the_app(current_user.country) if current_user.is_authenticated else None
+    return render_template('home.html', top=top)
 
 
 @app.route('/signup-artist', methods=['GET', 'POST'])
@@ -346,4 +348,6 @@ def settings():
 @login_required
 @roles_required(roles['ARTIST'])
 def stats():
-    return render_template('statistics.html', get_gender_listener=get_gender_listener, get_followers_count=get_followers_count)
+    # get_country_listener(current_user.username) --> 'Italy,0.6,Germany,0.3,England,0.1'
+    return render_template('statistics.html', get_gender_listener=get_gender_listener,
+                           get_followers_count=get_followers_count, get_country_listener=get_country_listener)

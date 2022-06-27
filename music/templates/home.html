@@ -29,5 +29,29 @@
       </div>
     </header>
 
+    {% if current_user.is_authenticated and not is_artist(current_user.username) %}
+        <section class="container w-50" style="margin-left: auto; margin-right: auto;">
+        <br>
+        <h1>BEST IN THE APP</h1>
+        {% for key, value in top.items() %}
+            <br>
+            <h2>{{ key }}</h2>
+            {% with table = key.split(' ')[1] %}
+            {% for elem in value %}
+                <div class="list-group-item list-group-item-action">
+                    {% if table == 'artists' %}
+                    <a href="/view-{{ elem.id }}" class="text-decoration-none">{{ elem.stage_name }}</a>
+                    {% else %}
+                    <a href="/view-{{ get_element_creator(table, elem.id) }}" class="text-decoration-none">{{ get_title(elem.id) }}</a>
+                    {% endif %}
+                </div>
+
+            {% endfor %}
+            {% endwith %}
+        {% endfor %}
+        <br>
+        </section>
+    {% endif %}
+
 </body>
 {% endblock %}

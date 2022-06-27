@@ -140,6 +140,7 @@ WHEN ( NOT NEW.is_private )
 EXECUTE FUNCTION check_public_playlist();
 
 
+-- TODO vedere se anche update
 
 CREATE OR REPLACE FUNCTION delete_elements() RETURNS trigger AS $$
 BEGIN

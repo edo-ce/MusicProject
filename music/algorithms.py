@@ -1,5 +1,4 @@
 from music.utils import *
-from sqlalchemy.sql import text
 from random import shuffle
 
 # TODO controllare tutto il testo con lowercase
@@ -158,18 +157,12 @@ def advice_func(username):
     }
 
 
-# STATISTICS
-'''
-    follower
-    elementi salvati nelle playlist
-    sesso ascoltatori (può essere null)
-    nazionalità
-    età (può essere null)
-    numero tracce salvate
-    tracce più salvate
-    album più seguito
-'''
-
-
-def stats():
-    pass
+def top_int_the_app(country):
+    return {
+        'Top artists': top_three_artists(),
+        f'Top artists in {country}': top_three_artists(country),
+        'Top tracks': top_three_elements(Track),
+        f'Top tracks in {country}': top_three_elements(Track, country),
+        'Top albums': top_three_elements(Album),
+        f'Top albums in {country}': top_three_elements(Album, country),
+    }
