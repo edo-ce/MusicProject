@@ -1,9 +1,8 @@
 $(document).ready(function(){
-    var ctx = $("#myChart");
-    
+    var ctx = $("#gender");
 
     //get values from jinja
-    let vector = $('.values').eq(0).data().name;
+    let vector = $('.gender_listeners').eq(0).data().name;
     //console.log(vector);
     let numbers = vector.split(',');
     var values = [numbers[0],numbers[1],numbers[2]];

@@ -346,4 +346,4 @@ def settings():
 @login_required
 @roles_required(roles['ARTIST'])
 def stats():
-    return render_template('statistics.html', get_gender_listener=get_gender_listener)
+    return render_template('statistics.html', get_gender_listener=get_gender_listener, get_followers_count=get_followers_count)
