@@ -1,4 +1,3 @@
-
 function darkMode() {
     var t, e = document.getElementById("darkSwitch");
     if (e) {
