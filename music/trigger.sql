@@ -84,7 +84,7 @@ BEGIN
                  WHERE album_id = NEW.id ) ) THEN
         DELETE FROM albums
         WHERE id = NEW.id;
-        RAISE EXCEPTION 'Album non caricato correttamente';
+        RAISE EXCEPTION 'Album non caricato correttamente!';
     END IF;
     RETURN NEW;
 END;
@@ -163,6 +163,11 @@ EXECUTE FUNCTION not_creator_equals_feat();
 CREATE OR REPLACE FUNCTION check_public_playlist() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
+                 FROM artists
+                 WHERE id = NEW.creator )) THEN
+        RETURN NEW;
+    END IF;
+    IF ( EXISTS( SELECT *
                  FROM premiums
                  WHERE id = NEW.creator) ) THEN
         RETURN NEW;
@@ -209,3 +214,45 @@ AFTER DELETE
 ON playlists
 FOR EACH ROW
 EXECUTE FUNCTION delete_elements();
+
+
+
+CREATE OR REPLACE FUNCTION no_two_events_at_the_same_time_creator() RETURNS trigger AS $$
+BEGIN
+    IF ( EXISTS( SELECT * FROM events e JOIN guests g ON e.id = g.id_event
+                 WHERE (e.creator = NEW.creator OR g.id_artist = NEW.creator)
+                 AND e.date = NEW.date
+                 AND ( (NEW.start_time >= e.start_time AND NEW.start_time <= e.end_time)
+                 OR (NEW.end_time >= e.start_time AND NEW.end_time <= e.end_time) ) ) ) THEN
+        RAISE EXCEPTION 'Il creatore partecipa già ad un altro evento nello stesso orario!';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS no_two_events_at_the_same_time_creator ON events;
+CREATE TRIGGER no_two_events_at_the_same_time_creator
+BEFORE INSERT OR UPDATE
+ON events
+FOR EACH ROW
+EXECUTE FUNCTION no_two_events_at_the_same_time_creator();
+
+CREATE OR REPLACE FUNCTION no_two_events_at_the_same_time_guest() RETURNS trigger AS $$
+BEGIN
+    IF ( EXISTS( SELECT * FROM events e JOIN guests g ON e.id = g.id_event JOIN events e2 ON e2.id = NEW.id_event
+                 WHERE (e.creator = NEW.id_artist OR g.id_artist = NEW.id_artist)
+                 AND e.date = e2.date
+                 AND ( (e2.start_time >= e.start_time AND e2.start_time <= e.end_time)
+                 OR (e2.end_time >= e.start_time AND e2.end_time <= e.end_time) ) ) ) THEN
+        RAISE EXCEPTION 'Questo ospite partecipa già ad un altro evento nello stesso orario!';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS no_two_events_at_the_same_time_guest ON guests;
+CREATE TRIGGER no_two_events_at_the_same_time_guest
+BEFORE INSERT OR UPDATE
+ON guests
+FOR EACH ROW
+EXECUTE FUNCTION no_two_events_at_the_same_time_guest();

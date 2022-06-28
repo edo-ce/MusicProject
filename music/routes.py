@@ -19,7 +19,10 @@ def handle_error(e):
 @app.errorhandler(InternalError)
 def handle_error(e):
     rollback()
-    flash(str(e), 'danger')
+    index1 = str(e).find(' ') + 1
+    index2 = str(e).find('!') + 1
+    error_msg = str(e)[index1:index2]
+    flash(error_msg, 'danger')
     return redirect(url_for('home'))
 
 
@@ -156,7 +159,6 @@ def upload_track(number):
         if number != 1:
             return redirect(url_for('upload_track', number=number-1, album=album))
         else:
-            commit()
             flash('Album uploaded successfully!', category='success')
             return redirect(url_for('private'))
     return render_template('forms/upload_track.html', form=form)
@@ -188,7 +190,7 @@ def upload_event():
             guests = [is_artist(x.strip()) for x in form.guests.data.split(',')]
             for artist in guests:
                 if artist is None:
-                    flash(f'Artist does not exist!', category='danger')
+                    flash('Guest does not exist!', category='danger')
                     return redirect(url_for('upload_event'))
                 elif artist.id == current_user.username:
                     flash(f'Artist {artist.id} is the current user!', category='danger')
@@ -224,11 +226,10 @@ def add_playlist_track(playlist, number):
             flash(f'Track is already in the playlist', category='danger')
             return redirect(url_for('add_playlist_track', number=number, playlist=playlist))
         p.tracks_id.append(track)
-        flush()
+        commit()
         if number != 1:
             return redirect(url_for('add_playlist_track', number=number-1, playlist=playlist))
         else:
-            commit()
             flash('Playlist uploaded successfully!', category='success')
             return redirect(url_for('private'))
     return render_template('forms/add_playlist_track.html', form=form)
@@ -246,7 +247,7 @@ def create_playlist():
             is_private = True
         else:
             is_private = form.private.data
-        add_no_commit(Playlist, id=code, is_private=is_private, creator=current_user.username)
+        add_and_commit(Playlist, id=code, is_private=is_private, creator=current_user.username)
         return redirect(url_for('add_playlist_track', number=form.number_tracks.data, playlist=code))
     return render_template('forms/create_playlist.html', form=form)
 
