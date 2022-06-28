@@ -7,7 +7,8 @@ from music.algorithms import *
 from datetime import date
 from sqlalchemy.exc import InternalError
 
-# no cache saving
+
+# TODO no cache saving
 @app.after_request
 def add_header(r):
     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -15,6 +16,7 @@ def add_header(r):
     r.headers["Expires"] = "0"
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
+
 
 @app.errorhandler(IntegrityError)
 def handle_error(e):
@@ -377,6 +379,6 @@ def settings():
 @login_required
 @roles_required(roles['ARTIST'])
 def stats():
-    # get_country_listener(current_user.username) --> 'Italy,0.6,Germany,0.3,England,0.1'
+    # {'Germany': 0.2, 'Italy': 0.4, 'Spain': 0.2, 'USA': 0.2}
     return render_template('statistics.html', get_gender_listener=get_gender_listener,
                            get_followers_count=get_followers_count, get_country_listener=get_country_listener)

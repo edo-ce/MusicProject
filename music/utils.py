@@ -178,13 +178,12 @@ def get_gender_listener(code):
 
 
 def get_country_listener(code):
-    res = ''
+    res = dict()
     number_users = artist_session.query(Follower).filter_by(id_artist=code).count()
     if number_users == 0:
         return res
     countries = artist_session.query(User.country, func.count()).join(Follower, Follower.id_listener == User.username)\
         .filter(Follower.id_artist == code).group_by(User.country)
     for country in countries:
-        res += f'{country[0]},{country[1]/number_users},'
-    res = res[:-1]
+        res[country[0]] = country[1]/number_users
     return res
