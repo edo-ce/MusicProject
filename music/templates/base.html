@@ -28,10 +28,10 @@
       />
 
     <!-- Image with random colors generator library -->
-    <script src="static/js/image-gen.js"></script>
+    <script src="{{ url_for('static/js', filename='image-gen.js') }}"></script>
     <script src="static/js/search-and-details.js"></script>
     <script src="static/js/back-to-top.js"></script>
-    <script src="static/js/dark-mode-switch.min.js"></script>
+
       <title>
         {% block title %}
 
@@ -92,6 +92,7 @@
                 <label for="darkSwitch" class="switch"></label>
                 &nbsp;&nbsp;&nbsp;
                 <i class="bi bi-moon"></i>
+                <script src="static/js/dark-mode-switch.js"></script>
             </div>
 
       </nav>
