@@ -219,7 +219,7 @@ EXECUTE FUNCTION delete_elements();
 
 CREATE OR REPLACE FUNCTION no_two_events_at_the_same_time_creator() RETURNS trigger AS $$
 BEGIN
-    IF ( EXISTS( SELECT * FROM events e JOIN guests g ON e.id = g.id_event
+    IF ( EXISTS( SELECT * FROM events e LEfT JOIN guests g ON e.id = g.id_event
                  WHERE (e.creator = NEW.creator OR g.id_artist = NEW.creator)
                  AND e.date = NEW.date
                  AND ( (NEW.start_time >= e.start_time AND NEW.start_time <= e.end_time)
@@ -239,7 +239,7 @@ EXECUTE FUNCTION no_two_events_at_the_same_time_creator();
 
 CREATE OR REPLACE FUNCTION no_two_events_at_the_same_time_guest() RETURNS trigger AS $$
 BEGIN
-    IF ( EXISTS( SELECT * FROM events e JOIN guests g ON e.id = g.id_event JOIN events e2 ON e2.id = NEW.id_event
+    IF ( EXISTS( SELECT * FROM events e LEFT JOIN guests g ON e.id = g.id_event JOIN events e2 ON e2.id = NEW.id_event
                  WHERE (e.creator = NEW.id_artist OR g.id_artist = NEW.id_artist)
                  AND e.date = e2.date
                  AND ( (e2.start_time >= e.start_time AND e2.start_time <= e.end_time)

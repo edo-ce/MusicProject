@@ -6,17 +6,17 @@ from random import shuffle
 
 def search_func(search_result):
     res = {'albums': [], 'tracks': [], 'playlists': [], 'artists': []}
-    elems = session.query(Element).filter(func.lower(Element.title) == search_result).all()
+    elems = listener_session.query(Element).filter(func.lower(Element.title) == search_result).all()
     for key in res.keys():
         if key == 'artists':
-            artists = session.query(Artist).filter(func.lower(Artist.stage_name) == search_result).all()
+            artists = listener_session.query(Artist).filter(func.lower(Artist.stage_name) == search_result).all()
             res['artists'] = artists
         else:
             for elem in elems:
-                query = session.query(Element).join(key).where(Element.id == elem.id and Element.id == key+'.id')\
+                query = listener_session.query(Element).join(key).where(Element.id == elem.id and Element.id == key+'.id')\
                     .first()
                 if query and (key != 'playlists'
-                              or not session.query(Playlist.is_private).filter_by(id=query.id).first()[0]):
+                              or not listener_session.query(Playlist.is_private).filter_by(id=query.id).first()[0]):
                     res[key].append(query)
     return res
 
@@ -29,11 +29,11 @@ def find_saved_elements(listener):
             table_elems = get_element_table(elem)
             listener_elems = get_listener(listener).elements
             for e in listener_elems:
-                val = session.query(table_elems).filter_by(id=e.id).first()
+                val = listener_session.query(table_elems).filter_by(id=e.id).first()
                 if val is not None and (table_elems != Playlist or val.creator != listener):
                     elems[elem].append(val)
         else:
-            res = session.query(Artist).join(Follower).join(Listener).where(Listener.id == listener).all()
+            res = listener_session.query(Artist).join(Follower).join(Listener).where(Listener.id == listener).all()
             elems[elem] = res
 
     elems['own playlists'] = get_playlists_by_creator(listener)
@@ -44,7 +44,7 @@ def find_saved_elements(listener):
 def display_artist_contents(artist):
     elems = {'albums': [], 'singles': [], 'playlists': [], 'events': []}
 
-    albums = session.query(Album).filter_by(artist_id=artist).all()
+    albums = artist_session.query(Album).filter_by(artist_id=artist).all()
     for a in albums:
         if a.number_of_tracks() > 1:
             elems['albums'].append(a)
@@ -58,7 +58,7 @@ def display_artist_contents(artist):
 
 def is_saved(id_listener, id_save):
     if type(id_save) == str:
-        return session.query(Follower).filter(Follower.id_artist == id_save)\
+        return admin_session.query(Follower).filter(Follower.id_artist == id_save)\
                    .filter(Follower.id_listener == id_listener).first() is not None
     else:
         return get_element(id_save) in get_listener(id_listener).elements
@@ -77,12 +77,12 @@ def save_something(id_listener, id_save):
 def delete_from_saved(id_listener, id_saved):
     try:
         if type(id_saved) == str:
-            session.query(Follower).filter(Follower.id_artist == id_saved)\
+            listener_session.query(Follower).filter(Follower.id_artist == id_saved)\
                 .filter(Follower.id_listener == id_listener).delete()
         else:
-            session.query(saved_elements).filter(saved_elements.c.id_listener == id_listener).\
+            listener_session.query(saved_elements).filter(saved_elements.c.id_listener == id_listener).\
                 filter(saved_elements.c.id_element == id_saved).delete()
-        commit()
+        listener_session.commit()
     except Exception as e:
         rollback()
         raise e
@@ -94,10 +94,10 @@ def advice_func_tracks(username):
     genre = get_favorite_genre(username)
     listener = get_listener(username)
     res = dict()
-    tracks = session.query(Track).filter_by(genre=genre).all()
+    tracks = listener_session.query(Track).filter_by(genre=genre).all()
     for track in tracks:
         if get_element(track.id) not in listener.elements:
-            res[track] = session.query(saved_elements).filter_by(id_element=track.id).count()
+            res[track] = listener_session.query(saved_elements).filter_by(id_element=track.id).count()
     return [get_element(k.id) for k, v in sorted(res.items(), key=lambda item: item[1], reverse=True)]
 
 

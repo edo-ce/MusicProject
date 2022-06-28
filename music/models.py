@@ -12,11 +12,11 @@ create_schema()
 
 @login_manager.user_loader
 def load_user(code):
-    return session.query(User).filter_by(username=code).first()
+    return admin_session.query(User).filter_by(username=code).first()
 
 
 def get_title(code):
-    return session.query(Element.title).filter_by(id=code).first()[0]
+    return admin_session.query(Element.title).filter_by(id=code).first()[0]
 
 
 class User(Base, UserMixin):
@@ -117,8 +117,8 @@ class Element(Base):
     playlists = relationship('Playlist', backref='element')
 
     def find_type(self):
-        return session.query(Track).filter_by(id=self.id).first() or session.query(Album).filter_by(id=self.id)\
-            .first() or session.query(Playlist).filter_by(id=self.id).first()
+        return admin_session.query(Track).filter_by(id=self.id).first() or admin_session.query(Album).filter_by(id=self.id)\
+            .first() or admin_session.query(Playlist).filter_by(id=self.id).first()
 
 
 featuring = Table('featuring', Base.metadata,
@@ -141,13 +141,13 @@ class Album(Base):
     tracks_in = relationship('Track', backref='album_in')
 
     def number_of_tracks(self):
-        return session.query(Album).join(Track).where(Track.album_id == self.id).count()
+        return admin_session.query(Album).join(Track).where(Track.album_id == self.id).count()
 
     def get_tracks(self):
-        return session.query(Track).filter_by(album_id=self.id).all()
+        return admin_session.query(Track).filter_by(album_id=self.id).all()
 
     def get_artist(self):
-        return session.query(Artist).filter_by(id=self.artist_id).first()
+        return admin_session.query(Artist).filter_by(id=self.artist_id).first()
 
     def __repr__(self):
         a = {
@@ -173,7 +173,7 @@ class Track(Base):
     playlists_id = relationship("Playlist", secondary=playlist_tracks, backref="tracks_id")
 
     def get_album(self):
-        return session.query(Album).filter_by(id=self.album_id).first()
+        return admin_session.query(Album).filter_by(id=self.album_id).first()
 
     def __repr__(self):
         ret = {
@@ -196,8 +196,8 @@ class Playlist(Base):
     creator = Column(ForeignKey(User.username, ondelete='CASCADE'), nullable=False)
 
     def get_creator_name(self):
-        artist = session.query(Artist).filter_by(id=self.creator).first()
-        listener = session.query(Listener).filter_by(id=self.creator).first()
+        artist = admin_session.query(Artist).filter_by(id=self.creator).first()
+        listener = admin_session.query(Listener).filter_by(id=self.creator).first()
         return artist.stage_name if artist else listener.id
 
     def __repr__(self):
@@ -235,7 +235,7 @@ class Event(Base):
 
     def __repr__(self):
         ret = {
-            'Name': f'{self.name} - {session.query(Artist.stage_name).filter_by(id=self.creator).first()[0]}',
+            'Name': f'{self.name} - {admin_session.query(Artist.stage_name).filter_by(id=self.creator).first()[0]}',
             'Date': str(self.date),
             'Time': f'{self.start_time} - {self.end_time}',
             'Location': self.location,
@@ -292,9 +292,13 @@ class Follower(Base):
     following_date = Column(Date, nullable=False)
 
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(engine_owner)
 
 
 populate()
 create_trigger()
 create_roles()
+
+admin_session = define_admin_session()
+listener_session = define_listener_session()
+artist_session = define_artist_session()

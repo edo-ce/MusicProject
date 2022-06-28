@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from music.models import session, User
+from music.models import admin_session, User
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField, TextAreaField, BooleanField, \
     IntegerField, TimeField, URLField
 from wtforms.validators import Length, Email, DataRequired, EqualTo, ValidationError, InputRequired, NumberRange, URL, \
@@ -20,12 +20,12 @@ class SignUpForm(FlaskForm):
     submit = SubmitField(label='Create Account')
 
     def username_check(self, username):
-        user = session.query(User).filter_by(username=username.data).first()
+        user = admin_session.query(User).filter_by(username=username.data).first()
         if user:
             raise ValidationError('Username already exists!')
 
     def email_check(self, email):
-        email_res = session.query(User).filter_by(email=email.data).first()
+        email_res = admin_session.query(User).filter_by(email=email.data).first()
         if email_res:
             raise ValidationError('Email already exists!')
 
@@ -51,7 +51,7 @@ class UserSettingsForm(FlaskForm):
     submit = SubmitField(label='Upload changes')
 
     def email_check(self, email):
-        email_res = session.query(User).filter_by(email=email.data).first()
+        email_res = admin_session.query(User).filter_by(email=email.data).first()
         if email_res:
             raise ValidationError('Email already exists!')
 

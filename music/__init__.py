@@ -1,10 +1,10 @@
-from music.config.config import config_diz as cf
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret_key'
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
 bcrypt = Bcrypt(app)
 

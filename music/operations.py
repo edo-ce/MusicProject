@@ -27,22 +27,22 @@ def convert_table(table):
 
 
 def commit():
-    session.commit()
+    admin_session.commit()
 
 
 def rollback():
-    session.rollback()
+    admin_session.rollback()
 
 
 def flush():
-    session.flush()
+    admin_session.flush()
 
 
 def add_and_commit(table, **kwargs):
     try:
         table = convert_table(table)
         elem = table(**kwargs)
-        session.add(elem)
+        admin_session.add(elem)
         commit()
         return elem
     except IntegrityError as e:
@@ -53,7 +53,7 @@ def add_no_commit(table, **kwargs):
     try:
         table = convert_table(table)
         elem = table(**kwargs)
-        session.add(elem)
+        admin_session.add(elem)
         flush()
         return elem
     except IntegrityError as e:
@@ -64,9 +64,9 @@ def delete_tuple(table, code):
     try:
         table = convert_table(table)
         if table == User:
-            session.query(table).filter_by(username=code).delete()
+            admin_session.query(table).filter_by(username=code).delete()
         else:
-            session.query(table).filter_by(id=code).delete()
+            admin_session.query(table).filter_by(id=code).delete()
         commit()
     except IntegrityError as e:
         raise e
@@ -76,9 +76,9 @@ def update_tuple(table, code, **kwargs):
     try:
         table = convert_table(table)
         if table == User:
-            row = session.query(table).filter_by(username=code).first()
+            row = admin_session.query(table).filter_by(username=code).first()
         else:
-            row = session.query(table).filter_by(id=code).first()
+            row = admin_session.query(table).filter_by(id=code).first()
         for attribute, value in kwargs.items():
             setattr(row, attribute, value)
         commit()

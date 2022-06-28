@@ -126,8 +126,8 @@ def premium():
 def delete_premium():
     if is_premium(current_user.username):
         payment_card = get_payment_card(current_user.username)
-        if session.query(PaymentCard).join(Premium).where(
-                PaymentCard.id == payment_card.id and PaymentCard.id == Premium.payment_card).count() > 1:
+        if admin_session.query(PaymentCard).join(Premium, PaymentCard.id == Premium.payment_card)\
+                .filter(PaymentCard.id == payment_card.id).count() > 1:
             delete_tuple(Premium, current_user.username)
         else:
             delete_tuple(PaymentCard, payment_card.id)

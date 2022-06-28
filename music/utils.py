@@ -3,18 +3,18 @@ from sqlalchemy import func
 
 
 def username_exists(code):
-    return session.query(User).filter_by(username=code).first()
+    return admin_session.query(User).filter_by(username=code).first()
 
 
 def is_premium(code):
-    return session.query(Premium).filter_by(id=code).first() is not None
+    return admin_session.query(Premium).filter_by(id=code).first() is not None
 
 
 # GET
 
 
 def get_all(table):
-    return session.query(table).all()
+    return admin_session.query(table).all()
 
 
 def get_element_table(name):
@@ -27,31 +27,31 @@ def get_element_table(name):
 
 
 def get_user(code):
-    return session.query(User).filter_by(username=code).first()
+    return admin_session.query(User).filter_by(username=code).first()
 
 
 def get_listener(code):
-    return session.query(Listener).filter_by(id=code).first()
+    return admin_session.query(Listener).filter_by(id=code).first()
 
 
 def get_element(code):
-    return session.query(Element).filter_by(id=code).first()
+    return admin_session.query(Element).filter_by(id=code).first()
 
 
 def get_playlist(code):
-    return session.query(Playlist).filter_by(id=code).first()
+    return admin_session.query(Playlist).filter_by(id=code).first()
 
 
 def get_track(code):
-    return session.query(Track).filter_by(id=code).first()
+    return admin_session.query(Track).filter_by(id=code).first()
 
 
 def get_album(code):
-    return session.query(Album).filter_by(id=code).first()
+    return admin_session.query(Album).filter_by(id=code).first()
 
 
 def get_event(code):
-    return session.query(Event).filter_by(id=code).first()
+    return admin_session.query(Event).filter_by(id=code).first()
 
 
 def get_element_creator(table, code):
@@ -65,54 +65,53 @@ def get_element_creator(table, code):
 
 
 def get_listener_artists(code):
-    artists_id = session.query(Follower.id_artist).filter_by(id_listener=code).all()
+    artists_id = admin_session.query(Follower.id_artist).filter_by(id_listener=code).all()
     if len(artists_id) > 0:
         artists_id = [x[0] for x in artists_id]
     return [is_artist(x) for x in artists_id]
 
 
 def get_artists_events(code):
-    return session.query(Event).filter_by(creator=code).all()
+    return admin_session.query(Event).filter_by(creator=code).all()
 
 
 def get_artist_albums(code):
-    return session.query(Album).filter_by(artist_id=code).all()
+    return admin_session.query(Album).filter_by(artist_id=code).all()
 
 
 def get_playlists_by_creator(code):
-    return session.query(Playlist).filter_by(creator=code).all()
+    return admin_session.query(Playlist).filter_by(creator=code).all()
 
 
 def get_payment_card(code):
-    return session.query(PaymentCard).join(Premium).where(
+    return admin_session.query(PaymentCard).join(Premium).where(
         Premium.id == code and PaymentCard.id == Premium.payment_card).first()
 
 
 def get_payment_card_by_number_and_pin(number, pin):
-    card = session.query(PaymentCard).filter_by(number=number).first()
+    card = admin_session.query(PaymentCard).filter_by(number=number).first()
     if card and card.pin_check(pin):
         return card
     return None
 
 
 def get_playlist_track(title, album, artist):
-    # TODO gestire il caso in cui c'è un artista con il nome uguale e anche il nome di un album uguale
-    album_id = session.query(Album.id).join(Element).join(Artist).filter(func.lower(Artist.stage_name) == artist)\
+    album_id = admin_session.query(Album.id).join(Element).join(Artist).filter(func.lower(Artist.stage_name) == artist)\
         .filter(func.lower(Element.title) == album).filter(Element.id == Album.id).filter(Album.artist_id == Artist.id)\
         .first()
     if album_id is None:
         return None
     else:
-        return session.query(Track).join(Element).filter(func.lower(Element.title) == title)\
+        return admin_session.query(Track).join(Element).filter(func.lower(Element.title) == title)\
             .filter(Track.album_id == album_id[0]).filter(Element.id == Track.id).first()
 
 
 def is_artist(username):
-    return session.query(Artist).filter_by(id=username).first()
+    return admin_session.query(Artist).filter_by(id=username).first()
 
 
 def get_table(table):
-    return session.query(table).all()
+    return admin_session.query(table).all()
 
 
 def get_favorite_genre(code):
@@ -138,10 +137,10 @@ def get_favorite_genre(code):
 
 def top_three_artists(country=None):
     if country is None:
-        res = session.query(Artist)\
+        res = listener_session.query(Artist)\
             .join(Follower, Artist.id == Follower.id_artist).group_by(Artist.id).order_by(func.count(Follower.id_listener).desc())
     else:
-        res = session.query(Artist) \
+        res = listener_session.query(Artist) \
             .join(Follower, Artist.id == Follower.id_artist).join(User, Artist.id == User.username)\
             .filter(User.country == country).group_by(Artist.id).order_by(func.count(Follower.id_listener).desc())
     return res[:3]
@@ -149,11 +148,11 @@ def top_three_artists(country=None):
 
 def top_three_elements(table, country=None):
     if country is None:
-        res = session.query(table)\
+        res = listener_session.query(table)\
             .join(Element, Element.id == table.id).join(saved_elements, table.id == saved_elements.c.id_element)\
             .group_by(table.id).order_by(func.count(saved_elements.c.id_listener).desc())
     else:
-        res = session.query(table) \
+        res = listener_session.query(table) \
             .join(Element, Element.id == table.id).join(saved_elements, table.id == saved_elements.c.id_element)\
             .join(User, saved_elements.c.id_listener == User.username).filter(User.country == country)\
             .group_by(table.id).order_by(func.count(saved_elements.c.id_listener).desc())
@@ -164,26 +163,26 @@ def top_three_elements(table, country=None):
 
 # Artist
 def get_followers_count(code):
-    return session.query(Follower).filter_by(id_artist=code).count()
+    return artist_session.query(Follower).filter_by(id_artist=code).count()
 
 
 def get_gender_listener(code):
-    number_users = session.query(Follower).filter_by(id_artist=code).count()
+    number_users = artist_session.query(Follower).filter_by(id_artist=code).count()
     if number_users == 0:
         return f"{0},{0},{0}"
-    number_male = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
+    number_male = artist_session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'M').count()
-    number_female = session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
+    number_female = artist_session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'F').count()
     return f"{number_male/number_users},{number_female/number_users},{(number_users-number_male-number_female)/number_users}"
 
 
 def get_country_listener(code):
     res = ''
-    number_users = session.query(Follower).filter_by(id_artist=code).count()
+    number_users = artist_session.query(Follower).filter_by(id_artist=code).count()
     if number_users == 0:
         return res
-    countries = session.query(User.country, func.count()).join(Follower, Follower.id_listener == User.username)\
+    countries = artist_session.query(User.country, func.count()).join(Follower, Follower.id_listener == User.username)\
         .filter(Follower.id_artist == code).group_by(User.country)
     for country in countries:
         res += f'{country[0]},{country[1]/number_users},'
