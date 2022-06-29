@@ -65,6 +65,11 @@
   color: #eeeeee;
 }
 
+[data-theme="dark"] .table {
+  background-color: #292C35 !important;
+  color: #eeeeee;
+}
+
 [data-theme="dark"] .bg-black {
   background-color: #eee !important;
 }
