@@ -8,45 +8,61 @@
 
 <body>
 
-<meta class="gender_listeners" data-name="{{ get_gender_listener(current_user.username) }}">
-<meta class="followers_count" data-name="{{ get_followers_count(current_user.username) }}">
-<meta class="country_listeners" data-name="{{ get_country_listener(current_user.username) }}">
 
-
-
-<table>
+<table class="table">
     <tr>
         <td>
-            <div class="chart-container" style=" height:400px; width:400px;">
-               <canvas id="gender" width="400" height="400" style="background-size: contain;" ></canvas>
-            </div>
-        </td>
-        <td>
-            <div class="chart-container" style=" height:400px; width:400px;">
-               <canvas id="country" width="400" height="400" style="background-size: contain;" ></canvas>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td>
-                        <label>Follower Count:</label>
-                        </td><td>
-                        <ul class = "list-group">
-                            <li class = "list-group-item "> {{ get_followers_count(current_user.username) }} </li>
-                        </ul>
-                    </td>
-                </tr>
-            </table>
+            <span class="label label-default">Follower Count:</span>
+        </td><td>
+            <ul class = "list-group">
+                <li class = "list-group-item "> {{ get_followers_count(current_user.username) }} </li>
+            </ul>
         </td>
     </tr>
 </table>
 
+<br>
+<h4>Gender Listener</h4>
+<table class="table">
+    {% set res = get_gender_listener(current_user.username) %}
+    {% set item1, item2, item3 = res.split(',') %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
-<script src="../static/js/chart.js"></script>
+    <thead>
+        <tr>
+            <th scope="col">Male</th>
+            <th scope="col">Female</th>
+            <th scope="col">Null</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>{{ item1 }}</th>
+            <th>{{ item2 }}</th>
+            <th>{{ item3 }}</th>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+<h4>Gender Country</h4>
+<table class="table">
+    {% for result in get_country_listener(current_user.username) %}
+    <thead>
+        <tr>
+            <th scope="col">{{ result }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>{{ result }}</th>
+        </tr>
+    </tbody>
+    {% endfor %}
+
+
+
+</table>
+
 
 
 
