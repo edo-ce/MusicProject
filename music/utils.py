@@ -79,6 +79,10 @@ def get_artist_albums(code):
     return admin_session.query(Album).filter_by(artist_id=code).all()
 
 
+def get_artist_tracks(code):
+    return admin_session.query(Track).join(Album, Album.id == Track.album_id).filter(Album.artist_id == code).all()
+
+
 def get_playlists_by_creator(code):
     return admin_session.query(Playlist).filter_by(creator=code).all()
 
@@ -174,7 +178,8 @@ def get_gender_listener(code):
         .filter(Follower.id_artist == code).filter(User.gender == 'M').count()
     number_female = artist_session.query(User).outerjoin(Follower, User.username == Follower.id_listener)\
         .filter(Follower.id_artist == code).filter(User.gender == 'F').count()
-    return f"{number_male/number_users},{number_female/number_users},{(number_users-number_male-number_female)/number_users}"
+    return f"{format(number_male/number_users, '.2f')},{format(number_female/number_users, '.2f')}," \
+           f"{format((number_users-number_male-number_female)/number_users, '.2f')}"
 
 
 def get_country_listener(code):
@@ -187,3 +192,12 @@ def get_country_listener(code):
     for country in countries:
         res[country[0]] = country[1]/number_users
     return res
+
+
+def artist_best_elems(code, table):
+    if table == Track:
+        res = get_artist_tracks(code)
+    else:
+        res = get_artist_albums(code)
+    res.sort(key=lambda x: number_save(x.id), reverse=True)
+    return res[:3]

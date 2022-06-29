@@ -19,6 +19,10 @@ def get_title(code):
     return admin_session.query(Element.title).filter_by(id=code).first()[0]
 
 
+def number_save(code):
+    return admin_session.query(saved_elements).filter(saved_elements.c.id_element == code).count()
+
+
 class User(Base, UserMixin):
     __tablename__ = 'users'
 
@@ -152,6 +156,7 @@ class Album(Base):
     def __repr__(self):
         a = {
             'Title': get_title(self.id),
+            'Save': f'Saved by {number_save(self.id)}',
             'Release Date': str(self.release_date),
             'Artist': self.get_artist().stage_name
         }
@@ -178,6 +183,7 @@ class Track(Base):
     def __repr__(self):
         ret = {
             'Title': get_title(self.id),
+            'Save': f'Saved by {number_save(self.id)}',
             'Artist': self.get_album().get_artist().stage_name,
             'Featuring': ", ".join(f.stage_name for f in self.artists_feat),
             'Duration': self.duration,
@@ -203,6 +209,7 @@ class Playlist(Base):
     def __repr__(self):
         ret = {
             'Title': get_title(self.id),
+            'Save': f'Saved by {number_save(self.id)}',
             'Playlist Type': 'Private' if self.is_private else 'Public',
             'Creator': self.get_creator_name(),
             'Tracks': ', '.join(get_title(x.id) for x in self.tracks_id)

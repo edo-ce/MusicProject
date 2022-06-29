@@ -47,7 +47,7 @@ def handle_error(e):
 def utility_processor():
     return dict(is_premium=is_premium, is_artist=is_artist, is_saved=is_saved, delete_from_saved=delete_from_saved,
                 save_something=save_something, advice_func=advice_func, get_title=get_title,
-                get_element_creator=get_element_creator)
+                get_element_creator=get_element_creator, zip=zip)
 
 
 @app.route('/')
@@ -379,6 +379,6 @@ def settings():
 @login_required
 @roles_required(roles['ARTIST'])
 def stats():
-    # {'Germany': 0.2, 'Italy': 0.4, 'Spain': 0.2, 'USA': 0.2}
     return render_template('statistics.html', get_gender_listener=get_gender_listener,
-                           get_followers_count=get_followers_count, get_country_listener=get_country_listener)
+                           get_followers_count=get_followers_count, get_country_listener=get_country_listener,
+                           artist_best_elems=artist_best_elems)

@@ -83,29 +83,46 @@
         </tr>
     </tbody>
 </table>
+<br>
 
 <br>
-<h4>Gender Country</h4>
+<h4>Country Listener</h4>
 <table class="table">
-    {% for result in get_country_listener(current_user.username) %}
-    <thead>
-        <tr>
-            <th scope="col">{{ result }}</th>
-        </tr>
-    </thead>
+    {% for key, value in get_country_listener(current_user.username).items() %}
     <tbody>
         <tr>
-            <th>{{ result }}</th>
+            <th scope="col">{{ key }}</th>
+            <th scope="col">{{ value }}</th>
         </tr>
     </tbody>
     {% endfor %}
-
-
-
 </table>
+<br>
 
 
+<h4>Top saved tracks</h4>
+<table class="table">
+    {% for track, i in zip(artist_best_elems(current_user.username, Track), range(1, 4)) %}
+    <tbody>
+        <tr>
+            <th scope="col">{{ i }}: {{ get_title(track.id) }}</th>
+        </tr>
+    </tbody>
+    {% endfor %}
+</table>
+<br>
 
+<h4>Top saved albums</h4>
+<table class="table">
+    {% for album, i in zip(artist_best_elems(current_user.username, Album), range(1, 4)) %}
+    <tbody>
+        <tr>
+            <th scope="col">{{ i }}: {{ get_title(album.id) }}</th>
+        </tr>
+    </tbody>
+    {% endfor %}
+</table>
+<br>
 
 </body>
 {% endblock %}
