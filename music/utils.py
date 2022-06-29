@@ -119,21 +119,9 @@ def get_table(table):
 
 
 def get_favorite_genre(code):
-    listener = get_listener(code)
-    genres = dict()
-    max = 0
-    res = None
-    for elem in listener.elements:
-        track = get_track(elem.id)
-        if track:
-            if track.genre in genres.keys():
-                genres[track.genre] += 1
-            else:
-                genres[track.genre] = 1
-            if genres[track.genre] > max:
-                max = genres[track.genre]
-                res = track.genre
-    return res
+    res = admin_session.query(Track.genre).join(saved_elements, saved_elements.c.id_element == Track.id)\
+        .filter(saved_elements.c.id_listener == code).group_by(Track.genre).order_by(func.count().desc()).first()
+    return res[0] if res else None
 
 
 # TOP LIST

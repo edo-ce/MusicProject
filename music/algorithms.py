@@ -84,7 +84,7 @@ def delete_from_saved(id_listener, id_saved):
                 filter(saved_elements.c.id_element == id_saved).delete()
         listener_session.commit()
     except Exception as e:
-        rollback()
+        listener_session.rollback()
         raise e
 
 
@@ -97,7 +97,7 @@ def advice_func_tracks(username):
     tracks = listener_session.query(Track).filter_by(genre=genre).all()
     for track in tracks:
         if get_element(track.id) not in listener.elements:
-            res[track] = listener_session.query(saved_elements).filter_by(id_element=track.id).count()
+            res[track] = admin_session.query(saved_elements).filter_by(id_element=track.id).count()
     return [get_element(k.id) for k, v in sorted(res.items(), key=lambda item: item[1], reverse=True)]
 
 
@@ -122,11 +122,15 @@ def advice_func_playlists(username):
     listener = get_listener(username)
     tracks_in = set()
     res = list()
+    listener_playlists = [playlist for playlist in get_all(Playlist) if playlist.creator == username]
+    for elem in listener_playlists:
+        tracks_in = tracks_in.union(set(elem.tracks_id))
     for elem in listener.elements:
-        if get_playlist(elem.id) is Playlist:
-            tracks_in.union(set(get_playlist(elem.id).tracks_id))
+        if get_playlist(elem.id):
+            tracks_in = tracks_in.union(set(get_playlist(elem.id).tracks_id))
     for playlist in get_all(Playlist):
-        if get_element(playlist.id) not in listener.elements:
+        if not playlist.is_private and get_element(playlist.id) not in listener.elements \
+                and playlist not in listener_playlists:
             for track in playlist.tracks_id:
                 if track in tracks_in:
                     res.append(get_element(playlist.id))
@@ -141,8 +145,8 @@ def advice_func_artists(username):
     listener = get_listener(username)
     res = set()
     for elem in listener.elements:
-        if get_track(elem.id) is Track:
-            res.union(set(get_track(elem.id).artists_feat))
+        if get_track(elem.id):
+            res = res.union(set(artist for artist in get_track(elem.id).artists_feat if not is_saved(username, artist.id)))
     res = list(res)
     shuffle(res)
     return res
