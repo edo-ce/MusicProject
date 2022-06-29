@@ -38,11 +38,13 @@ ON premiums
 FOR EACH ROW
 EXECUTE FUNCTION delete_premium_elements();
 
+
+
 CREATE OR REPLACE FUNCTION no_same_title_track() RETURNS trigger AS $$
 BEGIN
-    IF ( NEW.title = ANY( SELECT e.title
-                          FROM elements e NATURAL JOIN tracks t
-                          WHERE t.album_id = NEW.album_id ) ) THEN
+    IF ( EXISTS(SELECT * FROM elements WHERE id = NEW.id
+                AND title = ANY( SELECT e.title FROM elements e NATURAL JOIN tracks t
+                                     WHERE t.album_id = NEW.album_id ) ) ) THEN
         RAISE EXCEPTION 'Non possono esserci due tracce con lo stesso titolo nello stesso album!';
     END IF;
     RETURN NEW;
@@ -74,29 +76,6 @@ BEFORE UPDATE
 ON elements
 FOR EACH ROW
 EXECUTE FUNCTION no_same_title_track_element();
-
-
-
-CREATE OR REPLACE FUNCTION at_least_one_track() RETURNS trigger AS $$
-BEGIN
-    IF ( NOT EXISTS( SELECT *
-                 FROM tracks
-                 WHERE album_id = NEW.id ) ) THEN
-        DELETE FROM albums
-        WHERE id = NEW.id;
-        RAISE EXCEPTION 'Album non caricato correttamente!';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS at_least_one_track ON albums;
-CREATE TRIGGER at_least_one_track
-AFTER INSERT OR UPDATE
-ON albums
-FOR EACH ROW
-EXECUTE FUNCTION at_least_one_track();
-
 
 
 

@@ -29,10 +29,7 @@ def handle_error(e):
 @app.errorhandler(InternalError)
 def handle_error(e):
     rollback()
-    index1 = str(e).find(' ') + 1
-    index2 = str(e).find('!') + 1
-    error_msg = str(e)[index1:index2]
-    flash(error_msg, 'danger')
+    print_error_msg(e)
     return redirect(url_for('home'))
 
 
@@ -162,10 +159,18 @@ def upload_track(number):
                 elif artist.id == current_user.username:
                     flash(f'Artist {artist.id} is the current user!', category='danger')
                     return redirect(url_for('upload_track', number=number, album=album))
-        code = add_no_commit(Element, title=form.title.data).id
-        add_and_commit(Track, id=code, duration=form.duration.data, copyright=form.copyright.data,
-                      genre=form.genre.data, album_id=int(album), artists_feat=feats)
-
+        try:
+            code = add_no_commit(Element, title=form.title.data).id
+            add_and_commit(Track, id=code, duration=form.duration.data, copyright=form.copyright.data,
+                          genre=form.genre.data, album_id=int(album), artists_feat=feats)
+        except InternalError as e:
+            rollback()
+            print_error_msg(e)
+            number += 1
+        except IntegrityError as e:
+            rollback()
+            flash(str(e), 'danger')
+            number += 1
         if number != 1:
             return redirect(url_for('upload_track', number=number-1, album=album))
         else:

@@ -10,6 +10,13 @@ def is_premium(code):
     return admin_session.query(Premium).filter_by(id=code).first() is not None
 
 
+def print_error_msg(e):
+    index1 = str(e).find(' ') + 1
+    index2 = str(e).find('!') + 1
+    error_msg = str(e)[index1:index2]
+    flash(error_msg, 'danger')
+
+
 # GET
 
 
