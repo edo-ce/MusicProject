@@ -7,10 +7,10 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="../static/css/element-card.css">
+    <!--link rel="stylesheet" href="../static/css/element-card.css">
 
     <link rel="stylesheet" href="../static/css/dark-mode.css">
-    <link rel="stylesheet" href="../static/css/back-to-top.css">
+    <link rel="stylesheet" href="../static/css/back-to-top.css"-->
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 
@@ -28,9 +28,35 @@
       />
 
     <!-- Image with random colors generator library -->
-    <script src="{{ url_for('static', filename='js/image-gen.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/search-and-details.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/back-to-top.js') }}"></script>
+    <script type="text/javascript" language="javascript">
+        function addJS(name) {
+            var versionUpdate = (new Date()).getTime();
+            var script = document.createElement("script");
+            script.src = "static/js/" + name + ".js?v=" + versionUpdate;
+            document.head.appendChild(script);
+        }
+
+        function addCSS(name) {
+            var versionUpdate = (new Date()).getTime();
+            var style = document.createElement("link");
+            style.src = "static/css/" + name + ".css?v=" + versionUpdate;
+            style.rel = "stylesheet";
+            document.head.appendChild(style);
+        }
+
+        var js = ["image-gen", "search-and-details", "back-to-top"];
+        var css = ["element-card", "dark-mode", "back-to-top"]
+
+        for (const x of js) {
+            addJS(x);
+        }
+        for (const x of css) {
+            addCSS(x);
+        }
+    </script>
+    <!--script language="JavaScript" src="{{ url_for('static', filename='js/image-gen.js') }}?n=1"></script>
+    <script language="JavaScript" src="{{ url_for('static', filename='js/search-and-details.js') }}?n=1"></script>
+    <script language="JavaScript" src="{{ url_for('static', filename='js/back-to-top.js') }}?n=1"></script-->
 
       <title>
         {% block title %}
@@ -85,14 +111,20 @@
               <input type="checkbox" class="form-check-input" id="darkSwitch" />
               <label class="custom-control-label" for="darkSwitch">Dark Mode</label>
           </div-->
-            <div class="content no-switch">
+            <div class="content no-switch" id="switcher-div">
                 <i class="bi bi-sun"></i>
                 &nbsp;&nbsp;&nbsp;
                 <input type="checkbox" id="darkSwitch" class="cbx hidden"/>
                 <label for="darkSwitch" class="switch"></label>
                 &nbsp;&nbsp;&nbsp;
                 <i class="bi bi-moon"></i>
-                <script src="{{ url_for('static', filename='js/dark-mode-switch.js') }}"></script>
+                <script>
+                    var versionUpdate = (new Date()).getTime();
+                    var script = document.createElement("script");
+                    script.src = "static/js/dark-mode-switch.js?v=" + versionUpdate;
+                    var div = document.getElementById("switcher-div");
+                    div.appendChild(script);
+                </script>
             </div>
 
       </nav>
