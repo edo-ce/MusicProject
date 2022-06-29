@@ -39,7 +39,7 @@
         function addCSS(name) {
             var versionUpdate = (new Date()).getTime();
             var style = document.createElement("link");
-            style.src = "static/css/" + name + ".css?v=" + versionUpdate;
+            style.href = "static/css/" + name + ".css?v=" + versionUpdate;
             style.rel = "stylesheet";
             document.head.appendChild(style);
         }
