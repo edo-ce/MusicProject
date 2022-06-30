@@ -19,11 +19,13 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, listeners, artists, premium
     tracks, albums, playlists, saved_elements, playlist_tracks, featuring, events, guests TO admin;
 
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, playlists, playlist_tracks, premiums, payment_cards, saved_elements, followers TO listener;
-GRANT SELECT, INSERT, DELETE ON TABLE saved_elements, followers, listeners TO listener;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, saved_elements TO listener;
+GRANT SELECT, INSERT, DELETE ON TABLE saved_elements, followers, listeners, playlists, playlist_tracks,
+    premiums, payment_cards, followers TO listener;
 GRANT SELECT ON TABLE albums, tracks, artists, events, elements, featuring TO listener;
 
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, artists, playlists, playlist_tracks TO artist;
-GRANT SELECT, INSERT, DELETE ON TABLE elements, albums, tracks, featuring, events, guests TO artist;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, artists TO artist;
+GRANT SELECT, INSERT, DELETE ON TABLE elements, albums, tracks, playlists, playlist_tracks,
+    featuring, events, guests TO artist;
 GRANT SELECT ON TABLE listeners, followers TO artist;

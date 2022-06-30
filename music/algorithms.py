@@ -1,8 +1,6 @@
 from music.utils import *
 from random import shuffle
 
-# TODO controllare tutto il testo con lowercase
-
 
 def search_func(search_result):
     res = {'albums': [], 'tracks': [], 'playlists': [], 'artists': []}

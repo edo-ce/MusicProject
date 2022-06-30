@@ -45,9 +45,6 @@
                 <div class="row">
                     {% for i in values %}
                     <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 albums">
-                        <!-- MUST PASS AN OBJECT WITH ['duration', 'copyright', 'genre', 'release_date', 'stage_name', 'bio', 'creator']
-                         AS KEYS (NOT NECESSARY ALL, AT LEAST ONE)
-                         TODO REVIEW JINJIA ARGUMENTS -->
                             <meta class="repr" data-name="{{ i.__repr__() }}" >
                             <meta class="id_elem" data-name="{{ i.id }}" >
                             <meta class="table_elem" data-name="{{ i.__tablename__ }}" >

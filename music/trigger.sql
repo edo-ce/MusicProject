@@ -99,26 +99,6 @@ EXECUTE FUNCTION not_last_track();
 
 
 
-CREATE OR REPLACE FUNCTION not_creator_equals_guest() RETURNS trigger AS $$
-BEGIN
-    IF ( EXISTS( SELECT *
-                 FROM events
-                 WHERE id = NEW.id_event AND creator = NEW.id_artist ) ) THEN
-        RAISE EXCEPTION 'Il creatore di un evento non può essere anche un ospite!';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS not_creator_equals_guest ON guests;
-CREATE TRIGGER not_creator_equals_guest
-BEFORE INSERT OR UPDATE
-ON guests
-FOR EACH ROW
-EXECUTE FUNCTION not_creator_equals_guest();
-
-
-
 CREATE OR REPLACE FUNCTION not_creator_equals_feat() RETURNS trigger AS $$
 BEGIN
     IF ( EXISTS( SELECT *
