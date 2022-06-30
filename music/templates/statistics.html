@@ -88,39 +88,45 @@
 <br>
 <h4>Country Listener</h4>
 <table class="table">
-    {% for key, value in get_country_listener(current_user.username).items() %}
-    <tbody>
+    <thead>
         <tr>
-            <th scope="col">{{ key }}</th>
-            <th scope="col">{{ value }}</th>
+            <th scope="col">Country</th>
+            <th scope="col">Value</th>
         </tr>
-    </tbody>
+    </thead>
+    <tbody>
+    {% for key, value in get_country_listener(current_user.username).items() %}
+        <tr>
+            <th scope="row">{{ key }}</th>
+            <th scope="row">{{ value }}</th>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
 <br>
 
 
 <h4>Top saved tracks</h4>
 <table class="table">
-    {% for track, i in zip(artist_best_elems(current_user.username, Track), range(1, 4)) %}
     <tbody>
+    {% for track, i in zip(artist_best_elems(current_user.username, Track), range(1, 4)) %}
         <tr>
             <th scope="col">{{ i }}: {{ get_title(track.id) }}</th>
         </tr>
-    </tbody>
     {% endfor %}
+    </tbody>
 </table>
 <br>
 
 <h4>Top saved albums</h4>
 <table class="table">
-    {% for album, i in zip(artist_best_elems(current_user.username, Album), range(1, 4)) %}
     <tbody>
+    {% for album, i in zip(artist_best_elems(current_user.username, Album), range(1, 4)) %}
         <tr>
             <th scope="col">{{ i }}: {{ get_title(album.id) }}</th>
         </tr>
-    </tbody>
     {% endfor %}
+    </tbody>
 </table>
 <br>
 
