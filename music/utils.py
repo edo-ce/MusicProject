@@ -106,16 +106,15 @@ def get_payment_card_by_number_and_pin(number, pin):
     return None
 
 
-# TODO nella relazione
 def get_playlist_track(title, album, artist):
-    album_id = admin_session.query(Album.id).join(Element).join(Artist).filter(func.lower(Artist.stage_name) == artist)\
-        .filter(func.lower(Element.title) == album).filter(Element.id == Album.id).filter(Album.artist_id == Artist.id)\
-        .first()
+    album_id = admin_session.query(Album.id).join(Element, Element.id == Album.id)\
+        .join(Artist, Artist.id == Album.artist_id).filter(func.lower(Artist.stage_name) == artist)\
+        .filter(func.lower(Element.title) == album).first()
     if album_id is None:
         return None
     else:
-        return admin_session.query(Track).join(Element).filter(func.lower(Element.title) == title)\
-            .filter(Track.album_id == album_id[0]).filter(Element.id == Track.id).first()
+        return admin_session.query(Track).join(Element, Element.id == Track.id)\
+            .filter(func.lower(Element.title) == title).filter(Track.album_id == album_id[0]).first()
 
 
 def is_artist(username):
@@ -146,7 +145,6 @@ def top_three_artists(country=None):
     return res[:3]
 
 
-# TODO nella relazione
 def top_three_elements(table, country=None):
     if country is None:
         res = listener_session.query(table)\

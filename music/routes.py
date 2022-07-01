@@ -8,16 +8,6 @@ from datetime import date
 from sqlalchemy.exc import InternalError
 
 
-# TODO no cache saving
-@app.after_request
-def add_header(r):
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
-
-
 @app.errorhandler(IntegrityError)
 def handle_error(e):
     rollback()
@@ -265,6 +255,22 @@ def create_playlist():
         add_and_commit(Playlist, id=code, is_private=is_private, creator=current_user.username)
         return redirect(url_for('add_playlist_track', number=form.number_tracks.data, playlist=code))
     return render_template('forms/create_playlist.html', form=form)
+
+
+@app.route('/playlist-tracks-<code>', methods=['GET', 'POST'])
+@login_required
+def playlist_tracks(code):
+    tracks = get_playlist(int(code)).tracks_id
+    return render_template('playlist_tracks.html', playlist_id=code, tracks=tracks)
+
+
+@app.route('/playlist-<id_playlist>-tracks-<id_track>-remove', methods=['GET', 'POST'])
+@login_required
+def playlist_track_remove(id_playlist, id_track):
+    playlist = get_playlist(int(id_playlist))
+    playlist.tracks_id = [track for track in playlist.tracks_id if track.id != int(id_track)]
+    commit()
+    return redirect(url_for('playlist_tracks', code=id_playlist))
 
 
 @app.route('/delete-<table>-<code>')

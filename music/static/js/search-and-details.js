@@ -48,15 +48,19 @@ function search_alert() {
                     let route_user = 'location.href="/delete-' + id_elem +'"';
                     let route_artist = 'location.href="/delete-' + table_elem + '-' + id_elem + '"';
                     let route_save = 'location.href="/save-' + id_elem +'"';
+                    let route_modify = 'location.href="/playlist-tracks-' + id_elem + '"';
 
                     if (art === "user")
-                        if (table_elem === "playlists" && current_user === creator)
+                        if (table_elem === "playlists" && current_user === creator) {
+                            stringa += "<span style='cursor: pointer;'>Modify <i class='bi bi-plus-slash-minus' onclick=" + route_modify + "></i></span><br><br>"
                             stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick=" + route_artist + "></i></span>"
-                        else
+                        } else
                             stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick=" + route_user + "></i></span>"
-                    else if (art === "artist")
+                    else if (art === "artist") {
+                        if (table_elem === "playlists")
+                            stringa += "<span style='cursor: pointer;'>Modify <i class='bi bi-plus-slash-minus' onclick=" + route_modify + "></i></span><br><br>"
                         stringa += "<span style='cursor: pointer;'>Delete <i class='bi bi-trash' onclick=" + route_artist + "></i></span>"
-                    else if (art === "visit" && is_saved === "True")
+                    } else if (art === "visit" && is_saved === "True")
                         stringa += "<span style='cursor: pointer;'>Saved <i class='bi bi-heart-fill' onclick=" + route_user + "></i></span>"
                     else if (art === "visit")
                         stringa += "<span style='cursor: pointer;'>Save <i class='bi bi-heart' onclick=" + route_save + "></i></span>"

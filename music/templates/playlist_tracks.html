@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}
+    Playlist tracks
+{% endblock %}
+{% block content %}
+<body class="text-center">
+    <section class="container w-50" style="margin-left: auto; margin-right: auto;">
+        <h1>{{ get_title(playlist_id) }} tracks</h1>
+        <br>
+        {% for track in tracks %}
+            <div class="list-group-item list-group-item-action">
+                <a href="/view-{{ get_element_creator('tracks', track.id) }}" class="text-decoration-none">{{ get_title(track.id) }}</a>
+                <span style='cursor: pointer;'
+                      onclick="location.href='/playlist-{{ playlist_id }}-tracks-{{ track.id }}-remove'">
+                    <i class='bi bi-trash'></i>
+                </span>
+                <br>
+            </div>
+        {% endfor %}
+        <br>
+        <form action='/add-{{ playlist_id }}-track-1' method='POST' class='form-follow' autocomplete='off'>
+            <button type="submit" class="btn btn-success">Add a new track</button>
+        </form>
+    </section>
+</body>
+{% endblock %}
