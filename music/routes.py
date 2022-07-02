@@ -144,7 +144,7 @@ def upload_track(number):
             feats = [is_artist(x.strip()) for x in form.featuring.data.split(',')]
             for artist in feats:
                 if artist is None:
-                    flash(f'Artist {artist} does not exist!', category='danger')
+                    flash('Feat does not exist!', category='danger')
                     return redirect(url_for('upload_track', number=number, album=album))
                 elif artist.id == current_user.username:
                     flash(f'Artist {artist.id} is the current user!', category='danger')
