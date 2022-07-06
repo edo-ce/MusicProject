@@ -61,7 +61,7 @@ def signup_artist():
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
-        user = add_no_commit(User, username=form.username.data, email=form.email.data, password=form.password.data,
+        user = add_and_commit(User, username=form.username.data, email=form.email.data, password=form.password.data,
                     name=form.name.data, lastname=form.lastname.data, country=form.country.data,
                     gender=form.gender.data, birth_date=form.birth_date.data)
         if form.user_type.data == 'Artist':
